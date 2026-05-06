@@ -117,6 +117,38 @@ export class WorkspaceService {
     );
   }
 
+  async editMessage(
+    workspaceId: string,
+    channelId: string,
+    messageId: string,
+    content: string,
+  ) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(
+        `${this.apiUrl}/${workspaceId}/channels/${channelId}/messages/${messageId}`,
+        { content },
+        { headers },
+      ),
+    );
+  }
+
+  async addReaction(
+    workspaceId: string,
+    channelId: string,
+    messageId: string,
+    emoji: string,
+  ) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.post(
+        `${this.apiUrl}/${workspaceId}/channels/${channelId}/messages/${messageId}/reactions`,
+        { emoji },
+        { headers },
+      ),
+    );
+  }
+
   async getDeleteNotifications() {
     const headers = await this.getHeaders();
     return firstValueFrom(

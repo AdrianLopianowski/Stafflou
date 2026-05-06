@@ -40,7 +40,8 @@ model User {
 
   workspaces WorkspaceMember[]
 
-  messages  Message[]
+  messages   Message[]
+  reactions  Reaction[]
   sentInvitations Invitation[] @relation("Inviter")
   deleteNotifications DeleteNotification[]
 }
@@ -95,13 +96,30 @@ model Message {
   fileUrl   String?
   fileName  String?
   fileType  String?
+  isEdited  Boolean  @default(false)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   channelId String
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  reactions Reaction[]
+}
+
+model Reaction {
+  id        String   @id @default(uuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
 }
 
 model DeleteNotification {

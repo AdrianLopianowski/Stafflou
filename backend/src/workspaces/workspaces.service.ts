@@ -98,11 +98,13 @@ export class WorkspacesService {
   }
 
   async getMessages(channelId: string) {
-    const messages = await this.prisma.message.findMany({
+    const prismaAny = this.prisma as any;
+    const messages = await prismaAny.message.findMany({
       where: { channelId },
       orderBy: { createdAt: 'asc' },
       include: {
         user: true,
+        reactions: { include: { user: true } },
       },
     });
 
@@ -116,6 +118,70 @@ export class WorkspacesService {
             : msg.user?.name || msg.user?.email || 'Nieznany',
       },
     }));
+  }
+
+  async editMessage(
+    workspaceId: string,
+    messageId: string,
+    content: string,
+    requesterId: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+
+    const prismaAny = this.prisma as any;
+    const message = await prismaAny.message.findUnique({
+      where: { id: messageId },
+    });
+    if (!message) throw new NotFoundException('Wiadomość nie istnieje');
+    if (message.userId !== requesterId)
+      throw new ForbiddenException('Możesz edytować tylko własne wiadomości');
+    if (!message.content)
+      throw new ForbiddenException('Nie można edytować wiadomości z plikiem');
+
+    const updated = await prismaAny.message.update({
+      where: { id: messageId },
+      data: { content, isEdited: true },
+      include: { user: true, reactions: { include: { user: true } } },
+    });
+
+    return {
+      ...updated,
+      user: {
+        ...updated.user,
+        name:
+          updated.user?.firstName && updated.user?.lastName
+            ? `${updated.user.firstName} ${updated.user.lastName}`
+            : updated.user?.name || updated.user?.email || 'Nieznany',
+      },
+    };
+  }
+
+  async toggleReaction(
+    workspaceId: string,
+    messageId: string,
+    emoji: string,
+    userId: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+
+    const prismaAny = this.prisma as any;
+    const existing = await prismaAny.reaction.findUnique({
+      where: { messageId_userId_emoji: { messageId, userId, emoji } },
+    });
+
+    if (existing) {
+      await prismaAny.reaction.delete({ where: { id: existing.id } });
+      return { removed: true };
+    } else {
+      await prismaAny.reaction.create({ data: { messageId, userId, emoji } });
+      return { added: true };
+    }
   }
 
   async getMembers(workspaceId: string) {

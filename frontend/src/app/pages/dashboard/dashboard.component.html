@@ -292,24 +292,50 @@
                       class="p-4 border-b border-gray-50 dark:border-gray-800 bg-red-50 dark:bg-red-900/10"
                     >
                       <div class="flex items-start gap-2">
-                        <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        <svg
+                          class="w-4 h-4 text-red-500 shrink-0 mt-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          ></path>
                         </svg>
                         <div class="flex-1">
                           <p class="text-sm text-gray-700 dark:text-gray-300">
-                            <span class="font-bold text-red-600 dark:text-red-400">{{ notif.deletedByRole === 'OWNER' ? 'Właściciel' : 'Administrator' }}</span>
+                            <span
+                              class="font-bold text-red-600 dark:text-red-400"
+                              >{{
+                                notif.deletedByRole === "OWNER"
+                                  ? "Właściciel"
+                                  : "Administrator"
+                              }}</span
+                            >
                             usunął Twoją wiadomość z kanału
-                            <span class="font-bold text-gray-900 dark:text-gray-100">#{{ notif.channelName }}</span>
+                            <span
+                              class="font-bold text-gray-900 dark:text-gray-100"
+                              >#{{ notif.channelName }}</span
+                            >
                           </p>
                           @if (notif.messagePreview) {
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic truncate">"{{ notif.messagePreview }}"</p>
+                            <p
+                              class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic truncate"
+                            >
+                              "{{ notif.messagePreview }}"
+                            </p>
                           }
                         </div>
                       </div>
                     </div>
                   }
                   @if (deleteNotifications.length > 0) {
-                    <div class="p-3 border-b border-gray-100 dark:border-gray-800 flex justify-end">
+                    <div
+                      class="p-3 border-b border-gray-100 dark:border-gray-800 flex justify-end"
+                    >
                       <button
                         (click)="dismissDeleteNotifications()"
                         class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium"
@@ -441,20 +467,78 @@
               <div
                 class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 z-50 overflow-hidden"
               >
-                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-                  <p class="text-sm font-bold text-gray-900 dark:text-white truncate">
-                    {{ myProfile?.firstName }} {{ myProfile?.lastName }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth.currentUser?.email }}</p>
+                <div
+                  class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between gap-2"
+                >
+                  <div class="min-w-0">
+                    <p
+                      class="text-sm font-bold text-gray-900 dark:text-white truncate"
+                    >
+                      {{ myProfile?.firstName }} {{ myProfile?.lastName }}
+                    </p>
+                    <p
+                      class="text-xs text-gray-500 dark:text-gray-400 truncate"
+                    >
+                      {{ auth.currentUser?.email }}
+                    </p>
+                  </div>
+                  <button
+                    (click)="isProfileDropdownOpen = false"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0 mt-0.5"
+                    title="Zamknij"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </button>
                 </div>
                 <button
                   (click)="openSettings()"
                   class="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
-                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  <svg
+                    class="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    ></path>
                   </svg>
                   Edytuj profil
+                </button>
+                <button
+                  (click)="logout()"
+                  class="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-gray-800"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    ></path>
+                  </svg>
+                  Wyloguj
                 </button>
               </div>
             }
@@ -512,29 +596,80 @@
             class="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-gray-950"
           >
             @for (msg of messages; track msg.id) {
-              <div class="flex group relative rounded-xl transition-colors"
-                   [ngClass]="{'ring-1 ring-amber-300 dark:ring-amber-700/60 bg-amber-50 dark:bg-amber-900/10': isMentionedInMessage(msg.content)}">
+              <div
+                class="flex group relative rounded-xl transition-colors px-2 py-1 -mx-2"
+                [ngClass]="{
+                  'ring-1 ring-amber-300 dark:ring-amber-700/60 bg-amber-50 dark:bg-amber-900/10':
+                    isMentionedInMessage(msg.content),
+                }"
+              >
                 <div
-                  class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0 shadow-sm"
+                  class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0 shadow-sm cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all"
+                  (click)="openUserPopoverFromMessage(msg, $event)"
+                  title="Pokaż profil"
                 >
                   {{ getInitials(msg.user?.email || "U") }}
                 </div>
-                <div class="ml-4 flex-1">
+                <div class="ml-4 flex-1 min-w-0">
                   <div class="flex items-baseline gap-2">
                     <span class="font-bold text-gray-900 dark:text-gray-100">{{
                       msg.user?.name || msg.user?.email || "Nieznany Użytkownik"
                     }}</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">{{
-                      msg.createdAt | date: "short"
-                    }}</span>
+                    <span
+                      class="text-xs text-gray-500 dark:text-gray-400 font-medium"
+                      >{{ msg.createdAt | date: "short" }}</span
+                    >
+                    @if (msg.isEdited) {
+                      <span
+                        class="text-xs text-gray-400 dark:text-gray-500 italic"
+                        >(edytowano)</span
+                      >
+                    }
                   </div>
                   @if (msg.content) {
-                    <p class="text-gray-700 dark:text-gray-300 mt-1 leading-relaxed"
-                       [innerHTML]="renderContent(msg.content)">
-                    </p>
+                    @if (editingMessageId === msg.id) {
+                      <div class="mt-1.5">
+                        <textarea
+                          [(ngModel)]="editingContent"
+                          name="editContent"
+                          (keydown.escape)="cancelEdit()"
+                          rows="2"
+                          class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-indigo-500 rounded-lg text-sm text-gray-800 dark:text-white outline-none resize-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900"
+                        ></textarea>
+                        <div class="flex items-center gap-2 mt-1.5">
+                          <button
+                            type="button"
+                            (click)="saveEditMessage(msg)"
+                            [disabled]="isSavingEdit || !editingContent.trim()"
+                            class="px-3 py-1 text-xs font-bold bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {{ isSavingEdit ? "Zapisywanie..." : "Zapisz" }}
+                          </button>
+                          <button
+                            type="button"
+                            (click)="cancelEdit()"
+                            class="px-3 py-1 text-xs font-bold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                          >
+                            Anuluj
+                          </button>
+                          <span class="text-xs text-gray-400 dark:text-gray-500"
+                            >ESC – anuluj</span
+                          >
+                        </div>
+                      </div>
+                    } @else {
+                      <p
+                        class="text-gray-700 dark:text-gray-300 mt-1 leading-relaxed"
+                        [innerHTML]="renderContent(msg.content)"
+                      ></p>
+                    }
                   }
                   @if (msg.fileType === "image") {
-                    <a [href]="getFileUrl(msg.fileUrl)" target="_blank" class="block mt-2">
+                    <a
+                      [href]="getFileUrl(msg.fileUrl)"
+                      target="_blank"
+                      class="block mt-2"
+                    >
                       <img
                         [src]="getFileUrl(msg.fileUrl)"
                         [alt]="msg.fileName"
@@ -555,24 +690,119 @@
                       target="_blank"
                       class="mt-2 inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 font-medium transition-colors"
                     >
-                      <svg class="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      <svg
+                        class="w-4 h-4 text-indigo-500 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        ></path>
                       </svg>
                       {{ msg.fileName }}
                     </a>
                   }
+                  @if (getReactionGroups(msg).length > 0) {
+                    <div class="flex flex-wrap gap-1 mt-2">
+                      @for (rg of getReactionGroups(msg); track rg.emoji) {
+                        <button
+                          type="button"
+                          (click)="selectReactionDirect(msg.id, rg.emoji)"
+                          class="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-sm border transition-all"
+                          [ngClass]="{
+                            'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 font-semibold':
+                              rg.hasMe,
+                            'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700':
+                              !rg.hasMe,
+                          }"
+                          [title]="
+                            rg.hasMe
+                              ? 'Kliknij aby usunąć'
+                              : 'Kliknij aby zareagować'
+                          "
+                        >
+                          {{ rg.emoji
+                          }}<span
+                            class="text-xs font-medium text-gray-600 dark:text-gray-400 ml-0.5"
+                            >{{ rg.count }}</span
+                          >
+                        </button>
+                      }
+                    </div>
+                  }
                 </div>
-                @if (canDeleteMessage(msg)) {
+                <div
+                  class="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all"
+                >
                   <button
-                    (click)="deleteMessage(msg)"
-                    class="absolute top-0 right-0 p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
-                    title="Usuń wiadomość"
+                    type="button"
+                    (click)="openEmojiPicker(msg, $event)"
+                    class="p-1.5 text-gray-400 hover:text-yellow-500 dark:hover:text-yellow-400 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors"
+                    title="Dodaj reakcję"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
                     </svg>
                   </button>
-                }
+                  @if (canEditMessage(msg) && editingMessageId !== msg.id) {
+                    <button
+                      type="button"
+                      (click)="startEditMessage(msg)"
+                      class="p-1.5 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                      title="Edytuj wiadomość"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        ></path>
+                      </svg>
+                    </button>
+                  }
+                  @if (canDeleteMessage(msg)) {
+                    <button
+                      type="button"
+                      (click)="deleteMessage(msg)"
+                      class="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      title="Usuń wiadomość"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        ></path>
+                      </svg>
+                    </button>
+                  }
+                </div>
               </div>
             } @empty {
               <div
@@ -612,34 +842,65 @@
               </div>
             } @else {
               @if (mentionDropdownOpen) {
-                <div class="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden max-h-52 overflow-y-auto">
-                  @for (candidate of mentionCandidates; track candidate.id || candidate.userId) {
+                <div
+                  class="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden max-h-52 overflow-y-auto"
+                >
+                  @for (
+                    candidate of mentionCandidates;
+                    track candidate.id || candidate.userId
+                  ) {
                     <button
                       type="button"
                       (mousedown)="selectMention(candidate)"
                       class="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors text-left"
                     >
-                      @if (candidate.id === '__all__') {
-                        <div class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm shrink-0">&#64;</div>
+                      @if (candidate.id === "__all__") {
+                        <div
+                          class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm shrink-0"
+                        >
+                          &#64;
+                        </div>
                         <div>
-                          <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400">Wszyscy</p>
-                          <p class="text-xs text-gray-400 dark:text-gray-500">Powiadom wszystkich</p>
+                          <p
+                            class="text-sm font-bold text-indigo-600 dark:text-indigo-400"
+                          >
+                            Wszyscy
+                          </p>
+                          <p class="text-xs text-gray-400 dark:text-gray-500">
+                            Powiadom wszystkich
+                          </p>
                         </div>
                       } @else {
-                        <div class="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 shrink-0">
+                        <div
+                          class="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 shrink-0"
+                        >
                           {{ getMemberInitials(candidate) }}
                         </div>
                         <div class="min-w-0">
-                          <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
-                            {{ candidate.user?.firstName }} {{ candidate.user?.lastName }}
+                          <p
+                            class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate"
+                          >
+                            {{ candidate.user?.firstName }}
+                            {{ candidate.user?.lastName }}
                           </p>
                           @if (candidate.customRole) {
                             <p class="text-xs flex items-center gap-1">
-                              <span class="w-1.5 h-1.5 rounded-full shrink-0" [style.background-color]="candidate.customRole.color"></span>
-                              <span class="text-gray-400 dark:text-gray-500">{{ candidate.customRole.name }}</span>
+                              <span
+                                class="w-1.5 h-1.5 rounded-full shrink-0"
+                                [style.background-color]="
+                                  candidate.customRole.color
+                                "
+                              ></span>
+                              <span class="text-gray-400 dark:text-gray-500">{{
+                                candidate.customRole.name
+                              }}</span>
                             </p>
                           } @else {
-                            <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ candidate.user?.email }}</p>
+                            <p
+                              class="text-xs text-gray-400 dark:text-gray-500 truncate"
+                            >
+                              {{ candidate.user?.email }}
+                            </p>
                           }
                         </div>
                       }
@@ -666,13 +927,38 @@
                   class="shrink-0 p-2.5 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 bg-gray-100 dark:bg-gray-800 rounded-xl transition-colors disabled:opacity-50"
                 >
                   @if (isUploadingFile) {
-                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    <svg
+                      class="w-5 h-5 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      ></path>
                     </svg>
                   } @else {
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                      ></path>
                     </svg>
                   }
                 </button>
@@ -694,8 +980,18 @@
                   [disabled]="!newMessageContent.trim()"
                   class="absolute right-2 p-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-md"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                    ></path>
                   </svg>
                 </button>
               </form>
@@ -713,16 +1009,34 @@
           class="h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 font-bold text-sm text-gray-800 dark:text-gray-200"
         >
           Członkowie
-          <span class="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500">{{ members.length }}</span>
-          @if (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') {
+          <span
+            class="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500"
+            >{{ members.length }}</span
+          >
+          @if (currentUserRole === "OWNER" || currentUserRole === "ADMIN") {
             <button
               (click)="isRolesModalOpen = true"
               title="Zarządzaj rolami zespołowymi"
               class="ml-auto text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
               </svg>
             </button>
           } @else {
@@ -734,39 +1048,61 @@
             @if (group.members.length > 0) {
               <div>
                 <div class="px-2 mb-1">
-                  <h4 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                  <h4
+                    class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider"
+                  >
                     {{ roleLabel(group.role) }} — {{ group.members.length }}
                   </h4>
                 </div>
                 <div class="space-y-0.5">
                   @for (member of group.members; track member.userId) {
                     <div
-                      (click)="canManageMember(member) && openMemberModal(member)"
                       class="flex items-center gap-2.5 px-2 py-2 rounded-lg transition-colors"
                       [ngClass]="{
-                        'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800': canManageMember(member),
-                        'cursor-default': !canManageMember(member)
+                        'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800':
+                          canManageMember(member),
+                        'cursor-default': !canManageMember(member),
                       }"
+                      (click)="
+                        canManageMember(member) && openMemberModal(member)
+                      "
                     >
                       <div
-                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all"
                         [ngClass]="roleBadgeClass(member.role)"
+                        (click)="openUserPopover(member, $event)"
+                        title="Pokaż profil"
                       >
                         {{ getMemberInitials(member) }}
                       </div>
                       <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
-                          {{ member.user?.firstName && member.user?.lastName
-                            ? member.user.firstName + ' ' + member.user.lastName
-                            : member.user?.email || 'Użytkownik' }}
+                        <p
+                          class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate"
+                        >
+                          {{
+                            member.user?.firstName && member.user?.lastName
+                              ? member.user.firstName +
+                                " " +
+                                member.user.lastName
+                              : member.user?.email || "Użytkownik"
+                          }}
                         </p>
                         @if (member.customRole) {
-                          <p class="text-xs text-gray-500 dark:text-gray-400 truncate flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full shrink-0" [style.background-color]="member.customRole.color"></span>
+                          <p
+                            class="text-xs text-gray-500 dark:text-gray-400 truncate flex items-center gap-1"
+                          >
+                            <span
+                              class="w-1.5 h-1.5 rounded-full shrink-0"
+                              [style.background-color]="member.customRole.color"
+                            ></span>
                             {{ member.customRole.name }}
                           </p>
                         } @else {
-                          <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ member.user?.email }}</p>
+                          <p
+                            class="text-xs text-gray-400 dark:text-gray-500 truncate"
+                          >
+                            {{ member.user?.email }}
+                          </p>
                         }
                       </div>
                     </div>
@@ -789,13 +1125,25 @@
           <div
             class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
           >
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Zarządzaj członkiem</h3>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+              Zarządzaj członkiem
+            </h3>
             <button
               (click)="isMemberModalOpen = false"
               class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
               </svg>
             </button>
           </div>
@@ -809,9 +1157,14 @@
               </div>
               <div>
                 <p class="font-bold text-gray-900 dark:text-white">
-                  {{ selectedMember.user?.firstName && selectedMember.user?.lastName
-                    ? selectedMember.user.firstName + ' ' + selectedMember.user.lastName
-                    : selectedMember.user?.email }}
+                  {{
+                    selectedMember.user?.firstName &&
+                    selectedMember.user?.lastName
+                      ? selectedMember.user.firstName +
+                        " " +
+                        selectedMember.user.lastName
+                      : selectedMember.user?.email
+                  }}
                 </p>
                 <span
                   class="text-xs font-bold px-2 py-0.5 rounded-full"
@@ -822,18 +1175,22 @@
               </div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
+              <label
+                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
+              >
                 Zmień rolę
               </label>
               <div class="flex flex-wrap gap-2">
-                @for (role of availableRoles(selectedMember); track role) {
+                @for (role of availableRoles(); track role) {
                   <button
                     (click)="updateRole($any(role))"
                     [disabled]="isUpdatingRole || selectedMember.role === role"
                     class="px-3 py-1.5 text-sm font-bold rounded-lg border transition-all disabled:opacity-50"
                     [ngClass]="{
-                      'bg-indigo-500 text-white border-indigo-500': selectedMember.role === role,
-                      'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400': selectedMember.role !== role
+                      'bg-indigo-500 text-white border-indigo-500':
+                        selectedMember.role === role,
+                      'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400':
+                        selectedMember.role !== role,
                     }"
                   >
                     {{ roleLabel(role) }}
@@ -841,9 +1198,14 @@
                 }
               </div>
             </div>
-            @if (workspaceRoles.length > 0 && (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN')) {
+            @if (
+              workspaceRoles.length > 0 &&
+              (currentUserRole === "OWNER" || currentUserRole === "ADMIN")
+            ) {
               <div>
-                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
+                <label
+                  class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
+                >
                   Rola zespołowa
                 </label>
                 <div class="flex flex-wrap gap-2">
@@ -851,21 +1213,32 @@
                     (click)="assignCustomRole(null)"
                     class="px-3 py-1.5 text-sm font-bold rounded-lg border transition-all"
                     [ngClass]="{
-                      'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600': !selectedMember.customRoleId,
-                      'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-400': selectedMember.customRoleId
+                      'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600':
+                        !selectedMember.customRoleId,
+                      'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-400':
+                        selectedMember.customRoleId,
                     }"
-                  >Brak</button>
+                  >
+                    Brak
+                  </button>
                   @for (wr of workspaceRoles; track wr.id) {
                     <button
                       (click)="assignCustomRole(wr.id)"
                       class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold rounded-lg border transition-all"
                       [ngClass]="{
-                        'border-2 text-gray-800 dark:text-gray-100': selectedMember.customRoleId === wr.id,
-                        'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400': selectedMember.customRoleId !== wr.id
+                        'border-2 text-gray-800 dark:text-gray-100':
+                          selectedMember.customRoleId === wr.id,
+                        'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400':
+                          selectedMember.customRoleId !== wr.id,
                       }"
-                      [style.border-color]="selectedMember.customRoleId === wr.id ? wr.color : ''"
+                      [style.border-color]="
+                        selectedMember.customRoleId === wr.id ? wr.color : ''
+                      "
                     >
-                      <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="wr.color"></span>
+                      <span
+                        class="w-2 h-2 rounded-full shrink-0"
+                        [style.background-color]="wr.color"
+                      ></span>
                       {{ wr.name }}
                     </button>
                   }
@@ -881,7 +1254,7 @@
               [disabled]="isRemovingMember || !canRemoveMember(selectedMember)"
               class="px-4 py-2 text-sm font-bold text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {{ isRemovingMember ? 'Usuwanie...' : 'Usuń z zespołu' }}
+              {{ isRemovingMember ? "Usuwanie..." : "Usuń z zespołu" }}
             </button>
             <button
               (click)="isMemberModalOpen = false"
@@ -904,20 +1277,35 @@
           <div
             class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
           >
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Edytuj profil</h3>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              Edytuj profil
+            </h3>
             <button
               (click)="isSettingsModalOpen = false"
               class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
               </svg>
             </button>
           </div>
           <div class="px-6 py-6 space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Imię *</label>
+                <label
+                  class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
+                  >Imię *</label
+                >
                 <input
                   type="text"
                   [(ngModel)]="settingsData.firstName"
@@ -927,7 +1315,10 @@
                 />
               </div>
               <div>
-                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nazwisko *</label>
+                <label
+                  class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
+                  >Nazwisko *</label
+                >
                 <input
                   type="text"
                   [(ngModel)]="settingsData.lastName"
@@ -938,7 +1329,10 @@
               </div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Miejscowość (opcjonalnie)</label>
+              <label
+                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
+                >Miejscowość (opcjonalnie)</label
+              >
               <input
                 type="text"
                 [(ngModel)]="settingsData.location"
@@ -959,13 +1353,32 @@
             </button>
             <button
               (click)="submitSettings()"
-              [disabled]="isSavingSettings || !settingsData.firstName || !settingsData.lastName"
+              [disabled]="
+                isSavingSettings ||
+                !settingsData.firstName ||
+                !settingsData.lastName
+              "
               class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               @if (isSavingSettings) {
-                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  class="animate-spin h-4 w-4 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Zapisywanie...
               } @else {
@@ -1175,31 +1588,61 @@
     }
 
     @if (isRolesModalOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
-          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Role zespołowe</h3>
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm"
+      >
+        <div
+          class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800"
+        >
+          <div
+            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
+          >
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              Role zespołowe
+            </h3>
             <button
               (click)="isRolesModalOpen = false"
               class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
               </svg>
             </button>
           </div>
 
           <div class="px-6 py-5 space-y-4">
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              Twórz własne podgrupy członków jak <span class="font-semibold text-gray-700 dark:text-gray-300">Lead, Developer, Designer</span> itp.
-              Role zespołowe nie wpływają na uprawnienia — służą do organizacji.
+              Twórz własne podgrupy członków jak
+              <span class="font-semibold text-gray-700 dark:text-gray-300"
+                >Lead, Developer, Designer</span
+              >
+              itp. Role zespołowe nie wpływają na uprawnienia — służą do
+              organizacji.
             </p>
 
             <div class="space-y-2 max-h-52 overflow-y-auto">
               @for (wr of workspaceRoles; track wr.id) {
-                <div class="flex items-center gap-3 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                  <span class="w-4 h-4 rounded-full shrink-0 border-2 border-white dark:border-gray-700 shadow-sm" [style.background-color]="wr.color"></span>
-                  <span class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-200">{{ wr.name }}</span>
+                <div
+                  class="flex items-center gap-3 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl"
+                >
+                  <span
+                    class="w-4 h-4 rounded-full shrink-0 border-2 border-white dark:border-gray-700 shadow-sm"
+                    [style.background-color]="wr.color"
+                  ></span>
+                  <span
+                    class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-200"
+                    >{{ wr.name }}</span
+                  >
                   <span class="text-xs text-gray-400 dark:text-gray-500">
                     {{ countMembersByRole(wr.id) }}
                   </span>
@@ -1208,20 +1651,35 @@
                     class="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                     title="Usuń rolę"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      ></path>
                     </svg>
                   </button>
                 </div>
               } @empty {
-                <div class="text-center py-4 text-sm text-gray-400 dark:text-gray-500">
+                <div
+                  class="text-center py-4 text-sm text-gray-400 dark:text-gray-500"
+                >
                   Brak ról. Utwórz pierwszą poniżej.
                 </div>
               }
             </div>
 
             <div class="border-t border-gray-100 dark:border-gray-800 pt-4">
-              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3">Nowa rola</label>
+              <label
+                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3"
+                >Nowa rola</label
+              >
               <div class="flex gap-2">
                 <input
                   type="color"
@@ -1244,9 +1702,24 @@
                   class="px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-50 shrink-0"
                 >
                   @if (isCreatingRole) {
-                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    <svg
+                      class="w-4 h-4 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      ></path>
                     </svg>
                   } @else {
                     Dodaj
@@ -1256,13 +1729,129 @@
             </div>
           </div>
 
-          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+          <div
+            class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex justify-end"
+          >
             <button
               (click)="isRolesModalOpen = false"
               class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
               Zamknij
             </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (emojiPickerMsg) {
+      <div class="fixed inset-0 z-[99]" (click)="emojiPickerMsg = null"></div>
+      <div
+        class="fixed z-[100] bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1 w-52"
+        [style.top.px]="emojiPickerPos.top"
+        [style.right.px]="emojiPickerPos.right"
+        (click)="$event.stopPropagation()"
+      >
+        @for (emoji of quickEmojis; track emoji) {
+          <button
+            type="button"
+            (click)="selectReaction(emoji)"
+            class="text-xl w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          >
+            {{ emoji }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (userPopoverMember) {
+      <div class="fixed inset-0 z-[89]" (click)="closeUserPopover()"></div>
+      <div
+        class="fixed z-[90] w-56 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
+        [style.top.px]="userPopoverPos.top"
+        [style.left.px]="userPopoverPos.left"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="px-4 pt-4 pb-3">
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+              [ngClass]="roleBadgeClass(userPopoverMember.role)"
+            >
+              {{ getMemberInitials(userPopoverMember) }}
+            </div>
+            <div class="min-w-0">
+              <p
+                class="font-bold text-gray-900 dark:text-white text-sm truncate"
+              >
+                {{
+                  userPopoverMember.user?.firstName &&
+                  userPopoverMember.user?.lastName
+                    ? userPopoverMember.user.firstName +
+                      " " +
+                      userPopoverMember.user.lastName
+                    : userPopoverMember.user?.displayName ||
+                      userPopoverMember.user?.email ||
+                      "Użytkownik"
+                }}
+              </p>
+              <p class="text-xs text-gray-400 dark:text-gray-500 truncate">
+                {{ userPopoverMember.user?.email }}
+              </p>
+            </div>
+          </div>
+          <div
+            class="space-y-1.5 text-xs border-t border-gray-100 dark:border-gray-800 pt-3"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
+                >Rola</span
+              >
+              <span
+                class="font-medium px-1.5 py-0.5 rounded text-xs"
+                [ngClass]="roleBadgeClass(userPopoverMember.role)"
+              >
+                {{ roleLabel(userPopoverMember.role) }}
+              </span>
+            </div>
+            @if (userPopoverMember.customRole) {
+              <div class="flex items-center gap-2">
+                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
+                  >Zespół</span
+                >
+                <span
+                  class="flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300"
+                >
+                  <span
+                    class="w-2 h-2 rounded-full shrink-0"
+                    [style.background-color]="
+                      userPopoverMember.customRole.color
+                    "
+                  ></span>
+                  {{ userPopoverMember.customRole.name }}
+                </span>
+              </div>
+            }
+            @if (userPopoverMember.user?.location) {
+              <div class="flex items-center gap-2">
+                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
+                  >Lokalizacja</span
+                >
+                <span
+                  class="font-medium text-gray-700 dark:text-gray-300 truncate"
+                  >{{ userPopoverMember.user.location }}</span
+                >
+              </div>
+            }
+            @if (userPopoverMember.joinedAt) {
+              <div class="flex items-center gap-2">
+                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
+                  >Członek od</span
+                >
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                  userPopoverMember.joinedAt | date: "mediumDate"
+                }}</span>
+              </div>
+            }
           </div>
         </div>
       </div>

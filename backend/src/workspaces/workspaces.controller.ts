@@ -196,6 +196,36 @@ export class WorkspacesController {
     );
   }
 
+  @Patch(':id/channels/:channelId/messages/:messageId')
+  editMessage(
+    @Param('id') workspaceId: string,
+    @Param('messageId') messageId: string,
+    @Body('content') content: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.editMessage(
+      workspaceId,
+      messageId,
+      content,
+      req.user.uid,
+    );
+  }
+
+  @Post(':id/channels/:channelId/messages/:messageId/reactions')
+  toggleReaction(
+    @Param('id') workspaceId: string,
+    @Param('messageId') messageId: string,
+    @Body('emoji') emoji: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.toggleReaction(
+      workspaceId,
+      messageId,
+      emoji,
+      req.user.uid,
+    );
+  }
+
   @Get(':id/roles')
   getWorkspaceRoles(@Param('id') id: string) {
     return this.workspacesService.getWorkspaceRoles(id);

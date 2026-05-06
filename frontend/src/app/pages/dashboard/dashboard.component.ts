@@ -76,6 +76,17 @@ export class DashboardComponent implements OnInit {
   mentionCandidates: any[] = [];
   mentionStartIndex = -1;
 
+  editingMessageId: string | null = null;
+  editingContent = '';
+  isSavingEdit = false;
+
+  emojiPickerMsg: any = null;
+  emojiPickerPos = { top: 0, right: 0 };
+  readonly quickEmojis = ['👍', '❤️', '😂', '🎉', '😮', '😢', '🔥', '✅'];
+
+  userPopoverMember: any = null;
+  userPopoverPos = { top: 0, left: 0 };
+
   ngOnInit() {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
@@ -223,7 +234,7 @@ export class DashboardComponent implements OnInit {
     return false;
   }
 
-  availableRoles(member: any): string[] {
+  availableRoles(): string[] {
     if (this.currentUserRole === 'OWNER') return ['MEMBER', 'ADMIN', 'OWNER'];
     if (this.currentUserRole === 'ADMIN') return ['MEMBER', 'ADMIN'];
     return [];
@@ -636,6 +647,128 @@ export class DashboardComponent implements OnInit {
       (m) => m.customRoleId === customRoleId,
     ).length;
     return count > 0 ? `${count} os.` : '';
+  }
+
+  canEditMessage(msg: any): boolean {
+    return (
+      msg.userId === this.auth.currentUser?.uid && !!msg.content && !msg.fileUrl
+    );
+  }
+
+  startEditMessage(msg: any) {
+    this.editingMessageId = msg.id;
+    this.editingContent = msg.content || '';
+    this.emojiPickerMsg = null;
+  }
+
+  cancelEdit() {
+    this.editingMessageId = null;
+    this.editingContent = '';
+  }
+
+  async saveEditMessage(msg: any) {
+    if (
+      !this.editingContent.trim() ||
+      !this.activeWorkspace ||
+      !this.activeChannel
+    )
+      return;
+    this.isSavingEdit = true;
+    try {
+      await this.workspaceService.editMessage(
+        this.activeWorkspace.id,
+        this.activeChannel.id,
+        msg.id,
+        this.editingContent.trim(),
+      );
+      await this.loadMessages();
+      this.cancelEdit();
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się edytować wiadomości.');
+    } finally {
+      this.isSavingEdit = false;
+    }
+  }
+
+  openEmojiPicker(msg: any, event: MouseEvent) {
+    event.stopPropagation();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.emojiPickerPos = {
+      top: rect.bottom + 4,
+      right: window.innerWidth - rect.right,
+    };
+    this.emojiPickerMsg = this.emojiPickerMsg?.id === msg.id ? null : msg;
+  }
+
+  async selectReaction(emoji: string) {
+    const msg = this.emojiPickerMsg;
+    if (!msg || !this.activeWorkspace || !this.activeChannel) return;
+    this.emojiPickerMsg = null;
+    try {
+      await this.workspaceService.addReaction(
+        this.activeWorkspace.id,
+        this.activeChannel.id,
+        msg.id,
+        emoji,
+      );
+      await this.loadMessages();
+    } catch (e) {
+      console.error('Błąd dodawania reakcji', e);
+    }
+  }
+
+  async selectReactionDirect(msgId: string, emoji: string) {
+    if (!this.activeWorkspace || !this.activeChannel) return;
+    try {
+      await this.workspaceService.addReaction(
+        this.activeWorkspace.id,
+        this.activeChannel.id,
+        msgId,
+        emoji,
+      );
+      await this.loadMessages();
+    } catch (e) {
+      console.error('Błąd reakcji', e);
+    }
+  }
+
+  getReactionGroups(
+    msg: any,
+  ): { emoji: string; count: number; hasMe: boolean }[] {
+    if (!msg.reactions?.length) return [];
+    const myUid = this.auth.currentUser?.uid;
+    const groups: Record<string, { count: number; hasMe: boolean }> = {};
+    for (const r of msg.reactions) {
+      if (!groups[r.emoji]) groups[r.emoji] = { count: 0, hasMe: false };
+      groups[r.emoji].count++;
+      if (r.userId === myUid) groups[r.emoji].hasMe = true;
+    }
+    return Object.entries(groups).map(([emoji, data]) => ({ emoji, ...data }));
+  }
+
+  openUserPopover(member: any, event: MouseEvent) {
+    event.stopPropagation();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const popoverWidth = 224;
+    const spaceRight = window.innerWidth - rect.right - 8;
+    const left =
+      spaceRight >= popoverWidth
+        ? rect.right + 8
+        : Math.max(rect.left - popoverWidth - 8, 8);
+    const top = Math.min(rect.top, window.innerHeight - 260);
+    this.userPopoverPos = { top, left };
+    this.userPopoverMember = member;
+  }
+
+  openUserPopoverFromMessage(msg: any, event: MouseEvent) {
+    const member = this.members.find((m) => m.userId === msg.userId);
+    if (member) {
+      this.openUserPopover(member, event);
+    }
+  }
+
+  closeUserPopover() {
+    this.userPopoverMember = null;
   }
 
   renderContent(content: string | null | undefined): SafeHtml {
