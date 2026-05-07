@@ -87,6 +87,21 @@ export class DashboardComponent implements OnInit {
   userPopoverMember: any = null;
   userPopoverPos = { top: 0, left: 0 };
 
+  activeView: 'overview' | 'channel' | 'tasks' = 'overview';
+  isWorkspaceSelectorOpen = false;
+
+  tasks: any[] = [];
+  isCreateTaskModalOpen = false;
+  isTeamModalOpen = false;
+  newTask = {
+    title: '',
+    description: '',
+    priority: 'MEDIUM',
+    assigneeIds: [] as string[],
+    dueDate: '',
+  };
+  isCreatingTask = false;
+
   ngOnInit() {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
@@ -160,6 +175,7 @@ export class DashboardComponent implements OnInit {
   async selectChannel(channel: any, event: Event) {
     event.preventDefault();
     this.activeChannel = channel;
+    this.activeView = 'channel';
     await this.loadMessages();
   }
   openCreateModal() {
@@ -198,6 +214,9 @@ export class DashboardComponent implements OnInit {
   async selectWorkspace(workspace: any) {
     this.activeWorkspace = workspace;
     this.activeChannel = null;
+    this.activeView = 'overview';
+    this.isWorkspaceSelectorOpen = false;
+    this.tasks = [];
     await Promise.all([
       this.loadChannels(workspace.id),
       this.loadMembers(workspace.id),
@@ -769,6 +788,146 @@ export class DashboardComponent implements OnInit {
 
   closeUserPopover() {
     this.userPopoverMember = null;
+  }
+
+  setActiveView(view: 'overview' | 'channel' | 'tasks') {
+    this.activeView = view;
+    if (view === 'tasks' && this.activeWorkspace) {
+      this.loadTasks(this.activeWorkspace.id);
+    }
+  }
+
+  async loadTasks(workspaceId: string) {
+    try {
+      this.tasks = (await this.workspaceService.getTasks(workspaceId)) as any[];
+    } catch (e) {
+      console.error('Błąd pobierania zadań', e);
+    }
+  }
+
+  tasksByStatus(status: string): any[] {
+    return this.tasks.filter((t) => t.status === status);
+  }
+
+  async createTask() {
+    if (!this.newTask.title.trim() || !this.activeWorkspace) return;
+    this.isCreatingTask = true;
+    try {
+      await this.workspaceService.createTask(this.activeWorkspace.id, {
+        title: this.newTask.title.trim(),
+        description: this.newTask.description || undefined,
+        priority: this.newTask.priority,
+        assigneeIds: this.newTask.assigneeIds.length ? this.newTask.assigneeIds : undefined,
+        dueDate: this.newTask.dueDate || undefined,
+      });
+      await this.loadTasks(this.activeWorkspace.id);
+      this.isCreateTaskModalOpen = false;
+      this.newTask = {
+        title: '',
+        description: '',
+        priority: 'MEDIUM',
+        assigneeIds: [],
+        dueDate: '',
+      };
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się utworzyć zadania.');
+    } finally {
+      this.isCreatingTask = false;
+    }
+  }
+
+  async updateTaskStatus(task: any, status: string) {
+    if (!this.activeWorkspace) return;
+    try {
+      await this.workspaceService.updateTask(this.activeWorkspace.id, task.id, {
+        status,
+      });
+      await this.loadTasks(this.activeWorkspace.id);
+    } catch (e) {
+      console.error('Błąd zmiany statusu zadania', e);
+    }
+  }
+
+  async removeTask(task: any) {
+    if (!this.activeWorkspace) return;
+    if (!confirm('Czy na pewno chcesz usunąć to zadanie?')) return;
+    try {
+      await this.workspaceService.deleteTask(this.activeWorkspace.id, task.id);
+      await this.loadTasks(this.activeWorkspace.id);
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się usunąć zadania.');
+    }
+  }
+
+  priorityLabel(priority: string): string {
+    return (
+      { LOW: 'Niski', MEDIUM: 'Średni', HIGH: 'Wysoki', URGENT: 'Pilny' }[
+        priority
+      ] ?? priority
+    );
+  }
+
+  priorityBadgeClass(priority: string): string {
+    return (
+      {
+        LOW: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+        MEDIUM:
+          'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+        HIGH: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+        URGENT: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+      }[priority] ?? ''
+    );
+  }
+
+  getTaskAssignees(task: any): any[] {
+    if (!task.assigneeIds?.length) return [];
+    return this.members.filter((m) => task.assigneeIds.includes(m.userId));
+  }
+
+  getTaskAssigneeInitials(member: any): string {
+    const f = member.user?.firstName?.[0] || '';
+    const l = member.user?.lastName?.[0] || '';
+    return (f + l).toUpperCase() || member.user?.email?.[0]?.toUpperCase() || '?';
+  }
+
+  myActiveTasks(): any[] {
+    const uid = this.auth.currentUser?.uid;
+    return this.tasks.filter(
+      (t) => t.status !== 'DONE' && t.assigneeIds?.includes(uid),
+    );
+  }
+
+  activeTasksCount(): number {
+    return this.tasks.filter((t) => t.status !== 'DONE').length;
+  }
+
+  toggleTaskAssignee(userId: string) {
+    const idx = this.newTask.assigneeIds.indexOf(userId);
+    if (idx === -1) {
+      this.newTask.assigneeIds = [...this.newTask.assigneeIds, userId];
+    } else {
+      this.newTask.assigneeIds = this.newTask.assigneeIds.filter((id) => id !== userId);
+    }
+  }
+
+  assignRoleToTask(customRoleId: string) {
+    const roleMembers = this.members
+      .filter((m) => m.customRoleId === customRoleId)
+      .map((m) => m.userId);
+    const allSelected = roleMembers.every((id) => this.newTask.assigneeIds.includes(id));
+    if (allSelected) {
+      this.newTask.assigneeIds = this.newTask.assigneeIds.filter(
+        (id) => !roleMembers.includes(id),
+      );
+    } else {
+      const merged = new Set([...this.newTask.assigneeIds, ...roleMembers]);
+      this.newTask.assigneeIds = Array.from(merged);
+    }
+  }
+
+  isRoleFullySelected(customRoleId: string): boolean {
+    const roleMembers = this.members.filter((m) => m.customRoleId === customRoleId);
+    return roleMembers.length > 0 && roleMembers.every((m) => this.newTask.assigneeIds.includes(m.userId));
   }
 
   renderContent(content: string | null | undefined): SafeHtml {

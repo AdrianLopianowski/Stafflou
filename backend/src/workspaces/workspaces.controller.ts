@@ -284,4 +284,50 @@ export class WorkspacesController {
       req.user.uid,
     );
   }
+
+  @Get(':id/tasks')
+  getTasks(@Param('id') workspaceId: string) {
+    return this.workspacesService.getTasks(workspaceId);
+  }
+
+  @Post(':id/tasks')
+  createTask(
+    @Param('id') workspaceId: string,
+    @Body() body: any,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.createTask(
+      workspaceId,
+      body.title,
+      body.description,
+      body.priority,
+      body.assigneeIds || [],
+      body.dueDate,
+      req.user.uid,
+    );
+  }
+
+  @Patch(':id/tasks/:taskId')
+  updateTask(
+    @Param('id') workspaceId: string,
+    @Param('taskId') taskId: string,
+    @Body() body: any,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.updateTask(
+      workspaceId,
+      taskId,
+      body,
+      req.user.uid,
+    );
+  }
+
+  @Delete(':id/tasks/:taskId')
+  deleteTask(
+    @Param('id') workspaceId: string,
+    @Param('taskId') taskId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.deleteTask(workspaceId, taskId, req.user.uid);
+  }
 }

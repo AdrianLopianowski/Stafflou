@@ -283,4 +283,58 @@ export class WorkspaceService {
       ),
     );
   }
+
+  async getTasks(workspaceId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/${workspaceId}/tasks`, { headers }),
+    );
+  }
+
+  async createTask(
+    workspaceId: string,
+    data: {
+      title: string;
+      description?: string;
+      priority?: string;
+      assigneeIds?: string[];
+      dueDate?: string;
+    },
+  ) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.post(`${this.apiUrl}/${workspaceId}/tasks`, data, { headers }),
+    );
+  }
+
+  async updateTask(
+    workspaceId: string,
+    taskId: string,
+    updates: {
+      title?: string;
+      description?: string;
+      status?: string;
+      priority?: string;
+      assigneeIds?: string[] | null;
+      dueDate?: string | null;
+    },
+  ) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(
+        `${this.apiUrl}/${workspaceId}/tasks/${taskId}`,
+        updates,
+        { headers },
+      ),
+    );
+  }
+
+  async deleteTask(workspaceId: string, taskId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.delete(`${this.apiUrl}/${workspaceId}/tasks/${taskId}`, {
+        headers,
+      }),
+    );
+  }
 }

@@ -1,397 +1,285 @@
 @if (showOnboarding) {
-  <!-- EKRAN POWITALNY (ONBOARDING) -->
-  <div
-    class="min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-950 font-sans p-4"
-  >
-    <div
-      class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-gray-100 dark:border-gray-800 text-center"
-    >
-      <div
-        class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/50 rounded-2xl flex items-center justify-center text-indigo-500 mx-auto mb-6"
-      >
-        <svg
-          class="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          ></path>
+  <div class="min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-950 font-sans p-4">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-gray-100 dark:border-gray-800 text-center">
+      <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/50 rounded-2xl flex items-center justify-center text-indigo-500 mx-auto mb-6">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
       </div>
-
-      <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
-        Witaj w zespole! 👋
-      </h2>
-      <p class="text-gray-500 dark:text-gray-400 mb-8">
-        Zanim zaczniesz korzystać z platformy, opowiedz nam krótko o sobie.
-        Dzięki temu inni łatwiej Cię rozpoznają.
-      </p>
-
+      <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Witaj w zespole! 👋</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">Zanim zaczniesz korzystać z platformy, opowiedz nam krótko o sobie.</p>
       <form (ngSubmit)="submitOnboarding()" class="space-y-5 text-left">
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label
-              class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-              >Imię *</label
-            >
-            <input
-              type="text"
-              [(ngModel)]="onboardingData.firstName"
-              name="firstName"
-              required
-              placeholder="np. Jan"
-              class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"
-            />
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Imię *</label>
+            <input type="text" [(ngModel)]="onboardingData.firstName" name="firstName" required placeholder="np. Jan"
+              class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
           </div>
           <div>
-            <label
-              class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-              >Nazwisko *</label
-            >
-            <input
-              type="text"
-              [(ngModel)]="onboardingData.lastName"
-              name="lastName"
-              required
-              placeholder="np. Kowalski"
-              class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"
-            />
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nazwisko *</label>
+            <input type="text" [(ngModel)]="onboardingData.lastName" name="lastName" required placeholder="np. Kowalski"
+              class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
           </div>
         </div>
-
         <div>
-          <label
-            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-            >Miejscowość (opcjonalnie)</label
-          >
-          <input
-            type="text"
-            [(ngModel)]="onboardingData.location"
-            name="location"
-            placeholder="np. Warszawa"
-            class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"
-          />
+          <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Miejscowość (opcjonalnie)</label>
+          <input type="text" [(ngModel)]="onboardingData.location" name="location" placeholder="np. Warszawa"
+            class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
         </div>
-
-        <button
-          type="submit"
-          [disabled]="!onboardingData.firstName || !onboardingData.lastName"
-          class="w-full mt-6 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all disabled:opacity-50 flex justify-center"
-        >
+        <button type="submit" [disabled]="!onboardingData.firstName || !onboardingData.lastName"
+          class="w-full mt-6 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all disabled:opacity-50 flex justify-center">
           Zapisz profil i wejdź do aplikacji
         </button>
       </form>
     </div>
   </div>
 } @else {
-  <!-- EKRAN aplikacji  -->
-  <div
-    class="h-screen w-full flex bg-gray-50 dark:bg-gray-950 font-sans overflow-hidden transition-colors duration-300"
-  >
-    <nav
-      class="w-16 bg-gray-900 dark:bg-black flex flex-col items-center py-4 gap-4 z-20 shrink-0 border-r border-transparent dark:border-gray-800 transition-colors"
-    >
-      @for (workspace of workspaces; track workspace.id) {
-        <div
-          (click)="selectWorkspace(workspace)"
-          class="w-12 h-12 flex items-center justify-center font-bold text-xl cursor-pointer transition-all shadow-lg"
-          [ngClass]="{
-            'bg-indigo-500 text-white rounded-2xl':
-              activeWorkspace?.id === workspace.id,
-            'bg-gray-800 text-gray-400 rounded-3xl hover:bg-indigo-500 hover:text-white hover:rounded-xl':
-              activeWorkspace?.id !== workspace.id,
-          }"
-          title="{{ workspace.name }}"
-        >
-          {{ getInitials(workspace.name) }}
-        </div>
-      }
+  <div class="h-screen w-full flex bg-gray-50 dark:bg-gray-950 font-sans overflow-hidden transition-colors duration-300">
 
-      <div
-        class="w-8 h-0.5 bg-gray-700 dark:bg-gray-800 rounded-full my-2"
-      ></div>
+    <!-- ===== UNIFIED LEFT SIDEBAR ===== -->
+    <aside class="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col z-10 shrink-0 transition-colors">
 
-      <div
-        (click)="openCreateModal()"
-        title="Dodaj nową przestrzeń"
-        class="w-12 h-12 bg-gray-800 dark:bg-gray-900 rounded-3xl flex items-center justify-center text-gray-400 font-bold text-xl cursor-pointer hover:bg-green-500 hover:text-white hover:rounded-xl transition-all"
-      >
-        +
-      </div>
-    </nav>
+      <!-- Workspace selector -->
+      <div class="px-3 pt-3 pb-1 relative">
+        <button (click)="isWorkspaceSelectorOpen = !isWorkspaceSelectorOpen"
+          class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group">
+          <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            {{ activeWorkspace ? getInitials(activeWorkspace.name) : '?' }}
+          </div>
+          <span class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-200 text-left truncate">
+            {{ activeWorkspace ? activeWorkspace.name : 'Wybierz przestrzeń' }}
+          </span>
+          <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200" [class.rotate-180]="isWorkspaceSelectorOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
 
-    <aside
-      class="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col z-10 shrink-0 transition-colors"
-    >
-      <div
-        class="h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 font-bold text-gray-800 dark:text-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-      >
-        {{ activeWorkspace ? activeWorkspace.name : "Wybierz przestrzeń" }}
-        <svg
-          class="w-4 h-4 ml-auto text-gray-500 dark:text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 9l-7 7-7-7"
-          ></path>
-        </svg>
-      </div>
-
-      @if (activeWorkspace) {
-        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-          <button
-            (click)="openInviteModal()"
-            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm font-bold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
-          >
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-              ></path>
-            </svg>
-            Zaproś ludzi
-          </button>
-        </div>
-      }
-
-      <div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
-        <div>
-          <div class="flex justify-between items-center px-2 mb-2">
-            <h3
-              class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider"
-            >
-              Kanały
-            </h3>
-            @if (activeWorkspace) {
-              <button
-                (click)="isChannelModalOpen = true"
-                title="Dodaj kanał"
-                class="text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors font-bold text-lg leading-none"
-              >
-                +
+        @if (isWorkspaceSelectorOpen) {
+          <div class="absolute left-3 right-3 top-full mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50">
+            @for (ws of workspaces; track ws.id) {
+              <button (click)="selectWorkspace(ws)"
+                class="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+                [ngClass]="{ 'bg-indigo-50 dark:bg-indigo-900/20': activeWorkspace?.id === ws.id }">
+                <div class="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">{{ getInitials(ws.name) }}</div>
+                <span class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{{ ws.name }}</span>
+                @if (activeWorkspace?.id === ws.id) {
+                  <svg class="w-3.5 h-3.5 text-indigo-500 ml-auto shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                }
               </button>
             }
+            <div class="border-t border-gray-100 dark:border-gray-800">
+              <button (click)="openCreateModal(); isWorkspaceSelectorOpen = false"
+                class="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left text-indigo-600 dark:text-indigo-400 text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Nowa przestrzeń
+              </button>
+            </div>
           </div>
+        }
+      </div>
 
-          <div class="space-y-1">
+      <!-- Main navigation -->
+      <nav class="px-3 py-2 space-y-0.5">
+        <button (click)="setActiveView('overview')"
+          class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+          [ngClass]="activeView === 'overview' ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+          </svg>
+          Przegląd
+        </button>
+
+        @if (activeWorkspace) {
+          <button (click)="setActiveView('tasks')"
+            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+            [ngClass]="activeView === 'tasks' ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            </svg>
+            Zadania
+            @if (activeTasksCount() > 0) {
+              <span class="ml-auto text-xs font-bold bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md">{{ activeTasksCount() }}</span>
+            }
+          </button>
+        }
+      </nav>
+
+      <!-- Channels section -->
+      @if (activeWorkspace) {
+        <div class="px-3 pt-3">
+          <div class="flex items-center justify-between px-1 mb-1">
+            <span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Kanały</span>
+            <button (click)="isChannelModalOpen = true" title="Dodaj kanał"
+              class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors rounded text-lg leading-none">+</button>
+          </div>
+          <div class="space-y-0.5">
             @for (channel of channels; track channel.id) {
-              <a
-                (click)="selectChannel(channel, $event)"
-                class="flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer"
+              <button (click)="selectChannel(channel, $event)"
+                class="w-full flex items-center px-2 py-1.5 text-sm font-medium rounded-lg transition-colors cursor-pointer text-left gap-1.5"
                 [ngClass]="{
-                  'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400':
-                    activeChannel?.id === channel.id,
-                  'text-gray-600 dark:text-gray-400 hover:bg-gray-100 hover:dark:bg-gray-800':
-                    activeChannel?.id !== channel.id,
-                }"
-              >
-                <span
-                  class="mr-2"
-                  [ngClass]="{
-                    'text-indigo-400': activeChannel?.id === channel.id,
-                    'text-gray-400 dark:text-gray-500':
-                      activeChannel?.id !== channel.id,
-                  }"
-                >
-                  {{ channel.type === "INFO" ? "📢" : "#" }}
-                </span>
+                  'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400': activeChannel?.id === channel.id && activeView === 'channel',
+                  'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white': activeChannel?.id !== channel.id || activeView !== 'channel'
+                }">
+                <span class="text-xs">{{ channel.type === 'INFO' ? '📢' : '#' }}</span>
                 {{ channel.name }}
-              </a>
+              </button>
             } @empty {
-              @if (activeWorkspace) {
-                <div class="px-2 py-2 text-xs text-gray-500 dark:text-gray-500">
-                  Brak kanałów. Utwórz pierwszy!
-                </div>
-              }
+              <div class="px-2 py-1.5 text-xs text-gray-400 dark:text-gray-500">Brak kanałów. Utwórz pierwszy!</div>
             }
           </div>
         </div>
-      </div>
-    </aside>
+      }
 
-    <main
-      class="flex-1 flex flex-col h-full relative bg-gray-50/50 dark:bg-gray-950 transition-colors"
-    >
-      <header
-        class="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 transition-colors"
-      >
-        <nav class="flex space-x-1">
-          <a
-            href="#"
-            class="px-4 py-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
-            >Tablica</a
-          >
-          <a
-            href="#"
-            class="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-t-lg transition-colors"
-            >Zadania (3)</a
-          >
-        </nav>
+      <div class="flex-1"></div>
 
-        <div class="flex items-center gap-4">
+      <!-- Compact team section -->
+      @if (activeWorkspace && members.length > 0) {
+        <div class="px-3 py-2 border-t border-gray-100 dark:border-gray-800">
+          <div class="flex items-center justify-between px-1 mb-2">
+            <button (click)="isTeamModalOpen = true"
+              class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">
+              Zespół ({{ members.length }})
+            </button>
+            <div class="flex items-center gap-1">
+              @if (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') {
+                <button (click)="isRolesModalOpen = true" title="Role" class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors rounded">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                </button>
+                <button (click)="openInviteModal()" title="Zaproś" class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors rounded text-base leading-none">+</button>
+              }
+              <button (click)="isTeamModalOpen = true" title="Zobacz wszystkich" class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors rounded">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1.5 px-1">
+            @for (member of members.slice(0, 14); track member.userId) {
+              <div (click)="openUserPopover(member, $event)"
+                class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:ring-offset-1 hover:ring-offset-white dark:hover:ring-offset-gray-900 transition-all shrink-0"
+                [ngClass]="roleBadgeClass(member.role)"
+                [title]="(member.user?.firstName || '') + ' ' + (member.user?.lastName || '')">
+                {{ getMemberInitials(member) }}
+              </div>
+            }
+            @if (members.length > 14) {
+              <div class="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400">+{{ members.length - 14 }}</div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Bottom profile bar -->
+      <div class="px-3 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center gap-2">
+        <div class="relative">
+          <button (click)="isProfileDropdownOpen = !isProfileDropdownOpen"
+            class="w-8 h-8 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0 hover:opacity-90 transition-opacity"
+            title="Profil">
+            {{ getProfileInitials() }}
+          </button>
+
+          @if (isProfileDropdownOpen) {
+            <div class="absolute bottom-full left-0 mb-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 z-50 overflow-hidden">
+              <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ myProfile?.firstName }} {{ myProfile?.lastName }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth.currentUser?.email }}</p>
+                </div>
+                <button (click)="isProfileDropdownOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0 mt-0.5" title="Zamknij">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <button (click)="openSettings()"
+                class="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                Edytuj profil
+              </button>
+              <button (click)="logout()"
+                class="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-gray-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                Wyloguj
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate leading-tight">{{ myProfile?.firstName }} {{ myProfile?.lastName }}</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ currentUserRole | lowercase }}</p>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <!-- Notifications -->
           <div class="relative">
-            <button
-              (click)="isNotificationOpen = !isNotificationOpen"
-              class="relative text-gray-400 dark:text-gray-500 hover:text-indigo-500 transition-colors flex items-center"
-              title="Powiadomienia"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                ></path>
+            <button (click)="isNotificationOpen = !isNotificationOpen" title="Powiadomienia"
+              class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors relative">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
               </svg>
               @if (invitations.length > 0 || deleteNotifications.length > 0) {
-                <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span
-                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
-                  ></span>
-                  <span
-                    class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white dark:border-gray-900"
-                  ></span>
-                </span>
+                <span class="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-gray-900"></span>
               }
             </button>
 
             @if (isNotificationOpen) {
-              <div
-                class="absolute right-0 mt-3 w-80 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 z-50 overflow-hidden"
-              >
-                <div
-                  class="p-4 border-b border-gray-100 dark:border-gray-800 font-bold text-sm text-gray-800 dark:text-gray-200"
-                >
-                  Zaproszenia
-                </div>
+              <div class="absolute bottom-full right-0 mb-2 w-80 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 z-50 overflow-hidden">
+                <div class="p-4 border-b border-gray-100 dark:border-gray-800 font-bold text-sm text-gray-800 dark:text-gray-200">Powiadomienia</div>
                 <div class="max-h-80 overflow-y-auto">
                   @for (notif of deleteNotifications; track notif.id) {
-                    <div
-                      class="p-4 border-b border-gray-50 dark:border-gray-800 bg-red-50 dark:bg-red-900/10"
-                    >
+                    <div class="p-4 border-b border-gray-50 dark:border-gray-800 bg-red-50 dark:bg-red-900/10">
                       <div class="flex items-start gap-2">
-                        <svg
-                          class="w-4 h-4 text-red-500 shrink-0 mt-0.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          ></path>
+                        <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                         <div class="flex-1">
                           <p class="text-sm text-gray-700 dark:text-gray-300">
-                            <span
-                              class="font-bold text-red-600 dark:text-red-400"
-                              >{{
-                                notif.deletedByRole === "OWNER"
-                                  ? "Właściciel"
-                                  : "Administrator"
-                              }}</span
-                            >
-                            usunął Twoją wiadomość z kanału
-                            <span
-                              class="font-bold text-gray-900 dark:text-gray-100"
-                              >#{{ notif.channelName }}</span
-                            >
+                            <span class="font-bold text-red-600 dark:text-red-400">{{ notif.deletedByRole === 'OWNER' ? 'Właściciel' : 'Administrator' }}</span>
+                            usunął Twoją wiadomość z kanału <span class="font-bold text-gray-900 dark:text-gray-100">#{{ notif.channelName }}</span>
                           </p>
                           @if (notif.messagePreview) {
-                            <p
-                              class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic truncate"
-                            >
-                              "{{ notif.messagePreview }}"
-                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic truncate">"{{ notif.messagePreview }}"</p>
                           }
                         </div>
                       </div>
                     </div>
                   }
                   @if (deleteNotifications.length > 0) {
-                    <div
-                      class="p-3 border-b border-gray-100 dark:border-gray-800 flex justify-end"
-                    >
-                      <button
-                        (click)="dismissDeleteNotifications()"
-                        class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium"
-                      >
-                        Oznacz jako przeczytane
-                      </button>
+                    <div class="p-3 border-b border-gray-100 dark:border-gray-800 flex justify-end">
+                      <button (click)="dismissDeleteNotifications()" class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium">Oznacz jako przeczytane</button>
                     </div>
                   }
                   @for (inv of invitations; track inv.id) {
-                    <div
-                      class="p-4 border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                    >
+                    <div class="p-4 border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                       <p class="text-sm text-gray-600 dark:text-gray-300">
-                        <span
-                          class="font-bold text-gray-900 dark:text-gray-100"
-                          >{{ inv.invitedBy?.email || "Użytkownik" }}</span
-                        >
-                        zaprasza Cię do dołączenia do
-                        <span class="font-bold text-indigo-500">{{
-                          inv.workspace?.name
-                        }}</span>
+                        <span class="font-bold text-gray-900 dark:text-gray-100">{{ inv.invitedBy?.email || 'Użytkownik' }}</span>
+                        zaprasza Cię do <span class="font-bold text-indigo-500">{{ inv.workspace?.name }}</span>
                       </p>
                       <div class="mt-3 flex gap-2">
-                        <button
-                          (click)="acceptInv(inv.id)"
-                          class="px-3 py-1.5 bg-indigo-500 text-white text-xs font-bold rounded-lg hover:bg-indigo-600 transition-colors"
-                        >
-                          Zaakceptuj
-                        </button>
-                        <button
-                          (click)="isNotificationOpen = false"
-                          class="px-3 py-1.5 text-gray-500 dark:text-gray-400 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                        >
-                          Później
-                        </button>
+                        <button (click)="acceptInv(inv.id)" class="px-3 py-1.5 bg-indigo-500 text-white text-xs font-bold rounded-lg hover:bg-indigo-600 transition-colors">Zaakceptuj</button>
+                        <button (click)="isNotificationOpen = false" class="px-3 py-1.5 text-gray-500 dark:text-gray-400 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">Później</button>
                       </div>
                     </div>
                   } @empty {
                     @if (deleteNotifications.length === 0) {
-                      <div
-                        class="p-8 text-center text-gray-500 dark:text-gray-400 text-sm flex flex-col items-center"
-                      >
-                        <svg
-                          class="w-10 h-10 mb-2 opacity-50"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                          ></path>
+                      <div class="p-8 text-center text-gray-500 dark:text-gray-400 text-sm flex flex-col items-center">
+                        <svg class="w-8 h-8 mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                         </svg>
-                        Brak nowych powiadomień
+                        Brak powiadomień
                       </div>
                     }
                   }
@@ -400,308 +288,321 @@
             }
           </div>
 
-          <button
-            (click)="themeService.toggleTheme()"
-            title="Zmień motyw"
-            class="text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex items-center"
-          >
+          <!-- Theme toggle -->
+          <button (click)="themeService.toggleTheme()" title="Zmień motyw"
+            class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
             @if (themeService.isDarkMode()) {
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                ></path>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
               </svg>
             } @else {
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                ></path>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
               </svg>
             }
           </button>
-          <button
-            (click)="logout()"
-            title="Wyloguj się"
-            class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors flex items-center"
-          >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              ></path>
-            </svg>
-          </button>
-          <div class="relative">
-            <button
-              (click)="isProfileDropdownOpen = !isProfileDropdownOpen"
-              class="w-8 h-8 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 border-2 border-white dark:border-gray-800 shadow-sm flex items-center justify-center text-white text-xs font-bold"
-              title="Profil"
-            >
-              {{ getProfileInitials() }}
-            </button>
-
-            @if (isProfileDropdownOpen) {
-              <div
-                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 z-50 overflow-hidden"
-              >
-                <div
-                  class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between gap-2"
-                >
-                  <div class="min-w-0">
-                    <p
-                      class="text-sm font-bold text-gray-900 dark:text-white truncate"
-                    >
-                      {{ myProfile?.firstName }} {{ myProfile?.lastName }}
-                    </p>
-                    <p
-                      class="text-xs text-gray-500 dark:text-gray-400 truncate"
-                    >
-                      {{ auth.currentUser?.email }}
-                    </p>
-                  </div>
-                  <button
-                    (click)="isProfileDropdownOpen = false"
-                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0 mt-0.5"
-                    title="Zamknij"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-                <button
-                  (click)="openSettings()"
-                  class="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <svg
-                    class="w-4 h-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    ></path>
-                  </svg>
-                  Edytuj profil
-                </button>
-                <button
-                  (click)="logout()"
-                  class="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-gray-800"
-                >
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                    ></path>
-                  </svg>
-                  Wyloguj
-                </button>
-              </div>
-            }
-          </div>
         </div>
-      </header>
+      </div>
+    </aside>
 
-      @if (!activeChannel) {
-        <div class="flex-1 overflow-y-auto p-6 md:p-8">
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-gray-950 transition-colors">
+
+      <!-- ===== OVERVIEW VIEW ===== -->
+      @if (activeView === 'overview') {
+        <div class="flex-1 overflow-y-auto">
           @if (activeWorkspace) {
-            <div class="mb-8">
-              <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">
-                Witaj w {{ activeWorkspace.name }} 👋
-              </h1>
-              <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Oto co się dzisiaj dzieje w Twojej przestrzeni roboczej.
-              </p>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div
-                class="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer"
-              >
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-                  Naprawić logowanie w Angularze
-                </h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Szef zgłosił błąd...
-                </p>
+            <div class="max-w-4xl mx-auto px-6 py-8">
+              <div class="mb-8">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Witaj, {{ myProfile?.firstName }} 👋</h1>
+                <p class="mt-1 text-gray-500 dark:text-gray-400 text-sm">{{ activeWorkspace.name }} — przegląd przestrzeni roboczej</p>
+              </div>
+
+              <!-- Stats row -->
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Członkowie</p>
+                  <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ members.length }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors" (click)="setActiveView('tasks')">
+                  <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Aktywne zadania</p>
+                  <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ activeTasksCount() }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Kanały</p>
+                  <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ channels.length }}</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-6">
+                <!-- Quick actions -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">Szybkie akcje</h3>
+                  <div class="space-y-2">
+                    <button (click)="setActiveView('tasks'); isCreateTaskModalOpen = true"
+                      class="w-full flex items-center gap-3 px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-xl text-sm font-medium transition-colors text-left">
+                      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                      </svg>
+                      Nowe zadanie
+                    </button>
+                    @if (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') {
+                      <button (click)="openInviteModal()"
+                        class="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium transition-colors text-left">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        Zaproś członka
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- My tasks -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">Moje zadania</h3>
+                    <button (click)="setActiveView('tasks')" class="text-xs text-indigo-500 hover:text-indigo-600 font-medium">Zobacz wszystkie</button>
+                  </div>
+                  <div class="space-y-2">
+                    @for (t of myActiveTasks().slice(0, 4); track t.id) {
+                      <div class="flex items-center gap-2 py-1.5">
+                        <span class="text-xs font-bold px-1.5 py-0.5 rounded" [ngClass]="priorityBadgeClass(t.priority)">{{ priorityLabel(t.priority) }}</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{{ t.title }}</span>
+                      </div>
+                    } @empty {
+                      <p class="text-sm text-gray-400 dark:text-gray-500 py-2">Brak przypisanych zadań</p>
+                    }
+                  </div>
+                </div>
               </div>
             </div>
           } @else {
-            <div
-              class="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 text-lg"
-            >
-              <p>Utwórz nową przestrzeń roboczą, aby rozpocząć pracę.</p>
+            <div class="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500">
+              <svg class="w-12 h-12 mb-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <p class="font-medium">Utwórz lub wybierz przestrzeń roboczą</p>
+              <button (click)="openCreateModal()" class="mt-4 px-4 py-2 bg-indigo-500 text-white text-sm font-bold rounded-lg hover:bg-indigo-600 transition-colors">Nowa przestrzeń</button>
             </div>
           }
         </div>
-      } @else {
-        <div class="flex flex-col flex-1 h-full overflow-hidden">
-          <div
-            class="h-14 border-b border-gray-200 dark:border-gray-800 flex items-center px-6 shrink-0 bg-white dark:bg-gray-900 transition-colors shadow-sm z-10"
-          >
-            <h2
-              class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center"
-            >
-              <span class="text-gray-400 dark:text-gray-500 mr-2">{{
-                activeChannel.type === "INFO" ? "📢" : "#"
-              }}</span>
+      }
+
+      <!-- ===== TASKS VIEW ===== -->
+      @if (activeView === 'tasks') {
+        <div class="flex flex-col h-full overflow-hidden">
+          <header class="h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center px-6 shrink-0 gap-4">
+            <h2 class="text-base font-bold text-gray-800 dark:text-gray-100">Zadania</h2>
+            <span class="text-xs text-gray-400 dark:text-gray-500">{{ activeWorkspace?.name }}</span>
+            <button (click)="isCreateTaskModalOpen = true"
+              class="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg transition-colors shadow-sm shadow-indigo-500/30">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Nowe zadanie
+            </button>
+          </header>
+
+          <div class="flex-1 overflow-x-auto overflow-y-hidden">
+            <div class="flex gap-4 h-full p-5 min-w-max">
+
+              <!-- TODO column -->
+              <div class="w-72 flex flex-col bg-gray-100 dark:bg-gray-900/60 rounded-2xl overflow-hidden shrink-0">
+                <div class="px-4 py-3 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 shrink-0"></span>
+                  <h3 class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Do zrobienia</h3>
+                  <span class="ml-auto text-xs font-bold text-gray-400 dark:text-gray-500 bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded-md">{{ tasksByStatus('TODO').length }}</span>
+                </div>
+                <div class="flex-1 overflow-y-auto px-3 pb-3 space-y-2">
+                  @for (task of tasksByStatus('TODO'); track task.id) {
+                    <div class="bg-white dark:bg-gray-900 rounded-xl p-3.5 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow group">
+                      <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="text-xs font-bold px-1.5 py-0.5 rounded" [ngClass]="priorityBadgeClass(task.priority)">{{ priorityLabel(task.priority) }}</span>
+                        <button (click)="removeTask(task)" class="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-gray-600 hover:text-red-500 transition-all p-0.5 rounded">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-1.5 leading-snug">{{ task.title }}</p>
+                      @if (task.description) {
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">{{ task.description }}</p>
+                      }
+                      <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
+                        <div class="flex -space-x-1.5">
+                          @for (m of getTaskAssignees(task).slice(0,4); track m.userId) {
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-white dark:ring-gray-900 shrink-0"
+                              [ngClass]="roleBadgeClass(m.role)" [title]="(m.user?.firstName || '') + ' ' + (m.user?.lastName || '')">
+                              {{ getTaskAssigneeInitials(m) }}
+                            </div>
+                          }
+                          @if (getTaskAssignees(task).length > 4) {
+                            <div class="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400 ring-1 ring-white dark:ring-gray-900">+{{ getTaskAssignees(task).length - 4 }}</div>
+                          }
+                        </div>
+                        @if (task.dueDate) {
+                          <span class="text-xs text-gray-400 dark:text-gray-500">{{ task.dueDate | date:'d MMM' }}</span>
+                        }
+                        <button (click)="updateTaskStatus(task, 'IN_PROGRESS')" class="ml-auto text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100">
+                          Rozpocznij →
+                        </button>
+                      </div>
+                    </div>
+                  } @empty {
+                    <div class="text-center py-6 text-xs text-gray-400 dark:text-gray-500">Brak zadań</div>
+                  }
+                </div>
+              </div>
+
+              <!-- IN_PROGRESS column -->
+              <div class="w-72 flex flex-col bg-blue-50 dark:bg-blue-950/20 rounded-2xl overflow-hidden shrink-0">
+                <div class="px-4 py-3 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
+                  <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">W toku</h3>
+                  <span class="ml-auto text-xs font-bold text-blue-500 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded-md">{{ tasksByStatus('IN_PROGRESS').length }}</span>
+                </div>
+                <div class="flex-1 overflow-y-auto px-3 pb-3 space-y-2">
+                  @for (task of tasksByStatus('IN_PROGRESS'); track task.id) {
+                    <div class="bg-white dark:bg-gray-900 rounded-xl p-3.5 border border-blue-100 dark:border-blue-900/30 shadow-sm hover:shadow-md transition-shadow group">
+                      <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="text-xs font-bold px-1.5 py-0.5 rounded" [ngClass]="priorityBadgeClass(task.priority)">{{ priorityLabel(task.priority) }}</span>
+                        <button (click)="removeTask(task)" class="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-gray-600 hover:text-red-500 transition-all p-0.5 rounded">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-1.5 leading-snug">{{ task.title }}</p>
+                      @if (task.description) {
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">{{ task.description }}</p>
+                      }
+                      <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
+                        <div class="flex -space-x-1.5">
+                          @for (m of getTaskAssignees(task).slice(0,4); track m.userId) {
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-white dark:ring-gray-900 shrink-0"
+                              [ngClass]="roleBadgeClass(m.role)" [title]="(m.user?.firstName || '') + ' ' + (m.user?.lastName || '')">
+                              {{ getTaskAssigneeInitials(m) }}
+                            </div>
+                          }
+                          @if (getTaskAssignees(task).length > 4) {
+                            <div class="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400 ring-1 ring-white dark:ring-gray-900">+{{ getTaskAssignees(task).length - 4 }}</div>
+                          }
+                        </div>
+                        @if (task.dueDate) {
+                          <span class="text-xs text-gray-400 dark:text-gray-500">{{ task.dueDate | date:'d MMM' }}</span>
+                        }
+                        <div class="ml-auto flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button (click)="updateTaskStatus(task, 'TODO')" class="text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">← Cofnij</button>
+                          <button (click)="updateTaskStatus(task, 'DONE')" class="text-xs font-medium text-green-500 hover:text-green-600 transition-colors">Gotowe →</button>
+                        </div>
+                      </div>
+                    </div>
+                  } @empty {
+                    <div class="text-center py-6 text-xs text-blue-400 dark:text-blue-500">Brak zadań w toku</div>
+                  }
+                </div>
+              </div>
+
+              <!-- DONE column -->
+              <div class="w-72 flex flex-col bg-green-50 dark:bg-green-950/20 rounded-2xl overflow-hidden shrink-0">
+                <div class="px-4 py-3 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+                  <h3 class="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Ukończone</h3>
+                  <span class="ml-auto text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-1.5 py-0.5 rounded-md">{{ tasksByStatus('DONE').length }}</span>
+                </div>
+                <div class="flex-1 overflow-y-auto px-3 pb-3 space-y-2">
+                  @for (task of tasksByStatus('DONE'); track task.id) {
+                    <div class="bg-white dark:bg-gray-900 rounded-xl p-3.5 border border-green-100 dark:border-green-900/30 shadow-sm hover:shadow-md group opacity-75 hover:opacity-100 transition-all">
+                      <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Ukończone</span>
+                        <button (click)="removeTask(task)" class="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-gray-600 hover:text-red-500 transition-all p-0.5 rounded">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      <p class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1.5 leading-snug line-through">{{ task.title }}</p>
+                      <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
+                        <div class="flex -space-x-1.5">
+                          @for (m of getTaskAssignees(task).slice(0,4); track m.userId) {
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-white dark:ring-gray-900 shrink-0"
+                              [ngClass]="roleBadgeClass(m.role)" [title]="(m.user?.firstName || '') + ' ' + (m.user?.lastName || '')">
+                              {{ getTaskAssigneeInitials(m) }}
+                            </div>
+                          }
+                        </div>
+                        <button (click)="updateTaskStatus(task, 'IN_PROGRESS')" class="ml-auto text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100">← Wznów</button>
+                      </div>
+                    </div>
+                  } @empty {
+                    <div class="text-center py-6 text-xs text-green-600 dark:text-green-500 opacity-50">Brak ukończonych</div>
+                  }
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ===== CHANNEL VIEW ===== -->
+      @if (activeView === 'channel' && activeChannel) {
+        <div class="flex flex-col h-full overflow-hidden">
+          <div class="h-14 border-b border-gray-200 dark:border-gray-800 flex items-center px-6 shrink-0 bg-white dark:bg-gray-900 transition-colors shadow-sm z-10">
+            <h2 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <span class="text-gray-400 dark:text-gray-500 text-sm">{{ activeChannel.type === 'INFO' ? '📢' : '#' }}</span>
               {{ activeChannel.name }}
             </h2>
           </div>
 
-          <div
-            class="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-gray-950"
-          >
+          <div class="flex-1 overflow-y-auto p-6 space-y-5 bg-white dark:bg-gray-950">
             @for (msg of messages; track msg.id) {
-              <div
-                class="flex group relative rounded-xl transition-colors px-2 py-1 -mx-2"
-                [ngClass]="{
-                  'ring-1 ring-amber-300 dark:ring-amber-700/60 bg-amber-50 dark:bg-amber-900/10':
-                    isMentionedInMessage(msg.content),
-                }"
-              >
-                <div
-                  class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0 shadow-sm cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all"
-                  (click)="openUserPopoverFromMessage(msg, $event)"
-                  title="Pokaż profil"
-                >
-                  {{ getInitials(msg.user?.email || "U") }}
+              <div class="flex group relative rounded-xl transition-colors px-2 py-1 -mx-2"
+                [ngClass]="{ 'ring-1 ring-amber-300 dark:ring-amber-700/60 bg-amber-50 dark:bg-amber-900/10': isMentionedInMessage(msg.content) }">
+                <div class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0 text-xs shadow-sm cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all"
+                  (click)="openUserPopoverFromMessage(msg, $event)" title="Pokaż profil">
+                  {{ getInitials(msg.user?.email || 'U') }}
                 </div>
-                <div class="ml-4 flex-1 min-w-0">
+                <div class="ml-3 flex-1 min-w-0">
                   <div class="flex items-baseline gap-2">
-                    <span class="font-bold text-gray-900 dark:text-gray-100">{{
-                      msg.user?.name || msg.user?.email || "Nieznany Użytkownik"
-                    }}</span>
-                    <span
-                      class="text-xs text-gray-500 dark:text-gray-400 font-medium"
-                      >{{ msg.createdAt | date: "short" }}</span
-                    >
+                    <span class="font-bold text-gray-900 dark:text-gray-100 text-sm">{{ msg.user?.name || msg.user?.email || 'Nieznany' }}</span>
+                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ msg.createdAt | date:'short' }}</span>
                     @if (msg.isEdited) {
-                      <span
-                        class="text-xs text-gray-400 dark:text-gray-500 italic"
-                        >(edytowano)</span
-                      >
+                      <span class="text-xs text-gray-400 dark:text-gray-500 italic">(edytowano)</span>
                     }
                   </div>
                   @if (msg.content) {
                     @if (editingMessageId === msg.id) {
                       <div class="mt-1.5">
-                        <textarea
-                          [(ngModel)]="editingContent"
-                          name="editContent"
-                          (keydown.escape)="cancelEdit()"
-                          rows="2"
-                          class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-indigo-500 rounded-lg text-sm text-gray-800 dark:text-white outline-none resize-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900"
-                        ></textarea>
+                        <textarea [(ngModel)]="editingContent" name="editContent" (keydown.escape)="cancelEdit()" rows="2"
+                          class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-indigo-500 rounded-lg text-sm text-gray-800 dark:text-white outline-none resize-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900"></textarea>
                         <div class="flex items-center gap-2 mt-1.5">
-                          <button
-                            type="button"
-                            (click)="saveEditMessage(msg)"
-                            [disabled]="isSavingEdit || !editingContent.trim()"
-                            class="px-3 py-1 text-xs font-bold bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors disabled:opacity-50"
-                          >
-                            {{ isSavingEdit ? "Zapisywanie..." : "Zapisz" }}
+                          <button type="button" (click)="saveEditMessage(msg)" [disabled]="isSavingEdit || !editingContent.trim()"
+                            class="px-3 py-1 text-xs font-bold bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors disabled:opacity-50">
+                            {{ isSavingEdit ? 'Zapisywanie...' : 'Zapisz' }}
                           </button>
-                          <button
-                            type="button"
-                            (click)="cancelEdit()"
-                            class="px-3 py-1 text-xs font-bold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                          >
-                            Anuluj
-                          </button>
-                          <span class="text-xs text-gray-400 dark:text-gray-500"
-                            >ESC – anuluj</span
-                          >
+                          <button type="button" (click)="cancelEdit()" class="px-3 py-1 text-xs font-bold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Anuluj</button>
+                          <span class="text-xs text-gray-400 dark:text-gray-500">ESC – anuluj</span>
                         </div>
                       </div>
                     } @else {
-                      <p
-                        class="text-gray-700 dark:text-gray-300 mt-1 leading-relaxed"
-                        [innerHTML]="renderContent(msg.content)"
-                      ></p>
+                      <p class="text-gray-700 dark:text-gray-300 mt-0.5 leading-relaxed text-sm" [innerHTML]="renderContent(msg.content)"></p>
                     }
                   }
-                  @if (msg.fileType === "image") {
-                    <a
-                      [href]="getFileUrl(msg.fileUrl)"
-                      target="_blank"
-                      class="block mt-2"
-                    >
-                      <img
-                        [src]="getFileUrl(msg.fileUrl)"
-                        [alt]="msg.fileName"
-                        class="max-w-xs max-h-64 rounded-xl border border-gray-200 dark:border-gray-700 object-cover hover:opacity-90 transition-opacity cursor-pointer"
-                      />
+                  @if (msg.fileType === 'image') {
+                    <a [href]="getFileUrl(msg.fileUrl)" target="_blank" class="block mt-2">
+                      <img [src]="getFileUrl(msg.fileUrl)" [alt]="msg.fileName" class="max-w-xs max-h-64 rounded-xl border border-gray-200 dark:border-gray-700 object-cover hover:opacity-90 transition-opacity cursor-pointer" />
                     </a>
                   }
-                  @if (msg.fileType === "video") {
-                    <video
-                      [src]="getFileUrl(msg.fileUrl)"
-                      controls
-                      class="mt-2 max-w-sm rounded-xl border border-gray-200 dark:border-gray-700"
-                    ></video>
+                  @if (msg.fileType === 'video') {
+                    <video [src]="getFileUrl(msg.fileUrl)" controls class="mt-2 max-w-sm rounded-xl border border-gray-200 dark:border-gray-700"></video>
                   }
-                  @if (msg.fileType === "document") {
-                    <a
-                      [href]="getFileUrl(msg.fileUrl)"
-                      target="_blank"
-                      class="mt-2 inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 font-medium transition-colors"
-                    >
-                      <svg
-                        class="w-4 h-4 text-indigo-500 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        ></path>
+                  @if (msg.fileType === 'document') {
+                    <a [href]="getFileUrl(msg.fileUrl)" target="_blank"
+                      class="mt-2 inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 font-medium transition-colors">
+                      <svg class="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
                       {{ msg.fileName }}
                     </a>
@@ -709,198 +610,80 @@
                   @if (getReactionGroups(msg).length > 0) {
                     <div class="flex flex-wrap gap-1 mt-2">
                       @for (rg of getReactionGroups(msg); track rg.emoji) {
-                        <button
-                          type="button"
-                          (click)="selectReactionDirect(msg.id, rg.emoji)"
+                        <button type="button" (click)="selectReactionDirect(msg.id, rg.emoji)"
                           class="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-sm border transition-all"
-                          [ngClass]="{
-                            'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 font-semibold':
-                              rg.hasMe,
-                            'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700':
-                              !rg.hasMe,
-                          }"
-                          [title]="
-                            rg.hasMe
-                              ? 'Kliknij aby usunąć'
-                              : 'Kliknij aby zareagować'
-                          "
-                        >
-                          {{ rg.emoji
-                          }}<span
-                            class="text-xs font-medium text-gray-600 dark:text-gray-400 ml-0.5"
-                            >{{ rg.count }}</span
-                          >
+                          [ngClass]="{ 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 font-semibold': rg.hasMe, 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700': !rg.hasMe }"
+                          [title]="rg.hasMe ? 'Kliknij aby usunąć' : 'Kliknij aby zareagować'">
+                          {{ rg.emoji }}<span class="text-xs font-medium text-gray-600 dark:text-gray-400 ml-0.5">{{ rg.count }}</span>
                         </button>
                       }
                     </div>
                   }
                 </div>
-                <div
-                  class="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all"
-                >
-                  <button
-                    type="button"
-                    (click)="openEmojiPicker(msg, $event)"
-                    class="p-1.5 text-gray-400 hover:text-yellow-500 dark:hover:text-yellow-400 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors"
-                    title="Dodaj reakcję"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
+                <div class="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all">
+                  <button type="button" (click)="openEmojiPicker(msg, $event)"
+                    class="p-1.5 text-gray-400 hover:text-yellow-500 dark:hover:text-yellow-400 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors" title="Dodaj reakcję">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                   </button>
                   @if (canEditMessage(msg) && editingMessageId !== msg.id) {
-                    <button
-                      type="button"
-                      (click)="startEditMessage(msg)"
-                      class="p-1.5 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-                      title="Edytuj wiadomość"
-                    >
-                      <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        ></path>
+                    <button type="button" (click)="startEditMessage(msg)"
+                      class="p-1.5 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors" title="Edytuj">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                       </svg>
                     </button>
                   }
                   @if (canDeleteMessage(msg)) {
-                    <button
-                      type="button"
-                      (click)="deleteMessage(msg)"
-                      class="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      title="Usuń wiadomość"
-                    >
-                      <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        ></path>
+                    <button type="button" (click)="deleteMessage(msg)"
+                      class="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Usuń">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                       </svg>
                     </button>
                   }
                 </div>
               </div>
             } @empty {
-              <div
-                class="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500"
-              >
+              <div class="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500">
                 <span class="text-4xl mb-4">💬</span>
-                <p class="font-medium text-lg">
-                  Brak wiadomości. Bądź pierwszy!
-                </p>
+                <p class="font-medium text-lg">Brak wiadomości. Bądź pierwszy!</p>
               </div>
             }
           </div>
 
-          <div
-            class="p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shrink-0 relative"
-          >
-            @if (
-              activeChannel.type === "INFO" && currentUserRole === "MEMBER"
-            ) {
-              <div
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-sm text-gray-500 dark:text-gray-400 font-bold flex items-center justify-center gap-2"
-              >
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  ></path>
+          <div class="p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shrink-0 relative">
+            @if (activeChannel.type === 'INFO' && currentUserRole === 'MEMBER') {
+              <div class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-sm text-gray-500 dark:text-gray-400 font-bold flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
                 Tylko właściciel lub administrator może pisać na tym kanale.
               </div>
             } @else {
               @if (mentionDropdownOpen) {
-                <div
-                  class="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden max-h-52 overflow-y-auto"
-                >
-                  @for (
-                    candidate of mentionCandidates;
-                    track candidate.id || candidate.userId
-                  ) {
-                    <button
-                      type="button"
-                      (mousedown)="selectMention(candidate)"
-                      class="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors text-left"
-                    >
-                      @if (candidate.id === "__all__") {
-                        <div
-                          class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm shrink-0"
-                        >
-                          &#64;
-                        </div>
+                <div class="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden max-h-52 overflow-y-auto">
+                  @for (candidate of mentionCandidates; track candidate.id || candidate.userId) {
+                    <button type="button" (mousedown)="selectMention(candidate)"
+                      class="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors text-left">
+                      @if (candidate.id === '__all__') {
+                        <div class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm shrink-0">&#64;</div>
                         <div>
-                          <p
-                            class="text-sm font-bold text-indigo-600 dark:text-indigo-400"
-                          >
-                            Wszyscy
-                          </p>
-                          <p class="text-xs text-gray-400 dark:text-gray-500">
-                            Powiadom wszystkich
-                          </p>
+                          <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400">Wszyscy</p>
+                          <p class="text-xs text-gray-400 dark:text-gray-500">Powiadom wszystkich</p>
                         </div>
                       } @else {
-                        <div
-                          class="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 shrink-0"
-                        >
-                          {{ getMemberInitials(candidate) }}
-                        </div>
+                        <div class="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 shrink-0">{{ getMemberInitials(candidate) }}</div>
                         <div class="min-w-0">
-                          <p
-                            class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate"
-                          >
-                            {{ candidate.user?.firstName }}
-                            {{ candidate.user?.lastName }}
-                          </p>
+                          <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{{ candidate.user?.firstName }} {{ candidate.user?.lastName }}</p>
                           @if (candidate.customRole) {
                             <p class="text-xs flex items-center gap-1">
-                              <span
-                                class="w-1.5 h-1.5 rounded-full shrink-0"
-                                [style.background-color]="
-                                  candidate.customRole.color
-                                "
-                              ></span>
-                              <span class="text-gray-400 dark:text-gray-500">{{
-                                candidate.customRole.name
-                              }}</span>
+                              <span class="w-1.5 h-1.5 rounded-full shrink-0" [style.background-color]="candidate.customRole.color"></span>
+                              <span class="text-gray-400 dark:text-gray-500">{{ candidate.customRole.name }}</span>
                             </p>
                           } @else {
-                            <p
-                              class="text-xs text-gray-400 dark:text-gray-500 truncate"
-                            >
-                              {{ candidate.user?.email }}
-                            </p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ candidate.user?.email }}</p>
                           }
                         </div>
                       }
@@ -908,90 +691,30 @@
                   }
                 </div>
               }
-              <form
-                (ngSubmit)="sendMessage()"
-                class="relative flex items-center shadow-sm gap-2"
-              >
-                <input
-                  type="file"
-                  #fileInput
-                  class="hidden"
-                  (change)="onFileSelected($event)"
-                  accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
-                />
-                <button
-                  type="button"
-                  (click)="fileInput.click()"
-                  [disabled]="isUploadingFile"
-                  title="Załącz plik"
-                  class="shrink-0 p-2.5 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 bg-gray-100 dark:bg-gray-800 rounded-xl transition-colors disabled:opacity-50"
-                >
+              <form (ngSubmit)="sendMessage()" class="relative flex items-center gap-2">
+                <input type="file" #fileInput class="hidden" (change)="onFileSelected($event)" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" />
+                <button type="button" (click)="fileInput.click()" [disabled]="isUploadingFile" title="Załącz plik"
+                  class="shrink-0 p-2.5 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 bg-gray-100 dark:bg-gray-800 rounded-xl transition-colors disabled:opacity-50">
                   @if (isUploadingFile) {
-                    <svg
-                      class="w-5 h-5 animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle>
-                      <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      ></path>
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
                   } @else {
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                      ></path>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
                     </svg>
                   }
                 </button>
                 <label for="fileInput" class="sr-only">Załącz plik</label>
-                <input
-                  type="text"
-                  name="message"
-                  [(ngModel)]="newMessageContent"
-                  (input)="onMessageInput($event)"
-                  (blur)="onMessageBlur()"
-                  placeholder="Napisz na {{
-                    activeChannel.type === 'INFO' ? '📢' : '#'
-                  }}{{ activeChannel.name }}... (@ aby oznaczyć)"
-                  class="flex-1 pl-4 pr-12 py-3.5 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white font-medium"
-                  autocomplete="off"
-                />
-                <button
-                  type="submit"
-                  [disabled]="!newMessageContent.trim()"
-                  class="absolute right-2 p-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-md"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                    ></path>
+                <input type="text" name="message" [(ngModel)]="newMessageContent" (input)="onMessageInput($event)" (blur)="onMessageBlur()"
+                  placeholder="Napisz na {{ activeChannel.type === 'INFO' ? '📢' : '#' }}{{ activeChannel.name }}... (@ aby oznaczyć)"
+                  class="flex-1 pl-4 pr-12 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white text-sm font-medium"
+                  autocomplete="off" />
+                <button type="submit" [disabled]="!newMessageContent.trim()"
+                  class="absolute right-2 p-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-md">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                   </svg>
                 </button>
               </form>
@@ -999,246 +722,156 @@
           </div>
         </div>
       }
+
     </main>
 
-    @if (activeWorkspace) {
-      <aside
-        class="w-60 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 flex flex-col z-10 shrink-0 transition-colors"
-      >
-        <div
-          class="h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 font-bold text-sm text-gray-800 dark:text-gray-200"
-        >
-          Członkowie
-          <span
-            class="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500"
-            >{{ members.length }}</span
-          >
-          @if (currentUserRole === "OWNER" || currentUserRole === "ADMIN") {
-            <button
-              (click)="isRolesModalOpen = true"
-              title="Zarządzaj rolami zespołowymi"
-              class="ml-auto text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
-            >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                ></path>
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                ></path>
+    <!-- ===== MODALS ===== -->
+
+    <!-- Create Task Modal -->
+    @if (isCreateTaskModalOpen) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nowe zadanie</h3>
+            <button (click)="isCreateTaskModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
-          } @else {
-            <span class="ml-auto"></span>
-          }
-        </div>
-        <div class="flex-1 overflow-y-auto py-3 px-2 space-y-4">
-          @for (group of memberGroups(); track group.role) {
-            @if (group.members.length > 0) {
+          </div>
+          <div class="px-6 py-5 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Tytuł *</label>
+              <input type="text" [(ngModel)]="newTask.title" name="taskTitle" placeholder="Wpisz tytuł zadania..."
+                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Opis (opcjonalnie)</label>
+              <textarea [(ngModel)]="newTask.description" name="taskDesc" rows="2" placeholder="Opis zadania..."
+                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium resize-none"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
               <div>
-                <div class="px-2 mb-1">
-                  <h4
-                    class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider"
-                  >
-                    {{ roleLabel(group.role) }} — {{ group.members.length }}
-                  </h4>
-                </div>
-                <div class="space-y-0.5">
-                  @for (member of group.members; track member.userId) {
-                    <div
-                      class="flex items-center gap-2.5 px-2 py-2 rounded-lg transition-colors"
-                      [ngClass]="{
-                        'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800':
-                          canManageMember(member),
-                        'cursor-default': !canManageMember(member),
-                      }"
-                      (click)="
-                        canManageMember(member) && openMemberModal(member)
-                      "
-                    >
-                      <div
-                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all"
-                        [ngClass]="roleBadgeClass(member.role)"
-                        (click)="openUserPopover(member, $event)"
-                        title="Pokaż profil"
-                      >
-                        {{ getMemberInitials(member) }}
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <p
-                          class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate"
-                        >
-                          {{
-                            member.user?.firstName && member.user?.lastName
-                              ? member.user.firstName +
-                                " " +
-                                member.user.lastName
-                              : member.user?.email || "Użytkownik"
-                          }}
-                        </p>
-                        @if (member.customRole) {
-                          <p
-                            class="text-xs text-gray-500 dark:text-gray-400 truncate flex items-center gap-1"
-                          >
-                            <span
-                              class="w-1.5 h-1.5 rounded-full shrink-0"
-                              [style.background-color]="member.customRole.color"
-                            ></span>
-                            {{ member.customRole.name }}
-                          </p>
-                        } @else {
-                          <p
-                            class="text-xs text-gray-400 dark:text-gray-500 truncate"
-                          >
-                            {{ member.user?.email }}
-                          </p>
-                        }
-                      </div>
-                    </div>
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Priorytet</label>
+                <select [(ngModel)]="newTask.priority" name="taskPriority"
+                  class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium">
+                  <option value="LOW">Niski</option>
+                  <option value="MEDIUM">Średni</option>
+                  <option value="HIGH">Wysoki</option>
+                  <option value="URGENT">Pilny</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Termin</label>
+                <input type="date" [(ngModel)]="newTask.dueDate" name="taskDue"
+                  class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Przypisz do</label>
+                @if (newTask.assigneeIds.length > 0) {
+                  <button type="button" (click)="newTask.assigneeIds = []" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Wyczyść ({{ newTask.assigneeIds.length }})</button>
+                }
+              </div>
+              @if (workspaceRoles.length > 0) {
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                  @for (wr of workspaceRoles; track wr.id) {
+                    <button type="button" (click)="assignRoleToTask(wr.id)"
+                      class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all"
+                      [ngClass]="isRoleFullySelected(wr.id) ? 'border-2 text-gray-800 dark:text-gray-100' : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-300'"
+                      [style.border-color]="isRoleFullySelected(wr.id) ? wr.color : ''"
+                      [style.background-color]="isRoleFullySelected(wr.id) ? wr.color + '20' : ''">
+                      <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="wr.color"></span>
+                      {{ wr.name }}
+                    </button>
                   }
                 </div>
+              }
+              <div class="max-h-40 overflow-y-auto space-y-1 border border-gray-200 dark:border-gray-700 rounded-xl p-2 bg-gray-50 dark:bg-gray-800/50">
+                @for (m of members; track m.userId) {
+                  <label class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                    <input type="checkbox" [checked]="newTask.assigneeIds.includes(m.userId)" (change)="toggleTaskAssignee(m.userId)"
+                      class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 shrink-0" />
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0" [ngClass]="roleBadgeClass(m.role)">{{ getMemberInitials(m) }}</div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{{ m.user?.firstName }} {{ m.user?.lastName }}</p>
+                      @if (m.customRole) {
+                        <p class="text-xs flex items-center gap-1 leading-tight">
+                          <span class="w-1.5 h-1.5 rounded-full shrink-0" [style.background-color]="m.customRole.color"></span>
+                          <span class="text-gray-400 dark:text-gray-500">{{ m.customRole.name }}</span>
+                        </p>
+                      }
+                    </div>
+                  </label>
+                }
               </div>
-            }
-          }
+            </div>
+          </div>
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <button (click)="isCreateTaskModalOpen = false" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Anuluj</button>
+            <button (click)="createTask()" [disabled]="isCreatingTask || !newTask.title.trim()"
+              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              @if (isCreatingTask) {
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+              }
+              {{ isCreatingTask ? 'Tworzenie...' : 'Utwórz zadanie' }}
+            </button>
+          </div>
         </div>
-      </aside>
+      </div>
     }
 
+    <!-- Member Modal -->
     @if (isMemberModalOpen && selectedMember) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm"
-      >
-        <div
-          class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border dark:border-gray-800"
-        >
-          <div
-            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
-          >
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-              Zarządzaj członkiem
-            </h3>
-            <button
-              (click)="isMemberModalOpen = false"
-              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Zarządzaj członkiem</h3>
+            <button (click)="isMemberModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
           <div class="px-6 py-5 space-y-4">
             <div class="flex items-center gap-3">
-              <div
-                class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg"
-                [ngClass]="roleBadgeClass(selectedMember.role)"
-              >
-                {{ getMemberInitials(selectedMember) }}
-              </div>
+              <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg" [ngClass]="roleBadgeClass(selectedMember.role)">{{ getMemberInitials(selectedMember) }}</div>
               <div>
-                <p class="font-bold text-gray-900 dark:text-white">
-                  {{
-                    selectedMember.user?.firstName &&
-                    selectedMember.user?.lastName
-                      ? selectedMember.user.firstName +
-                        " " +
-                        selectedMember.user.lastName
-                      : selectedMember.user?.email
-                  }}
-                </p>
-                <span
-                  class="text-xs font-bold px-2 py-0.5 rounded-full"
-                  [ngClass]="roleBadgeClass(selectedMember.role)"
-                >
-                  {{ roleLabel(selectedMember.role) }}
-                </span>
+                <p class="font-bold text-gray-900 dark:text-white">{{ selectedMember.user?.firstName && selectedMember.user?.lastName ? selectedMember.user.firstName + ' ' + selectedMember.user.lastName : selectedMember.user?.email }}</p>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full" [ngClass]="roleBadgeClass(selectedMember.role)">{{ roleLabel(selectedMember.role) }}</span>
               </div>
             </div>
             <div>
-              <label
-                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-              >
-                Zmień rolę
-              </label>
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Zmień rolę</label>
               <div class="flex flex-wrap gap-2">
                 @for (role of availableRoles(); track role) {
-                  <button
-                    (click)="updateRole($any(role))"
-                    [disabled]="isUpdatingRole || selectedMember.role === role"
+                  <button (click)="updateRole($any(role))" [disabled]="isUpdatingRole || selectedMember.role === role"
                     class="px-3 py-1.5 text-sm font-bold rounded-lg border transition-all disabled:opacity-50"
-                    [ngClass]="{
-                      'bg-indigo-500 text-white border-indigo-500':
-                        selectedMember.role === role,
-                      'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400':
-                        selectedMember.role !== role,
-                    }"
-                  >
+                    [ngClass]="{ 'bg-indigo-500 text-white border-indigo-500': selectedMember.role === role, 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400': selectedMember.role !== role }">
                     {{ roleLabel(role) }}
                   </button>
                 }
               </div>
             </div>
-            @if (
-              workspaceRoles.length > 0 &&
-              (currentUserRole === "OWNER" || currentUserRole === "ADMIN")
-            ) {
+            @if (workspaceRoles.length > 0 && (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN')) {
               <div>
-                <label
-                  class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-                >
-                  Rola zespołowa
-                </label>
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Rola zespołowa</label>
                 <div class="flex flex-wrap gap-2">
-                  <button
-                    (click)="assignCustomRole(null)"
+                  <button (click)="assignCustomRole(null)"
                     class="px-3 py-1.5 text-sm font-bold rounded-lg border transition-all"
-                    [ngClass]="{
-                      'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600':
-                        !selectedMember.customRoleId,
-                      'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-400':
-                        selectedMember.customRoleId,
-                    }"
-                  >
+                    [ngClass]="{ 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600': !selectedMember.customRoleId, 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-400': selectedMember.customRoleId }">
                     Brak
                   </button>
                   @for (wr of workspaceRoles; track wr.id) {
-                    <button
-                      (click)="assignCustomRole(wr.id)"
+                    <button (click)="assignCustomRole(wr.id)"
                       class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold rounded-lg border transition-all"
-                      [ngClass]="{
-                        'border-2 text-gray-800 dark:text-gray-100':
-                          selectedMember.customRoleId === wr.id,
-                        'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400':
-                          selectedMember.customRoleId !== wr.id,
-                      }"
-                      [style.border-color]="
-                        selectedMember.customRoleId === wr.id ? wr.color : ''
-                      "
-                    >
-                      <span
-                        class="w-2 h-2 rounded-full shrink-0"
-                        [style.background-color]="wr.color"
-                      ></span>
+                      [ngClass]="{ 'border-2 text-gray-800 dark:text-gray-100': selectedMember.customRoleId === wr.id, 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-indigo-400': selectedMember.customRoleId !== wr.id }"
+                      [style.border-color]="selectedMember.customRoleId === wr.id ? wr.color : ''">
+                      <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="wr.color"></span>
                       {{ wr.name }}
                     </button>
                   }
@@ -1246,139 +879,56 @@
               </div>
             }
           </div>
-          <div
-            class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center"
-          >
-            <button
-              (click)="removeMember()"
-              [disabled]="isRemovingMember || !canRemoveMember(selectedMember)"
-              class="px-4 py-2 text-sm font-bold text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {{ isRemovingMember ? "Usuwanie..." : "Usuń z zespołu" }}
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <button (click)="removeMember()" [disabled]="isRemovingMember || !canRemoveMember(selectedMember)"
+              class="px-4 py-2 text-sm font-bold text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              {{ isRemovingMember ? 'Usuwanie...' : 'Usuń z zespołu' }}
             </button>
-            <button
-              (click)="isMemberModalOpen = false"
-              class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              Zamknij
-            </button>
+            <button (click)="isMemberModalOpen = false" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Zamknij</button>
           </div>
         </div>
       </div>
     }
 
+    <!-- Settings Modal -->
     @if (isSettingsModalOpen) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm"
-      >
-        <div
-          class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800"
-        >
-          <div
-            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
-          >
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-              Edytuj profil
-            </h3>
-            <button
-              (click)="isSettingsModalOpen = false"
-              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Edytuj profil</h3>
+            <button (click)="isSettingsModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
           <div class="px-6 py-6 space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label
-                  class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-                  >Imię *</label
-                >
-                <input
-                  type="text"
-                  [(ngModel)]="settingsData.firstName"
-                  name="settingsFirstName"
-                  placeholder="np. Jan"
-                  class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"
-                />
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Imię *</label>
+                <input type="text" [(ngModel)]="settingsData.firstName" name="settingsFirstName" placeholder="np. Jan"
+                  class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
               </div>
               <div>
-                <label
-                  class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-                  >Nazwisko *</label
-                >
-                <input
-                  type="text"
-                  [(ngModel)]="settingsData.lastName"
-                  name="settingsLastName"
-                  placeholder="np. Kowalski"
-                  class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"
-                />
+                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nazwisko *</label>
+                <input type="text" [(ngModel)]="settingsData.lastName" name="settingsLastName" placeholder="np. Kowalski"
+                  class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
               </div>
             </div>
             <div>
-              <label
-                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-                >Miejscowość (opcjonalnie)</label
-              >
-              <input
-                type="text"
-                [(ngModel)]="settingsData.location"
-                name="settingsLocation"
-                placeholder="np. Warszawa"
-                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"
-              />
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Miejscowość (opcjonalnie)</label>
+              <input type="text" [(ngModel)]="settingsData.location" name="settingsLocation" placeholder="np. Warszawa"
+                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium" />
             </div>
           </div>
-          <div
-            class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between"
-          >
-            <button
-              (click)="isSettingsModalOpen = false"
-              class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              Anuluj
-            </button>
-            <button
-              (click)="submitSettings()"
-              [disabled]="
-                isSavingSettings ||
-                !settingsData.firstName ||
-                !settingsData.lastName
-              "
-              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <button (click)="isSettingsModalOpen = false" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Anuluj</button>
+            <button (click)="submitSettings()" [disabled]="isSavingSettings || !settingsData.firstName || !settingsData.lastName"
+              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               @if (isSavingSettings) {
-                <svg
-                  class="animate-spin h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Zapisywanie...
               } @else {
@@ -1390,90 +940,34 @@
       </div>
     }
 
+    <!-- Create Workspace Modal -->
     @if (isCreateModalOpen) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm transition-opacity"
-      >
-        <div
-          class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border dark:border-gray-800"
-        >
-          <div
-            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
-          >
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-              Stwórz swój serwer
-            </h3>
-            <button
-              (click)="closeCreateModal()"
-              class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nowa przestrzeń robocza</h3>
+            <button (click)="closeCreateModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
-          <div class="px-6 py-6 text-center">
-            <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">
-              Twój serwer to miejsce, w którym spotykasz się ze swoim zespołem.
-              Nadaj mu nazwę.
-            </p>
-            <div class="text-left">
-              <label
-                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-                >Nazwa przestrzeni roboczej</label
-              >
-              <input
-                type="text"
-                [(ngModel)]="newWorkspaceName"
-                (keyup.enter)="submitNewWorkspace()"
-                placeholder="np. Zespół IT Stafflou"
-                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-lg focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white font-medium"
-              />
+          <div class="px-6 py-6">
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">Twój serwer to miejsce, w którym spotykasz się ze swoim zespołem. Nadaj mu nazwę.</p>
+            <div>
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nazwa przestrzeni</label>
+              <input type="text" [(ngModel)]="newWorkspaceName" (keyup.enter)="submitNewWorkspace()" placeholder="np. Zespół IT"
+                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-lg focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white font-medium" />
             </div>
           </div>
-          <div
-            class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between"
-          >
-            <button
-              (click)="closeCreateModal()"
-              class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              Wróć
-            </button>
-            <button
-              (click)="submitNewWorkspace()"
-              [disabled]="isCreating || !newWorkspaceName.trim()"
-              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <button (click)="closeCreateModal()" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Anuluj</button>
+            <button (click)="submitNewWorkspace()" [disabled]="isCreating || !newWorkspaceName.trim()"
+              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               @if (isCreating) {
-                <svg
-                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                <svg class="animate-spin -ml-1 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                 </svg>
                 Tworzenie...
               } @else {
@@ -1485,101 +979,42 @@
       </div>
     }
 
+    <!-- Create Channel Modal -->
     @if (isChannelModalOpen) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm transition-opacity"
-      >
-        <div
-          class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border dark:border-gray-800"
-        >
-          <div
-            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
-          >
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-              Utwórz kanał
-            </h3>
-            <button
-              (click)="isChannelModalOpen = false; newChannelName = ''"
-              class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Utwórz kanał</h3>
+            <button (click)="isChannelModalOpen = false; newChannelName = ''" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
           <div class="px-6 py-6 space-y-5 text-left">
             <div>
-              <label
-                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3"
-                >Typ kanału</label
-              >
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3">Typ kanału</label>
               <div class="flex gap-6">
                 <label class="flex items-center cursor-pointer group">
-                  <input
-                    type="radio"
-                    name="channelType"
-                    value="TEXT"
-                    [(ngModel)]="newChannelType"
-                    class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <span
-                    class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
-                    ># Tekstowy</span
-                  >
+                  <input type="radio" name="channelType" value="TEXT" [(ngModel)]="newChannelType" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                  <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"># Tekstowy</span>
                 </label>
                 <label class="flex items-center cursor-pointer group">
-                  <input
-                    type="radio"
-                    name="channelType"
-                    value="INFO"
-                    [(ngModel)]="newChannelType"
-                    class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <span
-                    class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
-                    >📢 Informacyjny</span
-                  >
+                  <input type="radio" name="channelType" value="INFO" [(ngModel)]="newChannelType" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                  <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">📢 Informacyjny</span>
                 </label>
               </div>
             </div>
             <div>
-              <label
-                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-                >Nazwa kanału</label
-              >
-              <input
-                type="text"
-                [(ngModel)]="newChannelName"
-                (keyup.enter)="submitNewChannel()"
-                placeholder="np. ogłoszenia"
-                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-lg focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white font-medium"
-              />
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nazwa kanału</label>
+              <input type="text" [(ngModel)]="newChannelName" (keyup.enter)="submitNewChannel()" placeholder="np. ogłoszenia"
+                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-lg focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white font-medium" />
             </div>
           </div>
-          <div
-            class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between"
-          >
-            <button
-              (click)="isChannelModalOpen = false; newChannelName = ''"
-              class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              Wróć
-            </button>
-            <button
-              (click)="submitNewChannel()"
-              [disabled]="!newChannelName.trim() || !activeWorkspace"
-              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <button (click)="isChannelModalOpen = false; newChannelName = ''" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Wróć</button>
+            <button (click)="submitNewChannel()" [disabled]="!newChannelName.trim() || !activeWorkspace"
+              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
               Utwórz kanał
             </button>
           </div>
@@ -1587,139 +1022,48 @@
       </div>
     }
 
+    <!-- Roles Modal -->
     @if (isRolesModalOpen) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm"
-      >
-        <div
-          class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800"
-        >
-          <div
-            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
-          >
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-              Role zespołowe
-            </h3>
-            <button
-              (click)="isRolesModalOpen = false"
-              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Role zespołowe</h3>
+            <button (click)="isRolesModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
-
           <div class="px-6 py-5 space-y-4">
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              Twórz własne podgrupy członków jak
-              <span class="font-semibold text-gray-700 dark:text-gray-300"
-                >Lead, Developer, Designer</span
-              >
-              itp. Role zespołowe nie wpływają na uprawnienia — służą do
-              organizacji.
-            </p>
-
+            <p class="text-sm text-gray-500 dark:text-gray-400">Twórz własne podgrupy członków jak <span class="font-semibold text-gray-700 dark:text-gray-300">Lead, Developer, Designer</span>. Role służą do organizacji, nie wpływają na uprawnienia.</p>
             <div class="space-y-2 max-h-52 overflow-y-auto">
               @for (wr of workspaceRoles; track wr.id) {
-                <div
-                  class="flex items-center gap-3 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl"
-                >
-                  <span
-                    class="w-4 h-4 rounded-full shrink-0 border-2 border-white dark:border-gray-700 shadow-sm"
-                    [style.background-color]="wr.color"
-                  ></span>
-                  <span
-                    class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-200"
-                    >{{ wr.name }}</span
-                  >
-                  <span class="text-xs text-gray-400 dark:text-gray-500">
-                    {{ countMembersByRole(wr.id) }}
-                  </span>
-                  <button
-                    (click)="deleteWorkspaceRole(wr.id)"
-                    class="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                    title="Usuń rolę"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
+                <div class="flex items-center gap-3 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                  <span class="w-4 h-4 rounded-full shrink-0 border-2 border-white dark:border-gray-700 shadow-sm" [style.background-color]="wr.color"></span>
+                  <span class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-200">{{ wr.name }}</span>
+                  <span class="text-xs text-gray-400 dark:text-gray-500">{{ countMembersByRole(wr.id) }}</span>
+                  <button (click)="deleteWorkspaceRole(wr.id)" class="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors" title="Usuń rolę">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
                   </button>
                 </div>
               } @empty {
-                <div
-                  class="text-center py-4 text-sm text-gray-400 dark:text-gray-500"
-                >
-                  Brak ról. Utwórz pierwszą poniżej.
-                </div>
+                <div class="text-center py-4 text-sm text-gray-400 dark:text-gray-500">Brak ról. Utwórz pierwszą poniżej.</div>
               }
             </div>
-
             <div class="border-t border-gray-100 dark:border-gray-800 pt-4">
-              <label
-                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3"
-                >Nowa rola</label
-              >
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3">Nowa rola</label>
               <div class="flex gap-2">
-                <input
-                  type="color"
-                  [(ngModel)]="newRoleColor"
-                  name="roleColor"
-                  class="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer shrink-0 p-0.5 bg-white dark:bg-gray-800"
-                  title="Wybierz kolor roli"
-                />
-                <input
-                  type="text"
-                  [(ngModel)]="newRoleName"
-                  name="roleName"
-                  (keyup.enter)="createWorkspaceRole()"
-                  placeholder="np. Developer, Lead, Designer..."
-                  class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium text-sm"
-                />
-                <button
-                  (click)="createWorkspaceRole()"
-                  [disabled]="isCreatingRole || !newRoleName.trim()"
-                  class="px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-50 shrink-0"
-                >
+                <input type="color" [(ngModel)]="newRoleColor" name="roleColor" class="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer shrink-0 p-0.5 bg-white dark:bg-gray-800" title="Wybierz kolor" />
+                <input type="text" [(ngModel)]="newRoleName" name="roleName" (keyup.enter)="createWorkspaceRole()" placeholder="np. Developer, Lead..."
+                  class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium text-sm" />
+                <button (click)="createWorkspaceRole()" [disabled]="isCreatingRole || !newRoleName.trim()"
+                  class="px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-50 shrink-0">
                   @if (isCreatingRole) {
-                    <svg
-                      class="w-4 h-4 animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle>
-                      <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      ></path>
+                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
                   } @else {
                     Dodaj
@@ -1728,224 +1072,43 @@
               </div>
             </div>
           </div>
-
-          <div
-            class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex justify-end"
-          >
-            <button
-              (click)="isRolesModalOpen = false"
-              class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              Zamknij
-            </button>
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+            <button (click)="isRolesModalOpen = false" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Zamknij</button>
           </div>
         </div>
       </div>
     }
 
-    @if (emojiPickerMsg) {
-      <div class="fixed inset-0 z-[99]" (click)="emojiPickerMsg = null"></div>
-      <div
-        class="fixed z-[100] bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1 w-52"
-        [style.top.px]="emojiPickerPos.top"
-        [style.right.px]="emojiPickerPos.right"
-        (click)="$event.stopPropagation()"
-      >
-        @for (emoji of quickEmojis; track emoji) {
-          <button
-            type="button"
-            (click)="selectReaction(emoji)"
-            class="text-xl w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-          >
-            {{ emoji }}
-          </button>
-        }
-      </div>
-    }
-
-    @if (userPopoverMember) {
-      <div class="fixed inset-0 z-[89]" (click)="closeUserPopover()"></div>
-      <div
-        class="fixed z-[90] w-56 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
-        [style.top.px]="userPopoverPos.top"
-        [style.left.px]="userPopoverPos.left"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="px-4 pt-4 pb-3">
-          <div class="flex items-center gap-3 mb-3">
-            <div
-              class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
-              [ngClass]="roleBadgeClass(userPopoverMember.role)"
-            >
-              {{ getMemberInitials(userPopoverMember) }}
-            </div>
-            <div class="min-w-0">
-              <p
-                class="font-bold text-gray-900 dark:text-white text-sm truncate"
-              >
-                {{
-                  userPopoverMember.user?.firstName &&
-                  userPopoverMember.user?.lastName
-                    ? userPopoverMember.user.firstName +
-                      " " +
-                      userPopoverMember.user.lastName
-                    : userPopoverMember.user?.displayName ||
-                      userPopoverMember.user?.email ||
-                      "Użytkownik"
-                }}
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                {{ userPopoverMember.user?.email }}
-              </p>
-            </div>
-          </div>
-          <div
-            class="space-y-1.5 text-xs border-t border-gray-100 dark:border-gray-800 pt-3"
-          >
-            <div class="flex items-center gap-2">
-              <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
-                >Rola</span
-              >
-              <span
-                class="font-medium px-1.5 py-0.5 rounded text-xs"
-                [ngClass]="roleBadgeClass(userPopoverMember.role)"
-              >
-                {{ roleLabel(userPopoverMember.role) }}
-              </span>
-            </div>
-            @if (userPopoverMember.customRole) {
-              <div class="flex items-center gap-2">
-                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
-                  >Zespół</span
-                >
-                <span
-                  class="flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300"
-                >
-                  <span
-                    class="w-2 h-2 rounded-full shrink-0"
-                    [style.background-color]="
-                      userPopoverMember.customRole.color
-                    "
-                  ></span>
-                  {{ userPopoverMember.customRole.name }}
-                </span>
-              </div>
-            }
-            @if (userPopoverMember.user?.location) {
-              <div class="flex items-center gap-2">
-                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
-                  >Lokalizacja</span
-                >
-                <span
-                  class="font-medium text-gray-700 dark:text-gray-300 truncate"
-                  >{{ userPopoverMember.user.location }}</span
-                >
-              </div>
-            }
-            @if (userPopoverMember.joinedAt) {
-              <div class="flex items-center gap-2">
-                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0"
-                  >Członek od</span
-                >
-                <span class="font-medium text-gray-700 dark:text-gray-300">{{
-                  userPopoverMember.joinedAt | date: "mediumDate"
-                }}</span>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-    }
-
+    <!-- Invite Modal -->
     @if (isInviteModalOpen) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm transition-opacity"
-      >
-        <div
-          class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border dark:border-gray-800"
-        >
-          <div
-            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"
-          >
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-              Zaproś do zespołu
-            </h3>
-            <button
-              (click)="closeInviteModal()"
-              class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Zaproś do zespołu</h3>
+            <button (click)="closeInviteModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
-
           <div class="px-6 py-6 space-y-5 text-left">
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              Wpisz adres e-mail osoby, którą chcesz zaprosić do przestrzeni
-              <span class="font-bold text-indigo-500">{{
-                activeWorkspace?.name
-              }}</span
-              >.
+              Wpisz adres e-mail osoby, którą chcesz zaprosić do przestrzeni <span class="font-bold text-indigo-500">{{ activeWorkspace?.name }}</span>.
             </p>
             <div>
-              <label
-                class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2"
-                >Adres E-mail</label
-              >
-              <input
-                type="email"
-                [(ngModel)]="inviteEmail"
-                (keyup.enter)="submitInvite()"
-                placeholder="np. jan.kowalski@firma.pl"
-                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-lg focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white font-medium"
-              />
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Adres e-mail</label>
+              <input type="email" [(ngModel)]="inviteEmail" name="inviteEmail" (keyup.enter)="submitInvite()" placeholder="np. jan.kowalski&#64;firma.pl"
+                class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-lg focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white font-medium" />
             </div>
           </div>
-
-          <div
-            class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between"
-          >
-            <button
-              (click)="closeInviteModal()"
-              class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              Wróć
-            </button>
-            <button
-              (click)="submitInvite()"
-              [disabled]="isInviting || !inviteEmail.trim()"
-              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <button (click)="closeInviteModal()" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Anuluj</button>
+            <button (click)="submitInvite()" [disabled]="isInviting || !inviteEmail.trim()"
+              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               @if (isInviting) {
-                <svg
-                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                 </svg>
                 Wysyłanie...
               } @else {
@@ -1956,5 +1119,148 @@
         </div>
       </div>
     }
+
+    <!-- Emoji Picker -->
+    @if (emojiPickerMsg) {
+      <div class="fixed inset-0 z-[99]" (click)="emojiPickerMsg = null"></div>
+      <div class="fixed z-[100] bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1 w-52"
+        [style.top.px]="emojiPickerPos.top" [style.right.px]="emojiPickerPos.right" (click)="$event.stopPropagation()">
+        @for (emoji of quickEmojis; track emoji) {
+          <button type="button" (click)="selectReaction(emoji)"
+            class="text-xl w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+            {{ emoji }}
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Team List Modal -->
+    @if (isTeamModalOpen) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border dark:border-gray-800 max-h-[85vh] flex flex-col">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+            <div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">Zespół</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ activeWorkspace?.name }} · {{ members.length }} {{ members.length === 1 ? 'osoba' : 'osób' }}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              @if (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') {
+                <button (click)="openInviteModal(); isTeamModalOpen = false"
+                  class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm font-bold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                  </svg>
+                  Zaproś
+                </button>
+              }
+              <button (click)="isTeamModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto">
+            @for (group of memberGroups(); track group.role) {
+              @if (group.members.length > 0) {
+                <div class="px-6 py-3">
+                  <h4 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">{{ roleLabel(group.role) }} — {{ group.members.length }}</h4>
+                  <div class="space-y-1">
+                    @for (member of group.members; track member.userId) {
+                      <div class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all text-sm"
+                          [ngClass]="roleBadgeClass(member.role)"
+                          (click)="openUserPopover(member, $event); isTeamModalOpen = false">
+                          {{ getMemberInitials(member) }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                              {{ member.user?.firstName && member.user?.lastName ? member.user.firstName + ' ' + member.user.lastName : member.user?.email || 'Użytkownik' }}
+                            </p>
+                            <span class="text-xs font-bold px-1.5 py-0.5 rounded-full" [ngClass]="roleBadgeClass(member.role)">{{ roleLabel(member.role) }}</span>
+                            @if (member.customRole) {
+                              <span class="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400">
+                                <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="member.customRole.color"></span>
+                                {{ member.customRole.name }}
+                              </span>
+                            }
+                          </div>
+                          <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ member.user?.email }}</p>
+                          @if (member.user?.location) {
+                            <p class="text-xs text-gray-400 dark:text-gray-500">📍 {{ member.user.location }}</p>
+                          }
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                          @if (member.joinedAt) {
+                            <span class="text-xs text-gray-400 dark:text-gray-500 hidden group-hover:block">od {{ member.joinedAt | date:'d MMM yyyy' }}</span>
+                          }
+                          @if (canManageMember(member)) {
+                            <button (click)="openMemberModal(member); isTeamModalOpen = false"
+                              class="opacity-0 group-hover:opacity-100 px-2.5 py-1 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all">
+                              Zarządzaj
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex justify-end shrink-0">
+            <button (click)="isTeamModalOpen = false" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Zamknij</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- User Popover -->
+    @if (userPopoverMember) {
+      <div class="fixed inset-0 z-[89]" (click)="closeUserPopover()"></div>
+      <div class="fixed z-[90] w-56 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
+        [style.top.px]="userPopoverPos.top" [style.left.px]="userPopoverPos.left" (click)="$event.stopPropagation()">
+        <div class="px-4 pt-4 pb-3">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0" [ngClass]="roleBadgeClass(userPopoverMember.role)">{{ getMemberInitials(userPopoverMember) }}</div>
+            <div class="min-w-0">
+              <p class="font-bold text-gray-900 dark:text-white text-sm truncate">{{ userPopoverMember.user?.firstName && userPopoverMember.user?.lastName ? userPopoverMember.user.firstName + ' ' + userPopoverMember.user.lastName : userPopoverMember.user?.email || 'Użytkownik' }}</p>
+              <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ userPopoverMember.user?.email }}</p>
+            </div>
+          </div>
+          <div class="space-y-1.5 text-xs border-t border-gray-100 dark:border-gray-800 pt-3">
+            <div class="flex items-center gap-2">
+              <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0">Rola</span>
+              <span class="font-medium px-1.5 py-0.5 rounded text-xs" [ngClass]="roleBadgeClass(userPopoverMember.role)">{{ roleLabel(userPopoverMember.role) }}</span>
+            </div>
+            @if (userPopoverMember.customRole) {
+              <div class="flex items-center gap-2">
+                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0">Zespół</span>
+                <span class="flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300">
+                  <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="userPopoverMember.customRole.color"></span>
+                  {{ userPopoverMember.customRole.name }}
+                </span>
+              </div>
+            }
+            @if (userPopoverMember.user?.location) {
+              <div class="flex items-center gap-2">
+                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0">Lokalizacja</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300 truncate">{{ userPopoverMember.user.location }}</span>
+              </div>
+            }
+            @if (userPopoverMember.joinedAt) {
+              <div class="flex items-center gap-2">
+                <span class="text-gray-400 dark:text-gray-500 w-16 shrink-0">Członek od</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ userPopoverMember.joinedAt | date:'mediumDate' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
   </div>
 }

@@ -522,4 +522,92 @@ export class WorkspacesService {
       include: { user: true, customRole: true },
     });
   }
+
+  async getTasks(workspaceId: string) {
+    const prismaAny = this.prisma as any;
+    return prismaAny.task.findMany({
+      where: { workspaceId },
+      include: { createdBy: true },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async createTask(
+    workspaceId: string,
+    title: string,
+    description: string | undefined,
+    priority: string,
+    assigneeIds: string[],
+    dueDate: string | undefined,
+    createdById: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: createdById },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+
+    const prismaAny = this.prisma as any;
+    return prismaAny.task.create({
+      data: {
+        title,
+        description: description || undefined,
+        priority: priority || 'MEDIUM',
+        workspaceId,
+        assigneeIds: assigneeIds || [],
+        dueDate: dueDate ? new Date(dueDate) : undefined,
+        createdById,
+      },
+      include: { createdBy: true },
+    });
+  }
+
+  async updateTask(
+    workspaceId: string,
+    taskId: string,
+    updates: {
+      title?: string;
+      description?: string;
+      status?: string;
+      priority?: string;
+      assigneeIds?: string[] | null;
+      dueDate?: string | null;
+    },
+    requesterId: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+
+    const prismaAny = this.prisma as any;
+    return prismaAny.task.update({
+      where: { id: taskId },
+      data: {
+        ...(updates.title !== undefined && { title: updates.title }),
+        ...(updates.description !== undefined && {
+          description: updates.description,
+        }),
+        ...(updates.status !== undefined && { status: updates.status }),
+        ...(updates.priority !== undefined && { priority: updates.priority }),
+        ...(updates.assigneeIds !== undefined && {
+          assigneeIds: updates.assigneeIds ?? [],
+        }),
+        ...(updates.dueDate !== undefined && {
+          dueDate: updates.dueDate ? new Date(updates.dueDate) : null,
+        }),
+      },
+      include: { createdBy: true },
+    });
+  }
+
+  async deleteTask(workspaceId: string, taskId: string, requesterId: string) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+
+    const prismaAny = this.prisma as any;
+    await prismaAny.task.delete({ where: { id: taskId } });
+    return { success: true };
+  }
 }
