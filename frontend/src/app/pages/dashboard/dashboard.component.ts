@@ -62,6 +62,7 @@ export class DashboardComponent implements OnInit {
   isRemovingMember = false;
 
   deleteNotifications: any[] = [];
+  taskNotifications: any[] = [];
   selectedFile: File | null = null;
   isUploadingFile = false;
 
@@ -82,7 +83,7 @@ export class DashboardComponent implements OnInit {
 
   emojiPickerMsg: any = null;
   emojiPickerPos = { top: 0, right: 0 };
-  readonly quickEmojis = ['👍', '❤️', '😂', '🎉', '😮', '😢', '🔥', '✅'];
+  readonly quickEmojis = ['👍', '❤️', '😂', '🎉', '😮', '😢', '🔥', '✅', '👎'];
 
   userPopoverMember: any = null;
   userPopoverPos = { top: 0, left: 0 };
@@ -91,16 +92,30 @@ export class DashboardComponent implements OnInit {
   isWorkspaceSelectorOpen = false;
 
   tasks: any[] = [];
+  tasksView: 'kanban' | 'results' = 'kanban';
   isCreateTaskModalOpen = false;
   isTeamModalOpen = false;
+  taskAttachmentFile: File | null = null;
+  statsTimePeriod: 'all' | 'week' | 'month' | 'year' = 'all';
+  statsFilterType: 'all' | 'role' | 'member' = 'all';
+  statsFilterId = '';
+
   newTask = {
     title: '',
     description: '',
     priority: 'MEDIUM',
     assigneeIds: [] as string[],
     dueDate: '',
+    submissionType: 'NONE',
+    submissionMode: 'INDIVIDUAL',
   };
   isCreatingTask = false;
+
+  isSubmitModalOpen = false;
+  submitTaskTarget: any = null;
+  submitText = '';
+  submitFiles: File[] = [];
+  isSubmitting = false;
 
   ngOnInit() {
     onAuthStateChanged(this.auth, async (user) => {
@@ -116,6 +131,7 @@ export class DashboardComponent implements OnInit {
         await Promise.all([
           this.loadInvitations(),
           this.loadDeleteNotifications(),
+          this.loadTaskNotifications(),
         ]);
       }
     });
@@ -133,6 +149,7 @@ export class DashboardComponent implements OnInit {
           this.loadChannels(this.activeWorkspace.id),
           this.loadMembers(this.activeWorkspace.id),
           this.loadWorkspaceRoles(this.activeWorkspace.id),
+          this.loadTasks(this.activeWorkspace.id),
         ]);
       }
     } catch (error) {
@@ -211,6 +228,18 @@ export class DashboardComponent implements OnInit {
     );
     return member ? member.role : 'MEMBER';
   }
+
+  get maxDueDate(): string {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().split('T')[0];
+  }
+
+  clampDueDate() {
+    if (this.newTask.dueDate && this.newTask.dueDate > this.maxDueDate) {
+      this.newTask.dueDate = this.maxDueDate;
+    }
+  }
   async selectWorkspace(workspace: any) {
     this.activeWorkspace = workspace;
     this.activeChannel = null;
@@ -221,6 +250,7 @@ export class DashboardComponent implements OnInit {
       this.loadChannels(workspace.id),
       this.loadMembers(workspace.id),
       this.loadWorkspaceRoles(workspace.id),
+      this.loadTasks(workspace.id),
     ]);
   }
 
@@ -462,6 +492,7 @@ export class DashboardComponent implements OnInit {
       await Promise.all([
         this.loadInvitations(),
         this.loadDeleteNotifications(),
+        this.loadTaskNotifications(),
       ]);
     } catch (error) {
       console.error('Błąd zapisu profilu:', error);
@@ -475,6 +506,15 @@ export class DashboardComponent implements OnInit {
       this.deleteNotifications = data || [];
     } catch (e) {
       console.error('Błąd pobierania powiadomień o usunięciu:', e);
+    }
+  }
+
+  async loadTaskNotifications() {
+    try {
+      const data: any = await this.workspaceService.getTaskNotifications();
+      this.taskNotifications = data || [];
+    } catch (e) {
+      console.error('Błąd pobierania powiadomień o zadaniach:', e);
     }
   }
 
@@ -542,6 +582,15 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  async dismissTaskNotifications() {
+    try {
+      await this.workspaceService.markTaskNotificationsRead();
+      this.taskNotifications = [];
+    } catch (e) {
+      console.error('Błąd oznaczania powiadomień o zadaniach jako przeczytane:', e);
+    }
+  }
+
   async loadWorkspaceRoles(workspaceId: string) {
     try {
       this.workspaceRoles = (await this.workspaceService.getWorkspaceRoles(
@@ -591,7 +640,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  async assignCustomRole(customRoleId: string | null) {
+  async toggleCustomRole(customRoleId: string) {
     if (!this.activeWorkspace || !this.selectedMember) return;
     try {
       await this.workspaceService.assignCustomRole(
@@ -599,11 +648,23 @@ export class DashboardComponent implements OnInit {
         this.selectedMember.userId,
         customRoleId,
       );
-      await this.loadMembers(this.activeWorkspace.id);
-      this.isMemberModalOpen = false;
+      const updated: any = await this.workspaceService.getMembers(
+        this.activeWorkspace.id,
+      );
+      this.members = updated;
+      this.selectedMember = this.members.find(
+        (m) => m.userId === this.selectedMember.userId,
+      );
     } catch (e: any) {
       alert(e?.error?.message || 'Nie udało się przypisać roli.');
     }
+  }
+
+  getMemberCustomRoles(member: any): any[] {
+    if (!member.customRoleIds?.length) return [];
+    return this.workspaceRoles.filter((r) =>
+      member.customRoleIds.includes(r.id),
+    );
   }
 
   onMessageInput(event: Event) {
@@ -662,8 +723,8 @@ export class DashboardComponent implements OnInit {
   }
 
   countMembersByRole(customRoleId: string): string {
-    const count = this.members.filter(
-      (m) => m.customRoleId === customRoleId,
+    const count = this.members.filter((m) =>
+      m.customRoleIds?.includes(customRoleId),
     ).length;
     return count > 0 ? `${count} os.` : '';
   }
@@ -813,21 +874,32 @@ export class DashboardComponent implements OnInit {
     if (!this.newTask.title.trim() || !this.activeWorkspace) return;
     this.isCreatingTask = true;
     try {
-      await this.workspaceService.createTask(this.activeWorkspace.id, {
-        title: this.newTask.title.trim(),
-        description: this.newTask.description || undefined,
-        priority: this.newTask.priority,
-        assigneeIds: this.newTask.assigneeIds.length ? this.newTask.assigneeIds : undefined,
-        dueDate: this.newTask.dueDate || undefined,
-      });
+      await this.workspaceService.createTask(
+        this.activeWorkspace.id,
+        {
+          title: this.newTask.title.trim(),
+          description: this.newTask.description || undefined,
+          priority: this.newTask.priority,
+          assigneeIds: this.newTask.assigneeIds.length
+            ? this.newTask.assigneeIds
+            : undefined,
+          dueDate: this.newTask.dueDate || undefined,
+          submissionType: this.newTask.submissionType,
+          submissionMode: this.newTask.submissionMode,
+        },
+        this.taskAttachmentFile,
+      );
       await this.loadTasks(this.activeWorkspace.id);
       this.isCreateTaskModalOpen = false;
+      this.taskAttachmentFile = null;
       this.newTask = {
         title: '',
         description: '',
         priority: 'MEDIUM',
         assigneeIds: [],
         dueDate: '',
+        submissionType: 'NONE',
+        submissionMode: 'INDIVIDUAL',
       };
     } catch (e: any) {
       alert(e?.error?.message || 'Nie udało się utworzyć zadania.');
@@ -887,7 +959,9 @@ export class DashboardComponent implements OnInit {
   getTaskAssigneeInitials(member: any): string {
     const f = member.user?.firstName?.[0] || '';
     const l = member.user?.lastName?.[0] || '';
-    return (f + l).toUpperCase() || member.user?.email?.[0]?.toUpperCase() || '?';
+    return (
+      (f + l).toUpperCase() || member.user?.email?.[0]?.toUpperCase() || '?'
+    );
   }
 
   myActiveTasks(): any[] {
@@ -906,15 +980,19 @@ export class DashboardComponent implements OnInit {
     if (idx === -1) {
       this.newTask.assigneeIds = [...this.newTask.assigneeIds, userId];
     } else {
-      this.newTask.assigneeIds = this.newTask.assigneeIds.filter((id) => id !== userId);
+      this.newTask.assigneeIds = this.newTask.assigneeIds.filter(
+        (id) => id !== userId,
+      );
     }
   }
 
   assignRoleToTask(customRoleId: string) {
     const roleMembers = this.members
-      .filter((m) => m.customRoleId === customRoleId)
+      .filter((m) => m.customRoleIds?.includes(customRoleId))
       .map((m) => m.userId);
-    const allSelected = roleMembers.every((id) => this.newTask.assigneeIds.includes(id));
+    const allSelected = roleMembers.every((id) =>
+      this.newTask.assigneeIds.includes(id),
+    );
     if (allSelected) {
       this.newTask.assigneeIds = this.newTask.assigneeIds.filter(
         (id) => !roleMembers.includes(id),
@@ -926,8 +1004,131 @@ export class DashboardComponent implements OnInit {
   }
 
   isRoleFullySelected(customRoleId: string): boolean {
-    const roleMembers = this.members.filter((m) => m.customRoleId === customRoleId);
-    return roleMembers.length > 0 && roleMembers.every((m) => this.newTask.assigneeIds.includes(m.userId));
+    const roleMembers = this.members.filter((m) =>
+      m.customRoleIds?.includes(customRoleId),
+    );
+    return (
+      roleMembers.length > 0 &&
+      roleMembers.every((m) => this.newTask.assigneeIds.includes(m.userId))
+    );
+  }
+
+  onTaskAttachmentSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.[0]) {
+      const file = input.files[0];
+      const maxMB = 20;
+      if (file.size > maxMB * 1024 * 1024) {
+        alert(`Plik jest za duży. Maksymalny rozmiar to ${maxMB} MB.`);
+        input.value = '';
+        return;
+      }
+      this.taskAttachmentFile = file;
+    }
+  }
+
+  deadlineBadgeClass(task: any): string {
+    if (!task.dueDate || task.status === 'DONE')
+      return 'text-gray-400 dark:text-gray-500';
+    const diff = new Date(task.dueDate).getTime() - Date.now();
+    const days = diff / 86400000;
+    if (days < 0) return 'text-red-600 dark:text-red-400 font-bold';
+    if (days < 1) return 'text-orange-500 dark:text-orange-400 font-semibold';
+    if (days < 3) return 'text-yellow-600 dark:text-yellow-500 font-semibold';
+    return 'text-gray-400 dark:text-gray-500';
+  }
+
+  deadlineIcon(task: any): string {
+    if (!task.dueDate || task.status === 'DONE') return '';
+    const diff = new Date(task.dueDate).getTime() - Date.now();
+    const days = diff / 86400000;
+    if (days < 0) return '⚠ ';
+    if (days < 1) return '🔥 ';
+    return '';
+  }
+
+  canSubmitTask(task: any): boolean {
+    if (task.submissionType === 'NONE') return false;
+    if (task.status !== 'IN_PROGRESS') return false;
+    const uid = this.auth.currentUser?.uid;
+    return task.assigneeIds?.includes(uid) ?? false;
+  }
+
+  openSubmitModal(task: any) {
+    this.submitTaskTarget = task;
+    this.submitText = '';
+    this.submitFiles = [];
+    this.isSubmitModalOpen = true;
+  }
+
+  onSubmitFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const maxMB = 10;
+    const remaining = 4 - this.submitFiles.length;
+    const toAdd = Array.from(input.files).slice(0, remaining);
+    const oversized = toAdd.filter((f) => f.size > maxMB * 1024 * 1024);
+    if (oversized.length) {
+      alert(`Niektóre pliki są za duże. Maksymalny rozmiar to ${maxMB} MB.`);
+      input.value = '';
+      return;
+    }
+    this.submitFiles = [...this.submitFiles, ...toAdd];
+    input.value = '';
+  }
+
+  removeSubmitFile(index: number) {
+    this.submitFiles = this.submitFiles.filter((_, i) => i !== index);
+  }
+
+  async submitTaskResult() {
+    if (!this.submitTaskTarget || !this.activeWorkspace) return;
+    const t = this.submitTaskTarget;
+    const needsText = t.submissionType === 'TEXT' || t.submissionType === 'BOTH';
+    const needsFile = t.submissionType === 'FILE' || t.submissionType === 'BOTH';
+    if (needsText && !this.submitText.trim()) return;
+    if (needsFile && !this.submitFiles.length) return;
+    this.isSubmitting = true;
+    try {
+      await this.workspaceService.submitTask(
+        this.activeWorkspace.id,
+        t.id,
+        { textContent: this.submitText || undefined },
+        this.submitFiles.length ? this.submitFiles : undefined,
+      );
+      await this.loadTasks(this.activeWorkspace.id);
+      this.isSubmitModalOpen = false;
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się przesłać wyniku.');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  myCreatedTasksWithSubmissions(): any[] {
+    const uid = this.auth.currentUser?.uid;
+    return this.tasks.filter(
+      (t) =>
+        t.createdById === uid &&
+        t.submissionType !== 'NONE' &&
+        t.submissions?.length > 0,
+    );
+  }
+
+  getSubmitterName(submittedById: string): string {
+    const m = this.members.find((m) => m.userId === submittedById);
+    if (!m) return submittedById;
+    return m.user?.firstName && m.user?.lastName
+      ? `${m.user.firstName} ${m.user.lastName}`
+      : m.user?.email || submittedById;
+  }
+
+  submissionTypeLabel(type: string): string {
+    return (
+      { NONE: 'Brak', TEXT: 'Opis tekstowy', FILE: 'Plik', BOTH: 'Opis i plik' }[
+        type
+      ] ?? type
+    );
   }
 
   renderContent(content: string | null | undefined): SafeHtml {
@@ -970,5 +1171,60 @@ export class DashboardComponent implements OnInit {
         .toLowerCase();
     const lower = content.toLowerCase();
     return lower.includes('@all') || (!!myName && lower.includes(`@${myName}`));
+  }
+
+  submissionModeLabel(mode: string): string {
+    return (
+      { INDIVIDUAL: 'Indywidualnie', GROUP: 'Grupowo' }[mode] ?? mode
+    );
+  }
+
+  getStatsTasksInPeriod(): any[] {
+    const done = this.tasks.filter((t) => t.status === 'DONE');
+    if (this.statsTimePeriod === 'all') return done;
+    const now = Date.now();
+    const ms = ({ week: 7, month: 30, year: 365 } as Record<string, number>)[this.statsTimePeriod] * 86400000;
+    return done.filter((t) => new Date(t.updatedAt).getTime() >= now - ms);
+  }
+
+  getFilteredDoneTasksCount(): number {
+    let tasks = this.getStatsTasksInPeriod();
+    if (this.statsFilterType === 'role' && this.statsFilterId) {
+      const roleUserIds = this.members
+        .filter((m) => m.customRoleIds?.includes(this.statsFilterId))
+        .map((m) => m.userId);
+      tasks = tasks.filter((t) =>
+        t.assigneeIds?.some((id: string) => roleUserIds.includes(id)),
+      );
+    } else if (this.statsFilterType === 'member' && this.statsFilterId) {
+      tasks = tasks.filter((t) => t.assigneeIds?.includes(this.statsFilterId));
+    }
+    return tasks.length;
+  }
+
+  getMyDoneTasksCount(): number {
+    const uid = this.auth.currentUser?.uid;
+    let tasks = this.tasks.filter(
+      (t) => t.status === 'DONE' && t.assigneeIds?.includes(uid),
+    );
+    if (this.statsTimePeriod === 'all') return tasks.length;
+    const now = Date.now();
+    const ms = ({ week: 7, month: 30, year: 365 } as Record<string, number>)[this.statsTimePeriod] * 86400000;
+    return tasks.filter((t) => new Date(t.updatedAt).getTime() >= now - ms).length;
+  }
+
+  myAssignedTasksCount(): number {
+    const uid = this.auth.currentUser?.uid;
+    return this.tasks.filter((t) => t.assigneeIds?.includes(uid)).length;
+  }
+
+  onStatsMemberFilterChange(userId: string) {
+    if (userId) {
+      this.statsFilterType = 'member';
+      this.statsFilterId = userId;
+    } else {
+      this.statsFilterType = 'all';
+      this.statsFilterId = '';
+    }
   }
 }

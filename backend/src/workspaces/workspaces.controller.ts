@@ -10,8 +10,9 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { WorkspacesService } from './workspaces.service';
@@ -38,6 +39,16 @@ export class WorkspacesController {
   @Patch('notifications/deleted/read')
   markNotificationsRead(@Req() req: any) {
     return this.workspacesService.markNotificationsRead(req.user.uid);
+  }
+
+  @Get('notifications/tasks')
+  getTaskNotifications(@Req() req: any) {
+    return this.workspacesService.getTaskNotifications(req.user.uid);
+  }
+
+  @Patch('notifications/tasks/read')
+  markTaskNotificationsRead(@Req() req: any) {
+    return this.workspacesService.markTaskNotificationsRead(req.user.uid);
   }
 
   @Get('test-create/:userId')
@@ -271,16 +282,16 @@ export class WorkspacesController {
   }
 
   @Patch(':id/members/:userId/custom-role')
-  assignCustomRole(
+  toggleCustomRole(
     @Param('id') workspaceId: string,
     @Param('userId') userId: string,
     @Body('customRoleId') customRoleId: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.assignCustomRole(
+    return this.workspacesService.toggleCustomRole(
       workspaceId,
       userId,
-      customRoleId || null,
+      customRoleId,
       req.user.uid,
     );
   }
@@ -291,19 +302,93 @@ export class WorkspacesController {
   }
 
   @Post(':id/tasks')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_req: any, file: any, cb: any) => {
+          const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, unique + extname(file.originalname));
+        },
+      }),
+      limits: { fileSize: 20 * 1024 * 1024 },
+    }),
+  )
   createTask(
     @Param('id') workspaceId: string,
     @Body() body: any,
+    @UploadedFile() file: any,
     @Req() req: any,
   ) {
+    const assigneeIds = body.assigneeIds
+      ? typeof body.assigneeIds === 'string'
+        ? JSON.parse(body.assigneeIds)
+        : body.assigneeIds
+      : [];
+    const attachmentUrl = file ? `/uploads/${file.filename}` : undefined;
+    const attachmentName = file ? file.originalname : undefined;
+    const attachmentType = file
+      ? file.mimetype.startsWith('image/')
+        ? 'image'
+        : file.mimetype.startsWith('video/')
+          ? 'video'
+          : 'document'
+      : undefined;
+
     return this.workspacesService.createTask(
       workspaceId,
       body.title,
       body.description,
       body.priority,
-      body.assigneeIds || [],
+      assigneeIds,
       body.dueDate,
       req.user.uid,
+      body.submissionType || 'NONE',
+      body.submissionMode || 'INDIVIDUAL',
+      attachmentUrl,
+      attachmentName,
+      attachmentType,
+    );
+  }
+
+  @Post(':id/tasks/:taskId/submit')
+  @UseInterceptors(
+    FilesInterceptor('files', 4, {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_req: any, file: any, cb: any) => {
+          const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, unique + extname(file.originalname));
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  submitTask(
+    @Param('id') workspaceId: string,
+    @Param('taskId') taskId: string,
+    @Body('textContent') textContent: string,
+    @UploadedFiles() files: any[],
+    @Req() req: any,
+  ) {
+    const fileUrls = files?.map((f) => `/uploads/${f.filename}`) || [];
+    const fileNames = files?.map((f) => f.originalname) || [];
+    const fileTypes =
+      files?.map((f) =>
+        f.mimetype.startsWith('image/')
+          ? 'image'
+          : f.mimetype.startsWith('video/')
+            ? 'video'
+            : 'document',
+      ) || [];
+    return this.workspacesService.submitTask(
+      workspaceId,
+      taskId,
+      req.user.uid,
+      textContent,
+      fileUrls,
+      fileNames,
+      fileTypes,
     );
   }
 

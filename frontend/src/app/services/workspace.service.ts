@@ -299,11 +299,45 @@ export class WorkspaceService {
       priority?: string;
       assigneeIds?: string[];
       dueDate?: string;
+      submissionType?: string;
+      submissionMode?: string;
     },
+    file?: File | null,
   ) {
     const headers = await this.getHeaders();
+    const formData = new FormData();
+    formData.append('title', data.title);
+    if (data.description) formData.append('description', data.description);
+    if (data.priority) formData.append('priority', data.priority);
+    if (data.assigneeIds?.length)
+      formData.append('assigneeIds', JSON.stringify(data.assigneeIds));
+    if (data.dueDate) formData.append('dueDate', data.dueDate);
+    if (data.submissionType) formData.append('submissionType', data.submissionType);
+    if (data.submissionMode) formData.append('submissionMode', data.submissionMode);
+    if (file) formData.append('file', file);
     return firstValueFrom(
-      this.http.post(`${this.apiUrl}/${workspaceId}/tasks`, data, { headers }),
+      this.http.post(`${this.apiUrl}/${workspaceId}/tasks`, formData, { headers }),
+    );
+  }
+
+  async submitTask(
+    workspaceId: string,
+    taskId: string,
+    data: { textContent?: string },
+    files?: File[],
+  ) {
+    const headers = await this.getHeaders();
+    const formData = new FormData();
+    if (data.textContent) formData.append('textContent', data.textContent);
+    if (files?.length) {
+      files.forEach((f) => formData.append('files', f));
+    }
+    return firstValueFrom(
+      this.http.post(
+        `${this.apiUrl}/${workspaceId}/tasks/${taskId}/submit`,
+        formData,
+        { headers },
+      ),
     );
   }
 
@@ -335,6 +369,20 @@ export class WorkspaceService {
       this.http.delete(`${this.apiUrl}/${workspaceId}/tasks/${taskId}`, {
         headers,
       }),
+    );
+  }
+
+  async getTaskNotifications() {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/notifications/tasks`, { headers }),
+    );
+  }
+
+  async markTaskNotificationsRead() {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(`${this.apiUrl}/notifications/tasks/read`, {}, { headers }),
     );
   }
 }

@@ -44,6 +44,7 @@ model User {
   reactions  Reaction[]
   sentInvitations     Invitation[] @relation("Inviter")
   deleteNotifications DeleteNotification[]
+  taskNotifications   TaskNotification[]
   tasksCreated        Task[]       @relation("TaskCreator")
 }
 
@@ -62,16 +63,15 @@ model Workspace {
 }
 
 model WorkspaceMember {
-  id           String   @id @default(uuid())
-  userId       String
-  workspaceId  String
-  role         Role     @default(MEMBER)
-  customRoleId String?
-  joinedAt     DateTime @default(now())
+  id            String   @id @default(uuid())
+  userId        String
+  workspaceId   String
+  role          Role     @default(MEMBER)
+  customRoleIds String[] @default([])
+  joinedAt      DateTime @default(now())
 
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace    Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  customRole   WorkspaceRole? @relation(fields: [customRoleId], references: [id], onDelete: SetNull)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
 }
@@ -83,8 +83,7 @@ model WorkspaceRole {
   color       String   @default("#6366f1")
   createdAt   DateTime @default(now())
 
-  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  members     WorkspaceMember[]
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
@@ -150,20 +149,51 @@ enum TaskPriority {
 }
 
 model Task {
-  id          String       @id @default(uuid())
-  title       String
-  description String?
-  status      TaskStatus   @default(TODO)
-  priority    TaskPriority @default(MEDIUM)
-  workspaceId String
-  assigneeIds String[]     @default([])
-  dueDate     DateTime?
-  createdById String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  status         TaskStatus   @default(TODO)
+  priority       TaskPriority @default(MEDIUM)
+  workspaceId    String
+  assigneeIds    String[]     @default([])
+  dueDate        DateTime?
+  createdById    String
+  attachmentUrl  String?
+  attachmentName String?
+  attachmentType String?
+  submissionType String       @default("NONE")
+  submissionMode String       @default("INDIVIDUAL")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdBy  User      @relation("TaskCreator", fields: [createdById], references: [id])
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User            @relation("TaskCreator", fields: [createdById], references: [id])
+  submissions TaskSubmission[]
+}
+
+model TaskSubmission {
+  id            String   @id @default(uuid())
+  taskId        String
+  submittedById String
+  textContent   String?
+  fileUrls      String[] @default([])
+  fileNames     String[] @default([])
+  fileTypes     String[] @default([])
+  createdAt     DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model TaskNotification {
+  id          String   @id @default(uuid())
+  userId      String
+  workspaceId String
+  taskId      String
+  taskTitle   String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Invitation {

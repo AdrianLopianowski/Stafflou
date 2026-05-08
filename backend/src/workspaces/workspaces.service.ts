@@ -188,7 +188,7 @@ export class WorkspacesService {
     const prismaAny = this.prisma as any;
     const members = await prismaAny.workspaceMember.findMany({
       where: { workspaceId },
-      include: { user: true, customRole: true },
+      include: { user: true },
       orderBy: { joinedAt: 'asc' },
     });
     return members.map((m: any) => ({
@@ -498,10 +498,10 @@ export class WorkspacesService {
     return prismaAny.workspaceRole.delete({ where: { id: roleId } });
   }
 
-  async assignCustomRole(
+  async toggleCustomRole(
     workspaceId: string,
     targetUserId: string,
-    customRoleId: string | null,
+    customRoleId: string,
     requesterId: string,
   ) {
     const requester = await this.prisma.workspaceMember.findFirst({
@@ -516,10 +516,15 @@ export class WorkspacesService {
     if (!target) throw new NotFoundException('Użytkownik nie jest członkiem');
 
     const prismaAny = this.prisma as any;
+    const currentIds: string[] = (target as any).customRoleIds || [];
+    const newIds = currentIds.includes(customRoleId)
+      ? currentIds.filter((id) => id !== customRoleId)
+      : [...currentIds, customRoleId];
+
     return prismaAny.workspaceMember.update({
       where: { id: target.id },
-      data: { customRoleId: customRoleId ?? null },
-      include: { user: true, customRole: true },
+      data: { customRoleIds: newIds },
+      include: { user: true },
     });
   }
 
@@ -527,7 +532,7 @@ export class WorkspacesService {
     const prismaAny = this.prisma as any;
     return prismaAny.task.findMany({
       where: { workspaceId },
-      include: { createdBy: true },
+      include: { createdBy: true, submissions: true },
       orderBy: { createdAt: 'asc' },
     });
   }
@@ -540,6 +545,11 @@ export class WorkspacesService {
     assigneeIds: string[],
     dueDate: string | undefined,
     createdById: string,
+    submissionType: string,
+    submissionMode: string,
+    attachmentUrl?: string,
+    attachmentName?: string,
+    attachmentType?: string,
   ) {
     const member = await this.prisma.workspaceMember.findFirst({
       where: { workspaceId, userId: createdById },
@@ -547,7 +557,7 @@ export class WorkspacesService {
     if (!member) throw new ForbiddenException('Brak dostępu');
 
     const prismaAny = this.prisma as any;
-    return prismaAny.task.create({
+    const task = await prismaAny.task.create({
       data: {
         title,
         description: description || undefined,
@@ -556,9 +566,68 @@ export class WorkspacesService {
         assigneeIds: assigneeIds || [],
         dueDate: dueDate ? new Date(dueDate) : undefined,
         createdById,
+        submissionType: submissionType || 'NONE',
+        submissionMode: submissionMode || 'INDIVIDUAL',
+        attachmentUrl: attachmentUrl || undefined,
+        attachmentName: attachmentName || undefined,
+        attachmentType: attachmentType || undefined,
       },
-      include: { createdBy: true },
+      include: { createdBy: true, submissions: true },
     });
+
+    for (const assigneeId of assigneeIds || []) {
+      if (assigneeId !== createdById) {
+        await prismaAny.taskNotification.create({
+          data: {
+            userId: assigneeId,
+            workspaceId,
+            taskId: task.id,
+            taskTitle: title,
+          },
+        });
+      }
+    }
+
+    return task;
+  }
+
+  async submitTask(
+    workspaceId: string,
+    taskId: string,
+    submittedById: string,
+    textContent?: string,
+    fileUrls?: string[],
+    fileNames?: string[],
+    fileTypes?: string[],
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: submittedById },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+
+    const prismaAny = this.prisma as any;
+
+    const task = await prismaAny.task.findUnique({ where: { id: taskId } });
+
+    const submission = await prismaAny.taskSubmission.create({
+      data: {
+        taskId,
+        submittedById,
+        textContent: textContent || undefined,
+        fileUrls: fileUrls || [],
+        fileNames: fileNames || [],
+        fileTypes: fileTypes || [],
+      },
+    });
+
+    if ((task as any)?.submissionMode === 'GROUP') {
+      await prismaAny.task.update({
+        where: { id: taskId },
+        data: { status: 'DONE' },
+      });
+    }
+
+    return submission;
   }
 
   async updateTask(
@@ -580,6 +649,30 @@ export class WorkspacesService {
     if (!member) throw new ForbiddenException('Brak dostępu');
 
     const prismaAny = this.prisma as any;
+
+    if (updates.assigneeIds !== undefined && updates.assigneeIds !== null) {
+      const currentTask = await prismaAny.task.findUnique({
+        where: { id: taskId },
+      });
+      if (currentTask) {
+        const oldIds: string[] = currentTask.assigneeIds || [];
+        const newIds: string[] = updates.assigneeIds ?? [];
+        const taskTitle: string = updates.title ?? currentTask.title;
+        for (const newId of newIds) {
+          if (!oldIds.includes(newId) && newId !== requesterId) {
+            await prismaAny.taskNotification.create({
+              data: {
+                userId: newId,
+                workspaceId,
+                taskId,
+                taskTitle,
+              },
+            });
+          }
+        }
+      }
+    }
+
     return prismaAny.task.update({
       where: { id: taskId },
       data: {
@@ -608,6 +701,23 @@ export class WorkspacesService {
 
     const prismaAny = this.prisma as any;
     await prismaAny.task.delete({ where: { id: taskId } });
+    return { success: true };
+  }
+
+  async getTaskNotifications(userId: string) {
+    const prismaAny = this.prisma as any;
+    return prismaAny.taskNotification.findMany({
+      where: { userId, isRead: false },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async markTaskNotificationsRead(userId: string) {
+    const prismaAny = this.prisma as any;
+    await prismaAny.taskNotification.updateMany({
+      where: { userId, isRead: false },
+      data: { isRead: true },
+    });
     return { success: true };
   }
 }
