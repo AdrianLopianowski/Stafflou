@@ -625,6 +625,22 @@ export class WorkspacesService {
         where: { id: taskId },
         data: { status: 'DONE' },
       });
+    } else {
+      const currentCompleted: string[] = (task as any)?.completedByIds || [];
+      if (!currentCompleted.includes(submittedById)) {
+        const updatedCompleted = [...currentCompleted, submittedById];
+        const assigneeIds: string[] = (task as any)?.assigneeIds || [];
+        const allDone =
+          assigneeIds.length > 0 &&
+          assigneeIds.every((id: string) => updatedCompleted.includes(id));
+        await prismaAny.task.update({
+          where: { id: taskId },
+          data: {
+            completedByIds: updatedCompleted,
+            ...(allDone ? { status: 'DONE' } : {}),
+          },
+        });
+      }
     }
 
     return submission;
@@ -650,44 +666,78 @@ export class WorkspacesService {
 
     const prismaAny = this.prisma as any;
 
-    if (updates.assigneeIds !== undefined && updates.assigneeIds !== null) {
-      const currentTask = await prismaAny.task.findUnique({
-        where: { id: taskId },
-      });
-      if (currentTask) {
-        const oldIds: string[] = currentTask.assigneeIds || [];
-        const newIds: string[] = updates.assigneeIds ?? [];
-        const taskTitle: string = updates.title ?? currentTask.title;
-        for (const newId of newIds) {
-          if (!oldIds.includes(newId) && newId !== requesterId) {
-            await prismaAny.taskNotification.create({
-              data: {
-                userId: newId,
-                workspaceId,
-                taskId,
-                taskTitle,
-              },
-            });
-          }
+    let currentTask: any = null;
+    if (updates.assigneeIds !== undefined || updates.status !== undefined) {
+      currentTask = await prismaAny.task.findUnique({ where: { id: taskId } });
+    }
+
+    if (updates.assigneeIds !== undefined && updates.assigneeIds !== null && currentTask) {
+      const oldIds: string[] = currentTask.assigneeIds || [];
+      const newIds: string[] = updates.assigneeIds ?? [];
+      const taskTitle: string = updates.title ?? currentTask.title;
+      for (const newId of newIds) {
+        if (!oldIds.includes(newId) && newId !== requesterId) {
+          await prismaAny.taskNotification.create({
+            data: { userId: newId, workspaceId, taskId, taskTitle },
+          });
         }
       }
+    }
+
+    const baseData = {
+      ...(updates.title !== undefined && { title: updates.title }),
+      ...(updates.description !== undefined && { description: updates.description }),
+      ...(updates.priority !== undefined && { priority: updates.priority }),
+      ...(updates.assigneeIds !== undefined && { assigneeIds: updates.assigneeIds ?? [] }),
+      ...(updates.dueDate !== undefined && {
+        dueDate: updates.dueDate ? new Date(updates.dueDate) : null,
+      }),
+    };
+
+    if (
+      updates.status &&
+      currentTask?.submissionMode === 'INDIVIDUAL' &&
+      (currentTask?.assigneeIds as string[])?.includes(requesterId)
+    ) {
+      const inProgressByIds: string[] = currentTask.inProgressByIds || [];
+      const completedByIds: string[] = currentTask.completedByIds || [];
+      const assigneeIds: string[] = currentTask.assigneeIds || [];
+
+      let newInProgress = [...inProgressByIds];
+      let newCompleted = [...completedByIds];
+      let globalStatus: string | undefined;
+
+      if (updates.status === 'IN_PROGRESS') {
+        if (!newInProgress.includes(requesterId)) newInProgress.push(requesterId);
+        newCompleted = newCompleted.filter((id) => id !== requesterId);
+      } else if (updates.status === 'DONE') {
+        if (!newCompleted.includes(requesterId)) newCompleted.push(requesterId);
+        newInProgress = newInProgress.filter((id) => id !== requesterId);
+        if (assigneeIds.length > 0 && assigneeIds.every((id) => newCompleted.includes(id))) {
+          globalStatus = 'DONE';
+        }
+      } else if (updates.status === 'TODO') {
+        newInProgress = newInProgress.filter((id) => id !== requesterId);
+        newCompleted = newCompleted.filter((id) => id !== requesterId);
+      }
+
+      return prismaAny.task.update({
+        where: { id: taskId },
+        data: {
+          ...baseData,
+          inProgressByIds: newInProgress,
+          completedByIds: newCompleted,
+          ...(globalStatus !== undefined && { status: globalStatus }),
+        },
+        include: { createdBy: true },
+      });
     }
 
     return prismaAny.task.update({
       where: { id: taskId },
       data: {
-        ...(updates.title !== undefined && { title: updates.title }),
-        ...(updates.description !== undefined && {
-          description: updates.description,
-        }),
+        ...baseData,
         ...(updates.status !== undefined && { status: updates.status }),
-        ...(updates.priority !== undefined && { priority: updates.priority }),
-        ...(updates.assigneeIds !== undefined && {
-          assigneeIds: updates.assigneeIds ?? [],
-        }),
-        ...(updates.dueDate !== undefined && {
-          dueDate: updates.dueDate ? new Date(updates.dueDate) : null,
-        }),
       },
       include: { createdBy: true },
     });

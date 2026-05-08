@@ -229,6 +229,10 @@ export class DashboardComponent implements OnInit {
     return member ? member.role : 'MEMBER';
   }
 
+  get minDueDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   get maxDueDate(): string {
     const d = new Date();
     d.setFullYear(d.getFullYear() + 1);
@@ -236,6 +240,9 @@ export class DashboardComponent implements OnInit {
   }
 
   clampDueDate() {
+    if (this.newTask.dueDate && this.newTask.dueDate < this.minDueDate) {
+      this.newTask.dueDate = this.minDueDate;
+    }
     if (this.newTask.dueDate && this.newTask.dueDate > this.maxDueDate) {
       this.newTask.dueDate = this.maxDueDate;
     }
@@ -866,8 +873,18 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  effectiveStatus(task: any): string {
+    const uid = this.auth.currentUser?.uid;
+    if (task.submissionMode === 'INDIVIDUAL' && uid && task.assigneeIds?.includes(uid)) {
+      if (task.completedByIds?.includes(uid)) return 'DONE';
+      if (task.inProgressByIds?.includes(uid)) return 'IN_PROGRESS';
+      return 'TODO';
+    }
+    return task.status;
+  }
+
   tasksByStatus(status: string): any[] {
-    return this.tasks.filter((t) => t.status === status);
+    return this.tasks.filter((t) => this.effectiveStatus(t) === status);
   }
 
   async createTask() {
@@ -967,7 +984,7 @@ export class DashboardComponent implements OnInit {
   myActiveTasks(): any[] {
     const uid = this.auth.currentUser?.uid;
     return this.tasks.filter(
-      (t) => t.status !== 'DONE' && t.assigneeIds?.includes(uid),
+      (t) => this.effectiveStatus(t) !== 'DONE' && t.assigneeIds?.includes(uid),
     );
   }
 
@@ -1028,7 +1045,7 @@ export class DashboardComponent implements OnInit {
   }
 
   deadlineBadgeClass(task: any): string {
-    if (!task.dueDate || task.status === 'DONE')
+    if (!task.dueDate || this.effectiveStatus(task) === 'DONE')
       return 'text-gray-400 dark:text-gray-500';
     const diff = new Date(task.dueDate).getTime() - Date.now();
     const days = diff / 86400000;
@@ -1039,7 +1056,7 @@ export class DashboardComponent implements OnInit {
   }
 
   deadlineIcon(task: any): string {
-    if (!task.dueDate || task.status === 'DONE') return '';
+    if (!task.dueDate || this.effectiveStatus(task) === 'DONE') return '';
     const diff = new Date(task.dueDate).getTime() - Date.now();
     const days = diff / 86400000;
     if (days < 0) return '⚠ ';
@@ -1049,7 +1066,7 @@ export class DashboardComponent implements OnInit {
 
   canSubmitTask(task: any): boolean {
     if (task.submissionType === 'NONE') return false;
-    if (task.status !== 'IN_PROGRESS') return false;
+    if (this.effectiveStatus(task) !== 'IN_PROGRESS') return false;
     const uid = this.auth.currentUser?.uid;
     return task.assigneeIds?.includes(uid) ?? false;
   }

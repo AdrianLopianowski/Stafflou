@@ -2470,6 +2470,7 @@
                   type="date"
                   [(ngModel)]="newTask.dueDate"
                   name="taskDue"
+                  [min]="minDueDate"
                   [max]="maxDueDate"
                   (change)="clampDueDate()"
                   class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"

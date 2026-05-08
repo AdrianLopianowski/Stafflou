@@ -161,9 +161,11 @@ model Task {
   attachmentUrl  String?
   attachmentName String?
   attachmentType String?
-  submissionType String       @default("NONE")
-  submissionMode String       @default("INDIVIDUAL")
-  createdAt      DateTime     @default(now())
+  submissionType   String       @default("NONE")
+  submissionMode   String       @default("INDIVIDUAL")
+  inProgressByIds  String[]     @default([])
+  completedByIds   String[]     @default([])
+  createdAt        DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
   workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
