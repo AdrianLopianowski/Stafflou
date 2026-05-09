@@ -88,7 +88,8 @@ export class DashboardComponent implements OnInit {
   userPopoverMember: any = null;
   userPopoverPos = { top: 0, left: 0 };
 
-  activeView: 'overview' | 'channel' | 'tasks' = 'overview';
+  activeView: 'overview' | 'channel' | 'tasks' | 'team' = 'overview';
+  memberSearchQuery = '';
   isWorkspaceSelectorOpen = false;
 
   tasks: any[] = [];
@@ -674,6 +675,33 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  getMemberTaskStats(userId: string): { assigned: number; done: number; inProgress: number } {
+    const assigned = this.tasks.filter((t) => t.assigneeIds?.includes(userId));
+    const done = assigned.filter((t) => {
+      if (t.submissionMode === 'INDIVIDUAL') return t.completedByIds?.includes(userId);
+      return t.status === 'DONE';
+    });
+    const inProgress = assigned.filter((t) => {
+      if (t.submissionMode === 'INDIVIDUAL') return t.inProgressByIds?.includes(userId) && !t.completedByIds?.includes(userId);
+      return t.status === 'IN_PROGRESS';
+    });
+    return { assigned: assigned.length, done: done.length, inProgress: inProgress.length };
+  }
+
+  filteredMembersForPanel(): any[] {
+    const q = this.memberSearchQuery.trim().toLowerCase();
+    if (!q) return this.members;
+    return this.members.filter((m) => {
+      const name = `${m.user?.firstName ?? ''} ${m.user?.lastName ?? ''}`.toLowerCase();
+      const email = (m.user?.email ?? '').toLowerCase();
+      return name.includes(q) || email.includes(q);
+    });
+  }
+
+  filteredMembersByRole(role: string): any[] {
+    return this.filteredMembersForPanel().filter((m) => m.role === role);
+  }
+
   onMessageInput(event: Event) {
     const input = event.target as HTMLInputElement;
     const value = input.value;
@@ -858,7 +886,7 @@ export class DashboardComponent implements OnInit {
     this.userPopoverMember = null;
   }
 
-  setActiveView(view: 'overview' | 'channel' | 'tasks') {
+  setActiveView(view: 'overview' | 'channel' | 'tasks' | 'team') {
     this.activeView = view;
     if (view === 'tasks' && this.activeWorkspace) {
       this.loadTasks(this.activeWorkspace.id);
