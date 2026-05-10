@@ -470,4 +470,98 @@ export class WorkspacesController {
   ) {
     return this.workspacesService.deleteTask(workspaceId, taskId, req.user.uid);
   }
+
+  @Get(':id/dm')
+  getDMConversations(@Param('id') workspaceId: string, @Req() req: any) {
+    return this.workspacesService.getDMConversations(workspaceId, req.user.uid);
+  }
+
+  @Patch(':id/dm/messages/:messageId')
+  editDM(
+    @Param('id') workspaceId: string,
+    @Param('messageId') messageId: string,
+    @Body('content') content: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.editDM(workspaceId, messageId, req.user.uid, content);
+  }
+
+  @Delete(':id/dm/messages/:messageId')
+  deleteDM(
+    @Param('id') workspaceId: string,
+    @Param('messageId') messageId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.deleteDM(workspaceId, messageId, req.user.uid);
+  }
+
+  @Get(':id/dm/:userId')
+  getDMHistory(
+    @Param('id') workspaceId: string,
+    @Param('userId') otherUserId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.getDMHistory(workspaceId, req.user.uid, otherUserId);
+  }
+
+  @Post(':id/dm/:userId')
+  sendDM(
+    @Param('id') workspaceId: string,
+    @Param('userId') recipientId: string,
+    @Body('content') content: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.sendDM(workspaceId, req.user.uid, recipientId, content);
+  }
+
+  @Post(':id/dm/:userId/upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_req: any, file: any, cb: any) => {
+          const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, unique + extname(file.originalname));
+        },
+      }),
+      limits: { fileSize: 50 * 1024 * 1024 },
+    }),
+  )
+  sendDMFile(
+    @Param('id') workspaceId: string,
+    @Param('userId') recipientId: string,
+    @UploadedFile() file: any,
+    @Body('content') content: string,
+    @Req() req: any,
+  ) {
+    const fileUrl = `/uploads/${file.filename}`;
+    const mime = file.mimetype;
+    const fileType = mime.startsWith('image/')
+      ? 'image'
+      : mime.startsWith('video/')
+        ? 'video'
+        : 'document';
+    return this.workspacesService.sendDMFile(
+      workspaceId,
+      req.user.uid,
+      recipientId,
+      fileUrl,
+      file.originalname,
+      fileType,
+      content || undefined,
+    );
+  }
+
+  @Patch(':id/dm/:userId/read')
+  markDMsRead(
+    @Param('id') workspaceId: string,
+    @Param('userId') otherUserId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.markDMsRead(
+      workspaceId,
+      req.user.uid,
+      otherUserId,
+    );
+  }
 }

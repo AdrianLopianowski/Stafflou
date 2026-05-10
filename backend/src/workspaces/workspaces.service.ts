@@ -893,4 +893,136 @@ export class WorkspacesService {
     });
     return { success: true };
   }
+
+  async getDMConversations(workspaceId: string, userId: string) {
+    const members = await this.prisma.workspaceMember.findMany({
+      where: { workspaceId, NOT: { userId } },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+      },
+      orderBy: { joinedAt: 'asc' },
+    });
+
+    const prismaAny = this.prisma as any;
+    return Promise.all(
+      members.map(async (m) => {
+        const lastMessage = await prismaAny.directMessage.findFirst({
+          where: {
+            workspaceId,
+            OR: [
+              { senderId: userId, recipientId: m.userId },
+              { senderId: m.userId, recipientId: userId },
+            ],
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+        const unreadCount = await prismaAny.directMessage.count({
+          where: {
+            workspaceId,
+            senderId: m.userId,
+            recipientId: userId,
+            isRead: false,
+          },
+        });
+        return { member: m, lastMessage, unreadCount };
+      }),
+    );
+  }
+
+  async getDMHistory(workspaceId: string, userId: string, otherUserId: string) {
+    const prismaAny = this.prisma as any;
+    await prismaAny.directMessage.updateMany({
+      where: { workspaceId, senderId: otherUserId, recipientId: userId, isRead: false },
+      data: { isRead: true },
+    });
+    return prismaAny.directMessage.findMany({
+      where: {
+        workspaceId,
+        OR: [
+          { senderId: userId, recipientId: otherUserId },
+          { senderId: otherUserId, recipientId: userId },
+        ],
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async sendDM(
+    workspaceId: string,
+    senderId: string,
+    recipientId: string,
+    content: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findUnique({
+      where: { userId_workspaceId: { userId: senderId, workspaceId } },
+    });
+    if (!member) throw new ForbiddenException('Nie jesteś członkiem tej przestrzeni.');
+    const prismaAny = this.prisma as any;
+    return prismaAny.directMessage.create({
+      data: { workspaceId, senderId, recipientId, content },
+    });
+  }
+
+  async sendDMFile(
+    workspaceId: string,
+    senderId: string,
+    recipientId: string,
+    fileUrl: string,
+    fileName: string,
+    fileType: string,
+    content?: string,
+  ) {
+    const prismaAny = this.prisma as any;
+    return prismaAny.directMessage.create({
+      data: { workspaceId, senderId, recipientId, fileUrl, fileName, fileType, content },
+    });
+  }
+
+  async editDM(
+    workspaceId: string,
+    messageId: string,
+    userId: string,
+    content: string,
+  ) {
+    const prismaAny = this.prisma as any;
+    const msg = await prismaAny.directMessage.findUnique({ where: { id: messageId } });
+    if (!msg || msg.workspaceId !== workspaceId)
+      throw new NotFoundException('Wiadomość nie istnieje.');
+    if (msg.senderId !== userId)
+      throw new ForbiddenException('Nie możesz edytować tej wiadomości.');
+    return prismaAny.directMessage.update({
+      where: { id: messageId },
+      data: { content, isEdited: true },
+    });
+  }
+
+  async deleteDM(workspaceId: string, messageId: string, userId: string) {
+    const prismaAny = this.prisma as any;
+    const msg = await prismaAny.directMessage.findUnique({ where: { id: messageId } });
+    if (!msg || msg.workspaceId !== workspaceId)
+      throw new NotFoundException('Wiadomość nie istnieje.');
+    if (msg.senderId !== userId)
+      throw new ForbiddenException('Nie możesz usunąć tej wiadomości.');
+    if (msg.fileUrl) {
+      const filePath = path.join('./uploads', path.basename(msg.fileUrl));
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+    return prismaAny.directMessage.delete({ where: { id: messageId } });
+  }
+
+  async markDMsRead(workspaceId: string, userId: string, otherUserId: string) {
+    const prismaAny = this.prisma as any;
+    await prismaAny.directMessage.updateMany({
+      where: {
+        workspaceId,
+        senderId: otherUserId,
+        recipientId: userId,
+        isRead: false,
+      },
+      data: { isRead: true },
+    });
+    return { success: true };
+  }
 }

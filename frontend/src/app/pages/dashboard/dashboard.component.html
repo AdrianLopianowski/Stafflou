@@ -319,6 +319,55 @@
         </div>
       }
 
+      <!-- DM section -->
+      @if (activeWorkspace) {
+        @let otherMembers = dmOtherMembers();
+        @if (otherMembers.length > 0) {
+          <div class="px-3 pt-2">
+            <div class="flex items-center px-1 mb-1 gap-1.5">
+              <span
+                class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider"
+                >Wiadomości prywatne</span
+              >
+              @if (dmTotalUnread() > 0) {
+                <span
+                  class="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none"
+                  >{{ dmTotalUnread() }}</span
+                >
+              }
+            </div>
+            <div class="space-y-0.5">
+              @for (member of otherMembers; track member.userId) {
+                <button
+                  (click)="selectDM(member)"
+                  class="w-full flex items-center gap-2 px-2 py-1.5 text-sm font-medium rounded-lg transition-colors text-left"
+                  [ngClass]="
+                    activeDMUser?.userId === member.userId && activeView === 'dm'
+                      ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  "
+                >
+                  <div
+                    class="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs shrink-0"
+                  >
+                    {{ getMemberInitials(member) }}
+                  </div>
+                  <span class="flex-1 truncate text-xs">
+                    {{ member.user?.firstName }} {{ member.user?.lastName }}
+                  </span>
+                  @if (dmUnreadForUser(member.userId) > 0) {
+                    <span
+                      class="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shrink-0 leading-none"
+                      >{{ dmUnreadForUser(member.userId) }}</span
+                    >
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        }
+      }
+
       <div class="flex-1"></div>
 
       <!-- Compact team section -->
@@ -2541,6 +2590,298 @@
                 </button>
               </form>
             }
+          </div>
+        </div>
+      }
+      <!-- ===== DM VIEW ===== -->
+      @if (activeView === "dm" && activeDMUser) {
+        <div class="flex flex-col h-full overflow-hidden">
+          <!-- DM Header -->
+          <div
+            class="h-14 border-b border-gray-200 dark:border-gray-800 flex items-center px-6 shrink-0 bg-white dark:bg-gray-900 transition-colors shadow-sm z-10 gap-3"
+          >
+            <div
+              class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm shrink-0"
+            >
+              {{ getMemberInitials(activeDMUser) }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h2
+                class="text-base font-bold text-gray-800 dark:text-gray-100 truncate leading-tight"
+              >
+                {{ activeDMUser.user?.firstName }} {{ activeDMUser.user?.lastName }}
+              </h2>
+              <p class="text-xs text-gray-400 dark:text-gray-500">
+                {{ roleLabel(activeDMUser.role) }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Messages area -->
+          <div class="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-950">
+            @if (dmMessages.length === 0) {
+              <div
+                class="flex flex-col items-center justify-center h-full text-center py-10 space-y-4"
+              >
+                <div
+                  class="w-20 h-20 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-2xl font-bold text-indigo-600 dark:text-indigo-400"
+                >
+                  {{ getMemberInitials(activeDMUser) }}
+                </div>
+                <div>
+                  <p class="font-bold text-gray-900 dark:text-white text-lg">
+                    {{ activeDMUser.user?.firstName }}
+                    {{ activeDMUser.user?.lastName }}
+                  </p>
+                  <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                    To jest początek Twojej prywatnej rozmowy.
+                  </p>
+                </div>
+              </div>
+            } @else {
+              <div class="space-y-4">
+                @for (msg of dmMessages; track msg.id) {
+                  <div
+                    class="flex group relative rounded-xl px-2 py-1 -mx-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                  >
+                    <div
+                      class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0 text-xs shadow-sm"
+                    >
+                      {{
+                        isDMSender(msg)
+                          ? getProfileInitials()
+                          : getMemberInitials(activeDMUser)
+                      }}
+                    </div>
+                    <div class="ml-3 flex-1 min-w-0">
+                      <div class="flex items-baseline gap-2">
+                        <span class="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                          @if (isDMSender(msg)) {
+                            {{ myProfile?.firstName }} {{ myProfile?.lastName }}
+                          } @else {
+                            {{ activeDMUser.user?.firstName }}
+                            {{ activeDMUser.user?.lastName }}
+                          }
+                        </span>
+                        <span class="text-xs text-gray-400 dark:text-gray-500">{{
+                          msg.createdAt | date: "short"
+                        }}</span>
+                        @if (msg.isEdited) {
+                          <span class="text-xs text-gray-400 dark:text-gray-500 italic"
+                            >(edytowano)</span
+                          >
+                        }
+                      </div>
+
+                      @if (dmEditingId === msg.id) {
+                        <div class="mt-1.5 flex gap-2 items-center">
+                          <input
+                            type="text"
+                            [(ngModel)]="dmEditingContent"
+                            name="dmEdit"
+                            class="flex-1 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-indigo-500 rounded-lg outline-none text-gray-800 dark:text-white"
+                          />
+                          <button
+                            type="button"
+                            (click)="saveDMEdit(msg)"
+                            [disabled]="dmIsSavingEdit"
+                            class="px-3 py-1.5 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                          >
+                            Zapisz
+                          </button>
+                          <button
+                            type="button"
+                            (click)="cancelDMEdit()"
+                            class="px-3 py-1.5 text-xs font-bold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                          >
+                            Anuluj
+                          </button>
+                        </div>
+                      } @else {
+                        @if (msg.content) {
+                          <p
+                            class="text-sm text-gray-800 dark:text-gray-200 mt-0.5 leading-relaxed break-words"
+                          >
+                            {{ msg.content }}
+                          </p>
+                        }
+                        @if (msg.fileUrl) {
+                          @if (msg.fileType === "image") {
+                            <a
+                              [href]="getFileUrl(msg.fileUrl)"
+                              target="_blank"
+                              class="block mt-1.5"
+                            >
+                              <img
+                                [src]="getFileUrl(msg.fileUrl)"
+                                [alt]="msg.fileName"
+                                class="max-w-xs max-h-64 rounded-xl object-cover border border-gray-200 dark:border-gray-700 hover:opacity-90 transition-opacity"
+                              />
+                            </a>
+                          } @else {
+                            <a
+                              [href]="getFileUrl(msg.fileUrl)"
+                              target="_blank"
+                              class="inline-flex items-center gap-2 mt-1.5 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                            >
+                              <svg
+                                class="w-4 h-4 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                                ></path>
+                              </svg>
+                              {{ msg.fileName || "Plik" }}
+                            </a>
+                          }
+                        }
+                      }
+                    </div>
+
+                    <!-- Actions (own messages, hover) -->
+                    @if (isDMSender(msg) && dmEditingId !== msg.id) {
+                      <div
+                        class="absolute right-2 top-1 hidden group-hover:flex items-center gap-1"
+                      >
+                        @if (msg.content && !msg.fileUrl) {
+                          <button
+                            type="button"
+                            (click)="startDMEdit(msg)"
+                            title="Edytuj"
+                            class="p-1.5 text-gray-400 hover:text-indigo-500 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm transition-colors"
+                          >
+                            <svg
+                              class="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              ></path>
+                            </svg>
+                          </button>
+                        }
+                        <button
+                          type="button"
+                          (click)="deleteDMMessage(msg)"
+                          title="Usuń"
+                          class="p-1.5 text-gray-400 hover:text-red-500 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm transition-colors"
+                        >
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            ></path>
+                          </svg>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Input bar -->
+          <div
+            class="px-4 pb-4 pt-2 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shrink-0"
+          >
+            <form (ngSubmit)="sendDMMessage()" class="relative flex items-center gap-2">
+              <input
+                type="file"
+                #dmFileInput
+                class="hidden"
+                (change)="onDMFileSelected($event)"
+                accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
+              />
+              <button
+                type="button"
+                (click)="dmFileInput.click()"
+                [disabled]="dmIsUploading"
+                title="Załącz plik"
+                class="shrink-0 p-2.5 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 bg-gray-100 dark:bg-gray-800 rounded-xl transition-colors disabled:opacity-50"
+              >
+                @if (dmIsUploading) {
+                  <svg
+                    class="w-5 h-5 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                } @else {
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                    ></path>
+                  </svg>
+                }
+              </button>
+              <input
+                type="text"
+                name="dmMessage"
+                [(ngModel)]="dmNewMessage"
+                placeholder="Napisz do {{ activeDMUser.user?.firstName }}..."
+                class="flex-1 pl-4 pr-12 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition-all text-gray-800 dark:text-white text-sm font-medium"
+                autocomplete="off"
+              />
+              <button
+                type="submit"
+                [disabled]="!dmNewMessage.trim()"
+                class="absolute right-2 p-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-md"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  ></path>
+                </svg>
+              </button>
+            </form>
           </div>
         </div>
       }

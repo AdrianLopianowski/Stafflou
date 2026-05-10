@@ -88,8 +88,17 @@ export class DashboardComponent implements OnInit {
   userPopoverMember: any = null;
   userPopoverPos = { top: 0, left: 0 };
 
-  activeView: 'overview' | 'channel' | 'tasks' | 'team' = 'overview';
+  activeView: 'overview' | 'channel' | 'tasks' | 'team' | 'dm' = 'overview';
   memberSearchQuery = '';
+
+  activeDMUser: any = null;
+  dmMessages: any[] = [];
+  dmConversations: any[] = [];
+  dmNewMessage = '';
+  dmIsUploading = false;
+  dmEditingId: string | null = null;
+  dmEditingContent = '';
+  dmIsSavingEdit = false;
 
   pinnedMessages: any[] = [];
   isPinnedPanelOpen = false;
@@ -162,6 +171,7 @@ export class DashboardComponent implements OnInit {
           this.loadMembers(this.activeWorkspace.id),
           this.loadWorkspaceRoles(this.activeWorkspace.id),
           this.loadTasks(this.activeWorkspace.id),
+          this.loadDMConversations(),
         ]);
       }
     } catch (error) {
@@ -381,11 +391,13 @@ export class DashboardComponent implements OnInit {
     this.activeView = 'overview';
     this.isWorkspaceSelectorOpen = false;
     this.tasks = [];
+    this.dmConversations = [];
     await Promise.all([
       this.loadChannels(workspace.id),
       this.loadMembers(workspace.id),
       this.loadWorkspaceRoles(workspace.id),
       this.loadTasks(workspace.id),
+      this.loadDMConversations(),
     ]);
   }
 
@@ -1013,11 +1025,139 @@ export class DashboardComponent implements OnInit {
     this.userPopoverMember = null;
   }
 
-  setActiveView(view: 'overview' | 'channel' | 'tasks' | 'team') {
+  setActiveView(view: 'overview' | 'channel' | 'tasks' | 'team' | 'dm') {
     this.activeView = view;
     if (view === 'tasks' && this.activeWorkspace) {
       this.loadTasks(this.activeWorkspace.id);
     }
+  }
+
+  async loadDMConversations() {
+    if (!this.activeWorkspace) return;
+    try {
+      this.dmConversations = (await this.workspaceService.getDMConversations(
+        this.activeWorkspace.id,
+      )) as any[];
+    } catch (e) {
+      console.error('Błąd pobierania konwersacji DM', e);
+    }
+  }
+
+  async selectDM(member: any) {
+    this.activeDMUser = member;
+    this.activeView = 'dm';
+    this.dmMessages = [];
+    await this.loadDMMessages();
+    await this.loadDMConversations();
+  }
+
+  async loadDMMessages() {
+    if (!this.activeWorkspace || !this.activeDMUser) return;
+    try {
+      this.dmMessages = (await this.workspaceService.getDMHistory(
+        this.activeWorkspace.id,
+        this.activeDMUser.userId,
+      )) as any[];
+    } catch (e) {
+      console.error('Błąd pobierania wiadomości DM', e);
+    }
+  }
+
+  async sendDMMessage() {
+    if (!this.dmNewMessage.trim() || !this.activeWorkspace || !this.activeDMUser) return;
+    try {
+      await this.workspaceService.sendDM(
+        this.activeWorkspace.id,
+        this.activeDMUser.userId,
+        this.dmNewMessage,
+      );
+      this.dmNewMessage = '';
+      await this.loadDMMessages();
+    } catch (e) {
+      console.error('Błąd wysyłania DM', e);
+    }
+  }
+
+  onDMFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.[0]) {
+      this.uploadDMFile(input.files[0]);
+      input.value = '';
+    }
+  }
+
+  async uploadDMFile(file: File) {
+    if (!this.activeWorkspace || !this.activeDMUser) return;
+    this.dmIsUploading = true;
+    try {
+      await this.workspaceService.uploadDMFile(
+        this.activeWorkspace.id,
+        this.activeDMUser.userId,
+        file,
+      );
+      await this.loadDMMessages();
+    } catch (e) {
+      console.error('Błąd uploadu DM', e);
+      alert('Nie udało się przesłać pliku.');
+    } finally {
+      this.dmIsUploading = false;
+    }
+  }
+
+  startDMEdit(msg: any) {
+    this.dmEditingId = msg.id;
+    this.dmEditingContent = msg.content || '';
+  }
+
+  cancelDMEdit() {
+    this.dmEditingId = null;
+    this.dmEditingContent = '';
+  }
+
+  async saveDMEdit(msg: any) {
+    if (!this.dmEditingContent.trim() || !this.activeWorkspace) return;
+    this.dmIsSavingEdit = true;
+    try {
+      await this.workspaceService.editDM(
+        this.activeWorkspace.id,
+        msg.id,
+        this.dmEditingContent.trim(),
+      );
+      await this.loadDMMessages();
+      this.cancelDMEdit();
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się edytować wiadomości.');
+    } finally {
+      this.dmIsSavingEdit = false;
+    }
+  }
+
+  async deleteDMMessage(msg: any) {
+    if (!this.activeWorkspace) return;
+    if (!confirm('Czy na pewno chcesz usunąć tę wiadomość?')) return;
+    try {
+      await this.workspaceService.deleteDM(this.activeWorkspace.id, msg.id);
+      await this.loadDMMessages();
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się usunąć wiadomości.');
+    }
+  }
+
+  isDMSender(msg: any): boolean {
+    return msg.senderId === this.auth.currentUser?.uid;
+  }
+
+  dmTotalUnread(): number {
+    return this.dmConversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+  }
+
+  dmUnreadForUser(userId: string): number {
+    return this.dmConversations.find((c) => c.member.userId === userId)?.unreadCount || 0;
+  }
+
+  dmOtherMembers(): any[] {
+    const uid = this.auth.currentUser?.uid;
+    return this.members.filter((m) => m.userId !== uid);
   }
 
   async loadTasks(workspaceId: string) {

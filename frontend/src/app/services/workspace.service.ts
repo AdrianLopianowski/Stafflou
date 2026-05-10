@@ -447,4 +447,75 @@ export class WorkspaceService {
       this.http.patch(`${this.apiUrl}/notifications/tasks/read`, {}, { headers }),
     );
   }
+
+  async getDMConversations(workspaceId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/${workspaceId}/dm`, { headers }),
+    );
+  }
+
+  async getDMHistory(workspaceId: string, userId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/${workspaceId}/dm/${userId}`, { headers }),
+    );
+  }
+
+  async sendDM(workspaceId: string, userId: string, content: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.post(
+        `${this.apiUrl}/${workspaceId}/dm/${userId}`,
+        { content },
+        { headers },
+      ),
+    );
+  }
+
+  async uploadDMFile(workspaceId: string, userId: string, file: File, content?: string) {
+    const headers = await this.getHeaders();
+    const formData = new FormData();
+    formData.append('file', file);
+    if (content) formData.append('content', content);
+    return firstValueFrom(
+      this.http.post(
+        `${this.apiUrl}/${workspaceId}/dm/${userId}/upload`,
+        formData,
+        { headers },
+      ),
+    );
+  }
+
+  async editDM(workspaceId: string, messageId: string, content: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(
+        `${this.apiUrl}/${workspaceId}/dm/messages/${messageId}`,
+        { content },
+        { headers },
+      ),
+    );
+  }
+
+  async deleteDM(workspaceId: string, messageId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.delete(
+        `${this.apiUrl}/${workspaceId}/dm/messages/${messageId}`,
+        { headers },
+      ),
+    );
+  }
+
+  async markDMsRead(workspaceId: string, userId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(
+        `${this.apiUrl}/${workspaceId}/dm/${userId}/read`,
+        {},
+        { headers },
+      ),
+    );
+  }
 }
