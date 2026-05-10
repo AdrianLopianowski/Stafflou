@@ -120,6 +120,129 @@ export class WorkspacesService {
     }));
   }
 
+  async togglePinMessage(
+    workspaceId: string,
+    messageId: string,
+    userId: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId, role: { in: ['OWNER', 'ADMIN'] } },
+    });
+    if (!member) throw new ForbiddenException('Brak uprawnień');
+    const prismaAny = this.prisma as any;
+    const msg = await prismaAny.message.findUnique({ where: { id: messageId } });
+    return prismaAny.message.update({
+      where: { id: messageId },
+      data: { isPinned: !msg.isPinned },
+    });
+  }
+
+  async getPinnedMessages(channelId: string) {
+    const prismaAny = this.prisma as any;
+    const messages = await prismaAny.message.findMany({
+      where: { channelId, isPinned: true },
+      orderBy: { createdAt: 'desc' },
+      include: { user: true },
+    });
+    return messages.map((msg: any) => ({
+      ...msg,
+      user: {
+        ...msg.user,
+        name:
+          msg.user?.firstName && msg.user?.lastName
+            ? `${msg.user.firstName} ${msg.user.lastName}`
+            : msg.user?.name || msg.user?.email || 'Nieznany',
+      },
+    }));
+  }
+
+  async createPoll(
+    workspaceId: string,
+    channelId: string,
+    userId: string,
+    question: string,
+    options: string[],
+    isMultiple: boolean,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+    const prismaAny = this.prisma as any;
+    return prismaAny.poll.create({
+      data: {
+        channelId,
+        workspaceId,
+        createdById: userId,
+        question,
+        isMultiple,
+        options: { create: options.map((text) => ({ text })) },
+      },
+      include: { options: true },
+    });
+  }
+
+  async getPolls(channelId: string) {
+    const prismaAny = this.prisma as any;
+    return prismaAny.poll.findMany({
+      where: { channelId },
+      orderBy: { createdAt: 'asc' },
+      include: { options: true },
+    });
+  }
+
+  async voteOnPoll(
+    workspaceId: string,
+    pollId: string,
+    optionId: string,
+    userId: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+    const prismaAny = this.prisma as any;
+    const poll = await prismaAny.poll.findUnique({
+      where: { id: pollId },
+      include: { options: true },
+    });
+    if (!poll || poll.isClosed) throw new ForbiddenException('Ankieta zamknięta');
+
+    if (!poll.isMultiple) {
+      for (const opt of poll.options) {
+        if (opt.id !== optionId && (opt.voterIds as string[]).includes(userId)) {
+          await prismaAny.pollOption.update({
+            where: { id: opt.id },
+            data: { voterIds: opt.voterIds.filter((id: string) => id !== userId) },
+          });
+        }
+      }
+    }
+
+    const target = poll.options.find((o: any) => o.id === optionId);
+    const hasVoted = (target.voterIds as string[]).includes(userId);
+    return prismaAny.pollOption.update({
+      where: { id: optionId },
+      data: {
+        voterIds: hasVoted
+          ? target.voterIds.filter((id: string) => id !== userId)
+          : [...target.voterIds, userId],
+      },
+    });
+  }
+
+  async closePoll(workspaceId: string, pollId: string, userId: string) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId, role: { in: ['OWNER', 'ADMIN'] } },
+    });
+    if (!member) throw new ForbiddenException('Brak uprawnień');
+    const prismaAny = this.prisma as any;
+    return prismaAny.poll.update({
+      where: { id: pollId },
+      data: { isClosed: true },
+    });
+  }
+
   async editMessage(
     workspaceId: string,
     messageId: string,

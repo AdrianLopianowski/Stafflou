@@ -26,6 +26,7 @@ model Channel {
   workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdAt   DateTime    @default(now())
   messages  Message[]
+  polls     Poll[]
 }
 
 model User {
@@ -98,6 +99,7 @@ model Message {
   fileName  String?
   fileType  String?
   isEdited  Boolean  @default(false)
+  isPinned  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -108,6 +110,29 @@ model Message {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   reactions Reaction[]
+}
+
+model Poll {
+  id          String   @id @default(uuid())
+  channelId   String
+  workspaceId String
+  createdById String
+  question    String
+  isMultiple  Boolean  @default(false)
+  isClosed    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  channel Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  options PollOption[]
+}
+
+model PollOption {
+  id       String   @id @default(uuid())
+  pollId   String
+  text     String
+  voterIds String[] @default([])
+
+  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade)
 }
 
 model Reaction {

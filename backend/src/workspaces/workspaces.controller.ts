@@ -135,6 +135,61 @@ export class WorkspacesController {
     );
   }
 
+  @Get(':id/channels/:channelId/pinned')
+  getPinnedMessages(@Param('channelId') channelId: string) {
+    return this.workspacesService.getPinnedMessages(channelId);
+  }
+
+  @Patch(':id/channels/:channelId/messages/:messageId/pin')
+  togglePinMessage(
+    @Param('id') workspaceId: string,
+    @Param('messageId') messageId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.togglePinMessage(workspaceId, messageId, req.user.uid);
+  }
+
+  @Get(':id/channels/:channelId/polls')
+  getPolls(@Param('channelId') channelId: string) {
+    return this.workspacesService.getPolls(channelId);
+  }
+
+  @Post(':id/channels/:channelId/polls')
+  createPoll(
+    @Param('id') workspaceId: string,
+    @Param('channelId') channelId: string,
+    @Body() body: { question: string; options: string[]; isMultiple: boolean },
+    @Req() req: any,
+  ) {
+    return this.workspacesService.createPoll(
+      workspaceId,
+      channelId,
+      req.user.uid,
+      body.question,
+      body.options,
+      body.isMultiple,
+    );
+  }
+
+  @Post(':id/channels/:channelId/polls/:pollId/vote')
+  voteOnPoll(
+    @Param('id') workspaceId: string,
+    @Param('pollId') pollId: string,
+    @Body('optionId') optionId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.voteOnPoll(workspaceId, pollId, optionId, req.user.uid);
+  }
+
+  @Patch(':id/channels/:channelId/polls/:pollId/close')
+  closePoll(
+    @Param('id') workspaceId: string,
+    @Param('pollId') pollId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.closePoll(workspaceId, pollId, req.user.uid);
+  }
+
   @Get(':id/channels/:channelId/messages')
   getMessages(@Param('channelId') channelId: string) {
     return this.workspacesService.getMessages(channelId);

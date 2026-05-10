@@ -90,6 +90,17 @@ export class DashboardComponent implements OnInit {
 
   activeView: 'overview' | 'channel' | 'tasks' | 'team' = 'overview';
   memberSearchQuery = '';
+
+  pinnedMessages: any[] = [];
+  isPinnedPanelOpen = false;
+
+  polls: any[] = [];
+  isCreatePollOpen = false;
+  newPoll: { question: string; options: string[]; isMultiple: boolean } = {
+    question: '',
+    options: ['', ''],
+    isMultiple: false,
+  };
   isWorkspaceSelectorOpen = false;
 
   tasks: any[] = [];
@@ -170,6 +181,119 @@ export class DashboardComponent implements OnInit {
       console.error('Błąd pobierania wiadomości', e);
     }
   }
+
+  async loadPolls() {
+    if (!this.activeWorkspace || !this.activeChannel) return;
+    try {
+      this.polls = (await this.workspaceService.getPolls(
+        this.activeWorkspace.id,
+        this.activeChannel.id,
+      )) as any[];
+    } catch (e) {
+      console.error('Błąd pobierania ankiet', e);
+    }
+  }
+
+  async loadPinnedMessages() {
+    if (!this.activeWorkspace || !this.activeChannel) return;
+    try {
+      this.pinnedMessages = (await this.workspaceService.getPinnedMessages(
+        this.activeWorkspace.id,
+        this.activeChannel.id,
+      )) as any[];
+    } catch (e) {
+      console.error('Błąd pobierania przypiętych wiadomości', e);
+    }
+  }
+
+  get mergedFeed(): any[] {
+    const msgs = this.messages.map((m) => ({ ...m, _type: 'message' }));
+    const polls = this.polls.map((p) => ({ ...p, _type: 'poll' }));
+    return [...msgs, ...polls].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+  }
+
+  async togglePin(msg: any) {
+    if (!this.activeWorkspace || !this.activeChannel) return;
+    await this.workspaceService.pinMessage(
+      this.activeWorkspace.id,
+      this.activeChannel.id,
+      msg.id,
+    );
+    await Promise.all([this.loadMessages(), this.loadPinnedMessages()]);
+  }
+
+  async submitCreatePoll() {
+    if (!this.activeWorkspace || !this.activeChannel) return;
+    const opts = this.newPoll.options.filter((o) => o.trim());
+    if (!this.newPoll.question.trim() || opts.length < 2) return;
+    try {
+      await this.workspaceService.createPoll(
+        this.activeWorkspace.id,
+        this.activeChannel.id,
+        { question: this.newPoll.question, options: opts, isMultiple: this.newPoll.isMultiple },
+      );
+      this.newPoll = { question: '', options: ['', ''], isMultiple: false };
+      this.isCreatePollOpen = false;
+      await this.loadPolls();
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się utworzyć ankiety.');
+    }
+  }
+
+  async doVotePoll(poll: any, optionId: string) {
+    if (!this.activeWorkspace || !this.activeChannel || poll.isClosed) return;
+    await this.workspaceService.votePoll(
+      this.activeWorkspace.id,
+      this.activeChannel.id,
+      poll.id,
+      optionId,
+    );
+    await this.loadPolls();
+  }
+
+  async doClosePoll(poll: any) {
+    if (!this.activeWorkspace || !this.activeChannel) return;
+    await this.workspaceService.closePoll(
+      this.activeWorkspace.id,
+      this.activeChannel.id,
+      poll.id,
+    );
+    await this.loadPolls();
+  }
+
+  canCreatePoll(): boolean {
+    return (
+      !!this.newPoll.question.trim() &&
+      this.newPoll.options.filter((o) => o.trim()).length >= 2
+    );
+  }
+
+  addPollOption() {
+    if (this.newPoll.options.length < 6) this.newPoll.options.push('');
+  }
+
+  removePollOption(i: number) {
+    if (this.newPoll.options.length > 2) this.newPoll.options.splice(i, 1);
+  }
+
+  pollTotalVotes(poll: any): number {
+    return (poll.options as any[])?.reduce(
+      (s: number, o: any) => s + (o.voterIds?.length || 0),
+      0,
+    ) ?? 0;
+  }
+
+  hasVotedOption(poll: any, optionId: string): boolean {
+    const uid = this.auth.currentUser?.uid;
+    return poll.options?.find((o: any) => o.id === optionId)?.voterIds?.includes(uid) ?? false;
+  }
+
+  hasVotedInPoll(poll: any): boolean {
+    const uid = this.auth.currentUser?.uid;
+    return poll.options?.some((o: any) => o.voterIds?.includes(uid)) ?? false;
+  }
   async sendMessage() {
     if (
       !this.newMessageContent.trim() ||
@@ -194,7 +318,10 @@ export class DashboardComponent implements OnInit {
     event.preventDefault();
     this.activeChannel = channel;
     this.activeView = 'channel';
-    await this.loadMessages();
+    this.isPinnedPanelOpen = false;
+    this.polls = [];
+    this.pinnedMessages = [];
+    await Promise.all([this.loadMessages(), this.loadPolls(), this.loadPinnedMessages()]);
   }
   openCreateModal() {
     this.newWorkspaceName = '';

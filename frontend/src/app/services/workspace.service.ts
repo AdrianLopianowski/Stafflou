@@ -63,6 +63,68 @@ export class WorkspaceService {
       ),
     );
   }
+  async getPinnedMessages(workspaceId: string, channelId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/${workspaceId}/channels/${channelId}/pinned`, { headers }),
+    );
+  }
+
+  async pinMessage(workspaceId: string, channelId: string, messageId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(
+        `${this.apiUrl}/${workspaceId}/channels/${channelId}/messages/${messageId}/pin`,
+        {},
+        { headers },
+      ),
+    );
+  }
+
+  async getPolls(workspaceId: string, channelId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/${workspaceId}/channels/${channelId}/polls`, { headers }),
+    );
+  }
+
+  async createPoll(
+    workspaceId: string,
+    channelId: string,
+    data: { question: string; options: string[]; isMultiple: boolean },
+  ) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.post(
+        `${this.apiUrl}/${workspaceId}/channels/${channelId}/polls`,
+        data,
+        { headers },
+      ),
+    );
+  }
+
+  async votePoll(workspaceId: string, channelId: string, pollId: string, optionId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.post(
+        `${this.apiUrl}/${workspaceId}/channels/${channelId}/polls/${pollId}/vote`,
+        { optionId },
+        { headers },
+      ),
+    );
+  }
+
+  async closePoll(workspaceId: string, channelId: string, pollId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(
+        `${this.apiUrl}/${workspaceId}/channels/${channelId}/polls/${pollId}/close`,
+        {},
+        { headers },
+      ),
+    );
+  }
+
   async getMessages(workspaceId: string, channelId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
