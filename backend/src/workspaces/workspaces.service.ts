@@ -401,6 +401,27 @@ export class WorkspacesService {
     return { success: true };
   }
 
+  private async extractMentionedIds(workspaceId: string, content: string): Promise<string[]> {
+    const lower = content.toLowerCase();
+    const members = await this.prisma.workspaceMember.findMany({
+      where: { workspaceId },
+      include: { user: { select: { id: true, firstName: true, lastName: true } } },
+    });
+
+    if (lower.includes('@all')) {
+      return members.map((m) => m.userId);
+    }
+
+    const mentioned: string[] = [];
+    for (const m of members) {
+      const fullName = `${m.user?.firstName || ''} ${m.user?.lastName || ''}`.trim().toLowerCase();
+      if (fullName && lower.includes(`@${fullName}`)) {
+        mentioned.push(m.userId);
+      }
+    }
+    return mentioned;
+  }
+
   async sendMessage(
     workspaceId: string,
     channelId: string,
@@ -422,11 +443,16 @@ export class WorkspacesService {
         'Tylko Właściciel lub Admin może pisać na kanale informacyjnym.',
       );
     }
-    const newMessage: any = await this.prisma.message.create({
+
+    const mentionedIds = await this.extractMentionedIds(workspaceId, content);
+
+    const prismaAny = this.prisma as any;
+    const newMessage: any = await prismaAny.message.create({
       data: {
         content,
         channelId,
         userId,
+        mentionedIds,
       },
       include: {
         user: true,

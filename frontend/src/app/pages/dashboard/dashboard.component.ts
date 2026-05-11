@@ -612,6 +612,11 @@ export class DashboardComponent implements OnInit {
       await this.workspaceService.updateMyProfile(this.settingsData);
       this.myProfile = { ...this.myProfile, ...this.settingsData };
       this.isSettingsModalOpen = false;
+      // Refresh members and messages so new name appears immediately everywhere
+      if (this.activeWorkspace) {
+        await this.loadMembers(this.activeWorkspace.id);
+        if (this.activeChannel) await this.loadMessages();
+      }
     } catch (error) {
       console.error('Błąd zapisu ustawień:', error);
       alert('Nie udało się zapisać danych.');
@@ -1475,7 +1480,15 @@ export class DashboardComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(highlighted);
   }
 
-  isMentionedInMessage(content: string | null | undefined): boolean {
+  isMentionedInMessage(msg: any): boolean {
+    const uid = this.auth.currentUser?.uid;
+    if (!uid) return false;
+    // Check stored mentionedIds (works even after name changes)
+    if (msg.mentionedIds?.length) {
+      return msg.mentionedIds.includes(uid);
+    }
+    // Fallback: text-based match for messages without mentionedIds
+    const content = typeof msg === 'string' ? msg : msg?.content;
     if (!content || !this.myProfile) return false;
     const myName =
       `${this.myProfile.firstName || ''} ${this.myProfile.lastName || ''}`
