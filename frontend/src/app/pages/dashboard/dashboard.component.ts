@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -19,6 +19,18 @@ export class DashboardComponent implements OnInit {
   private workspaceService = inject(WorkspaceService);
   public themeService = inject(ThemeService);
   private sanitizer = inject(DomSanitizer);
+
+  @ViewChild('channelMessages') private channelMessagesEl?: ElementRef<HTMLElement>;
+  @ViewChild('dmMessagesEl') private dmMessagesEl?: ElementRef<HTMLElement>;
+
+  private scrollToBottom(el?: ElementRef<HTMLElement>) {
+    if (!el) return;
+    setTimeout(() => {
+      try {
+        el.nativeElement.scrollTop = el.nativeElement.scrollHeight;
+      } catch (_) {}
+    }, 0);
+  }
   workspaces: any[] = [];
   activeWorkspace: any = null;
   activeChannel: any = null;
@@ -187,6 +199,7 @@ export class DashboardComponent implements OnInit {
         this.activeWorkspace.id,
         this.activeChannel.id,
       )) as any[];
+      this.scrollToBottom(this.channelMessagesEl);
     } catch (e) {
       console.error('Błąd pobierania wiadomości', e);
     }
@@ -1063,6 +1076,7 @@ export class DashboardComponent implements OnInit {
         this.activeWorkspace.id,
         this.activeDMUser.userId,
       )) as any[];
+      this.scrollToBottom(this.dmMessagesEl);
     } catch (e) {
       console.error('Błąd pobierania wiadomości DM', e);
     }

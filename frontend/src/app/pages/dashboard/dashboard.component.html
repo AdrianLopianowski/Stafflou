@@ -2081,6 +2081,7 @@
           }
 
           <div
+            #channelMessages
             class="flex-1 overflow-y-auto p-6 space-y-5 bg-white dark:bg-gray-950"
           >
             @for (item of mergedFeed; track item.id) {
@@ -2618,7 +2619,7 @@
           </div>
 
           <!-- Messages area -->
-          <div class="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-950">
+          <div #dmMessagesEl class="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-950">
             @if (dmMessages.length === 0) {
               <div
                 class="flex flex-col items-center justify-center h-full text-center py-10 space-y-4"
