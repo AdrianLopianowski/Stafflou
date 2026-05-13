@@ -279,43 +279,106 @@
       @if (activeWorkspace) {
         <div class="px-3 pt-3">
           <div class="flex items-center justify-between px-1 mb-1">
-            <span
-              class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider"
-              >Kanały</span
-            >
-            <button
-              (click)="isChannelModalOpen = true"
-              title="Dodaj kanał"
-              class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors rounded text-lg leading-none"
-            >
-              +
-            </button>
-          </div>
-          <div class="space-y-0.5">
-            @for (channel of channels; track channel.id) {
+            <span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Kanały</span>
+            <div class="flex items-center gap-1">
+              @if (currentUserRole === "OWNER" || currentUserRole === "ADMIN") {
+                <button
+                  (click)="isCategoryModalOpen = true"
+                  title="Dodaj kategorię"
+                  class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors rounded text-xs"
+                  aria-label="Dodaj kategorię"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18"/>
+                  </svg>
+                </button>
+              }
               <button
-                (click)="selectChannel(channel, $event)"
-                class="w-full flex items-center px-2 py-1.5 text-sm font-medium rounded-lg transition-colors cursor-pointer text-left gap-1.5"
-                [ngClass]="{
-                  'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400':
-                    activeChannel?.id === channel.id &&
-                    activeView === 'channel',
-                  'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white':
-                    activeChannel?.id !== channel.id ||
-                    activeView !== 'channel',
-                }"
-              >
-                <span class="text-xs">{{
-                  channel.type === "INFO" ? "📢" : "#"
-                }}</span>
-                {{ channel.name }}
-              </button>
-            } @empty {
-              <div class="px-2 py-1.5 text-xs text-gray-400 dark:text-gray-500">
-                Brak kanałów. Utwórz pierwszy!
+                (click)="isChannelModalOpen = true"
+                title="Dodaj kanał"
+                class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors rounded text-lg leading-none"
+              >+</button>
+            </div>
+          </div>
+          @if (channels.length === 0) {
+            <div class="px-2 py-1.5 text-xs text-gray-400 dark:text-gray-500">Brak kanałów. Utwórz pierwszy!</div>
+          }
+          @for (group of channelsByCategory(); track (group.category?.id ?? 'none')) {
+            @if (group.category) {
+              <!-- Category header -->
+              <div class="flex items-center gap-1 px-1 mt-2 mb-0.5 group/cat">
+                <button
+                  (click)="toggleCategoryCollapse(group.category.id)"
+                  class="flex items-center gap-1 flex-1 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  <svg class="w-3 h-3 transition-transform" [class.rotate-90]="!isCategoryCollapsed(group.category.id)" [class.-rotate-90]="isCategoryCollapsed(group.category.id)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                  @if (editingCategoryId === group.category.id) {
+                    <input
+                      type="text"
+                      [(ngModel)]="editingCategoryName"
+                      (keydown.enter)="saveEditCategory()"
+                      (keydown.escape)="cancelEditCategory()"
+                      (click)="$event.stopPropagation()"
+                      class="text-xs px-1 py-0 bg-white dark:bg-gray-800 border border-indigo-400 rounded outline-none w-24"
+                    />
+                    <button (click)="saveEditCategory(); $event.stopPropagation()" class="text-green-500 hover:text-green-600 ml-1">✓</button>
+                    <button (click)="cancelEditCategory(); $event.stopPropagation()" class="text-gray-400 hover:text-red-500">✕</button>
+                  } @else {
+                    <span>{{ group.category.name }}</span>
+                  }
+                </button>
+                @if ((currentUserRole === "OWNER" || currentUserRole === "ADMIN") && editingCategoryId !== group.category.id) {
+                  <div class="flex items-center gap-0.5 opacity-0 group-hover/cat:opacity-100 transition-opacity">
+                    <button (click)="startEditCategory(group.category)" title="Zmień nazwę" class="w-4 h-4 text-gray-400 hover:text-indigo-500 transition-colors flex items-center justify-center">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </button>
+                    <button (click)="deleteCategory(group.category.id)" title="Usuń kategorię" class="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
+                }
               </div>
             }
-          </div>
+            @if (!group.category || !isCategoryCollapsed(group.category.id)) {
+              <div class="space-y-0.5">
+                @for (channel of group.channels; track channel.id) {
+                  <div class="flex items-center group/ch">
+                    <button
+                      (click)="selectChannel(channel, $event)"
+                      class="flex-1 flex items-center px-2 py-1.5 text-sm font-medium rounded-lg transition-colors cursor-pointer text-left gap-1.5"
+                      [ngClass]="{
+                        'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400': activeChannel?.id === channel.id && activeView === 'channel',
+                        'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white': activeChannel?.id !== channel.id || activeView !== 'channel'
+                      }"
+                    >
+                      <span class="text-xs">{{ channel.type === "INFO" ? "📢" : "#" }}</span>
+                      {{ channel.name }}
+                    </button>
+                    @if (currentUserRole === "OWNER" || currentUserRole === "ADMIN") {
+                      <button
+                        (click)="assignChannelCategoryTarget = (assignChannelCategoryTarget?.id === channel.id ? null : channel)"
+                        title="Przypisz kategorię"
+                        class="w-5 h-5 flex items-center justify-center text-gray-300 hover:text-indigo-400 transition-colors rounded opacity-0 group-hover/ch:opacity-100 shrink-0 mr-1"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                      </button>
+                      @if (assignChannelCategoryTarget?.id === channel.id) {
+                        <div class="absolute left-0 right-0 z-50 mx-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-2 space-y-1">
+                          <div class="text-xs font-bold text-gray-500 dark:text-gray-400 px-1 mb-1">Przypisz do kategorii</div>
+                          <button (click)="assignChannelCategory(channel.id, null)" class="w-full text-left text-xs px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400">Brak kategorii</button>
+                          @for (cat of categories; track cat.id) {
+                            <button (click)="assignChannelCategory(channel.id, cat.id)" class="w-full text-left text-xs px-2 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-700 dark:text-gray-300">{{ cat.name }}</button>
+                          }
+                        </div>
+                      }
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
         </div>
       }
 
@@ -666,29 +729,39 @@
                   }
                   @for (notif of taskNotifications; track notif.id) {
                     <div
-                      class="p-4 border-b border-gray-50 dark:border-gray-800 bg-indigo-50 dark:bg-indigo-900/10"
+                      class="p-4 border-b border-gray-50 dark:border-gray-800"
+                      [ngClass]="{
+                        'bg-indigo-50 dark:bg-indigo-900/10': notif.type === 'ASSIGNED' || !notif.type,
+                        'bg-green-50 dark:bg-green-900/10': notif.type === 'ACCEPTED',
+                        'bg-amber-50 dark:bg-amber-900/10': notif.type === 'RETURNED'
+                      }"
                     >
                       <div class="flex items-start gap-2">
-                        <svg
-                          class="w-4 h-4 text-indigo-500 shrink-0 mt-0.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                          ></path>
-                        </svg>
+                        @if (notif.type === 'ACCEPTED') {
+                          <svg class="w-4 h-4 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                        } @else if (notif.type === 'RETURNED') {
+                          <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                          </svg>
+                        } @else {
+                          <svg class="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                          </svg>
+                        }
                         <div class="flex-1">
                           <p class="text-sm text-gray-700 dark:text-gray-300">
-                            Zostałeś przypisany do zadania
-                            <span
-                              class="font-bold text-indigo-700 dark:text-indigo-300"
-                              >{{ notif.taskTitle }}</span
-                            >
+                            @if (notif.type === 'ACCEPTED') {
+                              Zadanie <span class="font-bold text-green-700 dark:text-green-300">{{ notif.taskTitle }}</span> zostało zaakceptowane.
+                            } @else if (notif.type === 'RETURNED') {
+                              Zadanie <span class="font-bold text-amber-700 dark:text-amber-300">{{ notif.taskTitle }}</span> zwrócono do poprawy.
+                              @if (notif.comment) {
+                                <span class="block mt-1 text-xs text-gray-500 dark:text-gray-400 italic">"{{ notif.comment }}"</span>
+                              }
+                            } @else {
+                              Zostałeś przypisany do zadania <span class="font-bold text-indigo-700 dark:text-indigo-300">{{ notif.taskTitle }}</span>
+                            }
                           </p>
                         </div>
                       </div>
@@ -1576,6 +1649,53 @@
                       >
                         Brak zadań w toku
                       </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- REVIEW column -->
+                <div class="w-72 flex flex-col bg-amber-50 dark:bg-amber-950/20 rounded-2xl overflow-hidden shrink-0">
+                  <div class="px-4 py-3 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                    <h3 class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Do weryfikacji</h3>
+                    <span class="ml-auto text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded-md">{{ tasksByStatus("REVIEW").length }}</span>
+                  </div>
+                  <div class="flex-1 overflow-y-auto px-3 pb-3 space-y-2">
+                    @for (task of tasksByStatus("REVIEW"); track task.id) {
+                      <div class="bg-white dark:bg-gray-900 rounded-xl p-3.5 border border-amber-100 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-shadow group">
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                          <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Do weryfikacji</span>
+                          <button (click)="removeTask(task)" class="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-gray-600 hover:text-red-500 transition-all p-0.5 rounded">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                          </button>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-1.5 leading-snug">{{ task.title }}</p>
+                        @if (task.description) {
+                          <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">{{ task.description }}</p>
+                        }
+                        @if (task.submissions?.length > 0) {
+                          <div class="text-xs text-amber-600 dark:text-amber-400 mb-2 font-medium">
+                            Przesłano {{ task.submissions.length }} wynik(ów)
+                          </div>
+                        }
+                        <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
+                          <div class="flex -space-x-1.5">
+                            @for (m of getTaskAssignees(task).slice(0, 4); track m.userId) {
+                              <div class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-white dark:ring-gray-900 shrink-0" [ngClass]="roleBadgeClass(m.role)" [title]="(m.user?.firstName || '') + ' ' + (m.user?.lastName || '')">
+                                {{ getTaskAssigneeInitials(m) }}
+                              </div>
+                            }
+                          </div>
+                          <div class="ml-auto flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            @if (canReviewTask(task)) {
+                              <button (click)="acceptTask(task)" class="text-xs font-semibold text-green-500 hover:text-green-600 transition-colors" title="Akceptuj">✓ Akceptuj</button>
+                              <button (click)="openReviewModal(task)" class="text-xs font-medium text-amber-500 hover:text-amber-600 transition-colors" title="Zwróć do poprawy">↩ Zwróć</button>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    } @empty {
+                      <div class="text-center py-6 text-xs text-amber-400 dark:text-amber-500">Brak zadań do weryfikacji</div>
                     }
                   </div>
                 </div>
@@ -4611,6 +4731,82 @@
                 }}</span>
               </div>
             }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Review Task Modal -->
+    @if (reviewModalTask) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Zwróć zadanie do poprawy</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ reviewModalTask.title }}</p>
+            </div>
+            <button (click)="closeReviewModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="px-6 py-5">
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Komentarz (opcjonalny)</label>
+            <textarea
+              [(ngModel)]="reviewComment"
+              rows="4"
+              placeholder="Opisz co należy poprawić..."
+              class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-amber-500 outline-none transition-all text-gray-800 dark:text-white text-sm resize-none"
+            ></textarea>
+          </div>
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <button (click)="closeReviewModal()" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Anuluj</button>
+            <button
+              (click)="submitReview('RETURN')"
+              [disabled]="isReviewingTask"
+              class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-amber-500/30 transition-all disabled:opacity-50 flex items-center gap-2"
+            >
+              @if (isReviewingTask) {
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+              }
+              Zwróć do poprawy
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Category Creation Modal -->
+    @if (isCategoryModalOpen) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border dark:border-gray-800">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Nowa kategoria kanałów</h3>
+            <button (click)="isCategoryModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="px-6 py-5">
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nazwa kategorii</label>
+            <input
+              type="text"
+              [(ngModel)]="newCategoryName"
+              placeholder="np. Ogólne, Projekty..."
+              (keydown.enter)="createCategory()"
+              class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 outline-none transition-all text-gray-800 dark:text-white font-medium"
+            />
+          </div>
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end gap-3">
+            <button (click)="isCategoryModalOpen = false; newCategoryName = ''" class="px-4 py-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Anuluj</button>
+            <button
+              (click)="createCategory()"
+              [disabled]="isCreatingCategory || !newCategoryName.trim()"
+              class="px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-indigo-500/30 transition-all disabled:opacity-50"
+            >
+              {{ isCreatingCategory ? "Tworzenie..." : "Utwórz kategorię" }}
+            </button>
           </div>
         </div>
       </div>

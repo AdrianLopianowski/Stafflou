@@ -18,12 +18,25 @@ enum ChannelType {
   INFO
 }
 
+model ChannelCategory {
+  id          String    @id @default(uuid())
+  workspaceId String
+  name        String
+  position    Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channels  Channel[]
+}
+
 model Channel {
   id          String      @id @default(uuid())
   name        String
   type        ChannelType @default(TEXT)
   workspaceId String
-  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  category    ChannelCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdAt   DateTime    @default(now())
   messages  Message[]
   polls     Poll[]
@@ -59,6 +72,7 @@ model Workspace {
   members        WorkspaceMember[]
   invitations    Invitation[]
   channels       Channel[]
+  categories     ChannelCategory[]
   roles          WorkspaceRole[]
   tasks          Task[]
   directMessages DirectMessage[]
@@ -165,6 +179,7 @@ model DeleteNotification {
 enum TaskStatus {
   TODO
   IN_PROGRESS
+  REVIEW
   DONE
 }
 
@@ -192,6 +207,7 @@ model Task {
   submissionMode   String       @default("INDIVIDUAL")
   inProgressByIds  String[]     @default([])
   completedByIds   String[]     @default([])
+  reviewByIds      String[]     @default([])
   createdAt        DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -219,6 +235,8 @@ model TaskNotification {
   workspaceId String
   taskId      String
   taskTitle   String
+  type        String   @default("ASSIGNED")
+  comment     String?
   isRead      Boolean  @default(false)
   createdAt   DateTime @default(now())
 

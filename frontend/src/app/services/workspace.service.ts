@@ -346,6 +346,56 @@ export class WorkspaceService {
     );
   }
 
+  async getCategories(workspaceId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/${workspaceId}/categories`, { headers }),
+    );
+  }
+
+  async createCategory(workspaceId: string, name: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.post(`${this.apiUrl}/${workspaceId}/categories`, { name }, { headers }),
+    );
+  }
+
+  async updateCategory(workspaceId: string, categoryId: string, name: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(`${this.apiUrl}/${workspaceId}/categories/${categoryId}`, { name }, { headers }),
+    );
+  }
+
+  async deleteCategory(workspaceId: string, categoryId: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.delete(`${this.apiUrl}/${workspaceId}/categories/${categoryId}`, { headers }),
+    );
+  }
+
+  async assignChannelToCategory(workspaceId: string, channelId: string, categoryId: string | null) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.patch(
+        `${this.apiUrl}/${workspaceId}/channels/${channelId}/category`,
+        { categoryId },
+        { headers },
+      ),
+    );
+  }
+
+  async reviewTask(workspaceId: string, taskId: string, action: 'ACCEPT' | 'RETURN', comment?: string) {
+    const headers = await this.getHeaders();
+    return firstValueFrom(
+      this.http.post(
+        `${this.apiUrl}/${workspaceId}/tasks/${taskId}/review`,
+        { action, comment },
+        { headers },
+      ),
+    );
+  }
+
   async getTasks(workspaceId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(

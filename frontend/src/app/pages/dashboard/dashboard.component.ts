@@ -150,6 +150,20 @@ export class DashboardComponent implements OnInit {
   submitFiles: File[] = [];
   isSubmitting = false;
 
+  reviewModalTask: any = null;
+  reviewComment = '';
+  isReviewingTask = false;
+
+  categories: any[] = [];
+  isCategoryModalOpen = false;
+  newCategoryName = '';
+  isCreatingCategory = false;
+  editingCategoryId: string | null = null;
+  editingCategoryName = '';
+  collapsedCategories = new Set<string>();
+  assignChannelCategoryTarget: any = null;
+  isAssigningCategory = false;
+
   ngOnInit() {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
@@ -526,8 +540,12 @@ export class DashboardComponent implements OnInit {
 
   async loadChannels(workspaceId: string) {
     try {
-      const data: any = await this.workspaceService.getChannels(workspaceId);
-      this.channels = data;
+      const [channelData, categoryData]: any[] = await Promise.all([
+        this.workspaceService.getChannels(workspaceId),
+        this.workspaceService.getCategories(workspaceId),
+      ]);
+      this.channels = channelData;
+      this.categories = categoryData;
     } catch (e: any) {
       console.error('Błąd pobierania kanałów', e);
     }
@@ -1190,6 +1208,7 @@ export class DashboardComponent implements OnInit {
   effectiveStatus(task: any): string {
     const uid = this.auth.currentUser?.uid;
     if (task.submissionMode === 'INDIVIDUAL' && uid && task.assigneeIds?.includes(uid)) {
+      if (task.reviewByIds?.includes(uid)) return 'REVIEW';
       if (task.completedByIds?.includes(uid)) return 'DONE';
       if (task.inProgressByIds?.includes(uid)) return 'IN_PROGRESS';
       return 'TODO';
@@ -1359,7 +1378,8 @@ export class DashboardComponent implements OnInit {
   }
 
   deadlineBadgeClass(task: any): string {
-    if (!task.dueDate || this.effectiveStatus(task) === 'DONE')
+    const status = this.effectiveStatus(task);
+    if (!task.dueDate || status === 'DONE' || status === 'REVIEW')
       return 'text-gray-400 dark:text-gray-500';
     const diff = new Date(task.dueDate).getTime() - Date.now();
     const days = diff / 86400000;
@@ -1370,7 +1390,8 @@ export class DashboardComponent implements OnInit {
   }
 
   deadlineIcon(task: any): string {
-    if (!task.dueDate || this.effectiveStatus(task) === 'DONE') return '';
+    const status = this.effectiveStatus(task);
+    if (!task.dueDate || status === 'DONE' || status === 'REVIEW') return '';
     const diff = new Date(task.dueDate).getTime() - Date.now();
     const days = diff / 86400000;
     if (days < 0) return '⚠ ';
@@ -1564,6 +1585,139 @@ export class DashboardComponent implements OnInit {
     } else {
       this.statsFilterType = 'all';
       this.statsFilterId = '';
+    }
+  }
+
+  async acceptTask(task: any) {
+    this.reviewModalTask = task;
+    await this.submitReview('ACCEPT');
+  }
+
+  canReviewTask(task: any): boolean {
+    const uid = this.auth.currentUser?.uid;
+    if (!uid) return false;
+    const isCreator = task.createdById === uid;
+    const isAdminOrOwner = ['OWNER', 'ADMIN'].includes(this.currentUserRole);
+    return (isCreator || isAdminOrOwner) && task.status === 'REVIEW';
+  }
+
+  openReviewModal(task: any) {
+    this.reviewModalTask = task;
+    this.reviewComment = '';
+  }
+
+  closeReviewModal() {
+    this.reviewModalTask = null;
+    this.reviewComment = '';
+  }
+
+  async submitReview(action: 'ACCEPT' | 'RETURN') {
+    if (!this.reviewModalTask || !this.activeWorkspace) return;
+    this.isReviewingTask = true;
+    try {
+      await this.workspaceService.reviewTask(
+        this.activeWorkspace.id,
+        this.reviewModalTask.id,
+        action,
+        action === 'RETURN' ? this.reviewComment : undefined,
+      );
+      await this.loadTasks(this.activeWorkspace.id);
+      await this.loadTaskNotifications();
+      this.closeReviewModal();
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się zweryfikować zadania.');
+    } finally {
+      this.isReviewingTask = false;
+    }
+  }
+
+  channelsByCategory(): { category: any; channels: any[] }[] {
+    const uncategorized = this.channels.filter((c) => !c.categoryId);
+    const groups: { category: any; channels: any[] }[] = [];
+    if (uncategorized.length) {
+      groups.push({ category: null, channels: uncategorized });
+    }
+    for (const cat of this.categories) {
+      const catChannels = this.channels.filter((c) => c.categoryId === cat.id);
+      groups.push({ category: cat, channels: catChannels });
+    }
+    return groups;
+  }
+
+  toggleCategoryCollapse(categoryId: string) {
+    if (this.collapsedCategories.has(categoryId)) {
+      this.collapsedCategories.delete(categoryId);
+    } else {
+      this.collapsedCategories.add(categoryId);
+    }
+  }
+
+  isCategoryCollapsed(categoryId: string): boolean {
+    return this.collapsedCategories.has(categoryId);
+  }
+
+  async createCategory() {
+    if (!this.newCategoryName.trim() || !this.activeWorkspace) return;
+    this.isCreatingCategory = true;
+    try {
+      await this.workspaceService.createCategory(this.activeWorkspace.id, this.newCategoryName.trim());
+      await this.loadChannels(this.activeWorkspace.id);
+      this.newCategoryName = '';
+      this.isCategoryModalOpen = false;
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się utworzyć kategorii.');
+    } finally {
+      this.isCreatingCategory = false;
+    }
+  }
+
+  startEditCategory(cat: any) {
+    this.editingCategoryId = cat.id;
+    this.editingCategoryName = cat.name;
+  }
+
+  cancelEditCategory() {
+    this.editingCategoryId = null;
+    this.editingCategoryName = '';
+  }
+
+  async saveEditCategory() {
+    if (!this.editingCategoryName.trim() || !this.editingCategoryId || !this.activeWorkspace) return;
+    try {
+      await this.workspaceService.updateCategory(
+        this.activeWorkspace.id,
+        this.editingCategoryId,
+        this.editingCategoryName.trim(),
+      );
+      await this.loadChannels(this.activeWorkspace.id);
+      this.cancelEditCategory();
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się zaktualizować kategorii.');
+    }
+  }
+
+  async deleteCategory(categoryId: string) {
+    if (!this.activeWorkspace) return;
+    if (!confirm('Czy na pewno chcesz usunąć tę kategorię? Kanały zostaną przeniesione do "bez kategorii".')) return;
+    try {
+      await this.workspaceService.deleteCategory(this.activeWorkspace.id, categoryId);
+      await this.loadChannels(this.activeWorkspace.id);
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się usunąć kategorii.');
+    }
+  }
+
+  async assignChannelCategory(channelId: string, categoryId: string | null) {
+    if (!this.activeWorkspace) return;
+    this.isAssigningCategory = true;
+    try {
+      await this.workspaceService.assignChannelToCategory(this.activeWorkspace.id, channelId, categoryId);
+      await this.loadChannels(this.activeWorkspace.id);
+      this.assignChannelCategoryTarget = null;
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się przypisać kategorii.');
+    } finally {
+      this.isAssigningCategory = false;
     }
   }
 }

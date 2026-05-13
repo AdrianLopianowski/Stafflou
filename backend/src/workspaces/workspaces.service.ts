@@ -66,9 +66,74 @@ export class WorkspacesService {
   }
 
   async getChannels(workspaceId: string) {
-    return this.prisma.channel.findMany({
+    const prismaAny = this.prisma as any;
+    return prismaAny.channel.findMany({
       where: { workspaceId },
+      include: { category: true },
       orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async getCategories(workspaceId: string) {
+    const prismaAny = this.prisma as any;
+    return prismaAny.channelCategory.findMany({
+      where: { workspaceId },
+      orderBy: { position: 'asc' },
+    });
+  }
+
+  async createCategory(workspaceId: string, name: string, requesterId: string) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+    });
+    if (!member) throw new ForbiddenException('Brak uprawnień do tworzenia kategorii');
+    const prismaAny = this.prisma as any;
+    const count = await prismaAny.channelCategory.count({ where: { workspaceId } });
+    return prismaAny.channelCategory.create({
+      data: { workspaceId, name, position: count },
+    });
+  }
+
+  async updateCategory(workspaceId: string, categoryId: string, name: string, requesterId: string) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+    });
+    if (!member) throw new ForbiddenException('Brak uprawnień');
+    const prismaAny = this.prisma as any;
+    return prismaAny.channelCategory.update({
+      where: { id: categoryId },
+      data: { name },
+    });
+  }
+
+  async deleteCategory(workspaceId: string, categoryId: string, requesterId: string) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+    });
+    if (!member) throw new ForbiddenException('Brak uprawnień');
+    const prismaAny = this.prisma as any;
+    await prismaAny.channel.updateMany({
+      where: { workspaceId, categoryId },
+      data: { categoryId: null },
+    });
+    return prismaAny.channelCategory.delete({ where: { id: categoryId } });
+  }
+
+  async assignChannelToCategory(
+    workspaceId: string,
+    channelId: string,
+    categoryId: string | null,
+    requesterId: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+    });
+    if (!member) throw new ForbiddenException('Brak uprawnień');
+    const prismaAny = this.prisma as any;
+    return prismaAny.channel.update({
+      where: { id: channelId },
+      data: { categoryId: categoryId || null },
+      include: { category: true },
     });
   }
 
@@ -772,27 +837,89 @@ export class WorkspacesService {
     if ((task as any)?.submissionMode === 'GROUP') {
       await prismaAny.task.update({
         where: { id: taskId },
-        data: { status: 'DONE' },
+        data: { status: 'REVIEW' },
       });
     } else {
-      const currentCompleted: string[] = (task as any)?.completedByIds || [];
-      if (!currentCompleted.includes(submittedById)) {
-        const updatedCompleted = [...currentCompleted, submittedById];
+      const currentReview: string[] = (task as any)?.reviewByIds || [];
+      if (!currentReview.includes(submittedById)) {
+        const updatedReview = [...currentReview, submittedById];
         const assigneeIds: string[] = (task as any)?.assigneeIds || [];
-        const allDone =
+        const allReview =
           assigneeIds.length > 0 &&
-          assigneeIds.every((id: string) => updatedCompleted.includes(id));
+          assigneeIds.every((id: string) => updatedReview.includes(id));
         await prismaAny.task.update({
           where: { id: taskId },
           data: {
-            completedByIds: updatedCompleted,
-            ...(allDone ? { status: 'DONE' } : {}),
+            reviewByIds: updatedReview,
+            ...(allReview ? { status: 'REVIEW' } : {}),
           },
         });
       }
     }
 
     return submission;
+  }
+
+  async reviewTask(
+    workspaceId: string,
+    taskId: string,
+    requesterId: string,
+    action: 'ACCEPT' | 'RETURN',
+    comment?: string,
+  ) {
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId: requesterId },
+    });
+    if (!member) throw new ForbiddenException('Brak dostępu');
+
+    const prismaAny = this.prisma as any;
+    const task = await prismaAny.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Zadanie nie istnieje');
+
+    const isCreator = task.createdById === requesterId;
+    const isAdminOrOwner = ['OWNER', 'ADMIN'].includes(member.role);
+    if (!isCreator && !isAdminOrOwner) {
+      throw new ForbiddenException('Tylko zlecający lub administrator może weryfikować zadanie');
+    }
+
+    if (action === 'ACCEPT') {
+      const updated = await prismaAny.task.update({
+        where: { id: taskId },
+        data: { status: 'DONE', reviewByIds: [], completedByIds: task.assigneeIds || [] },
+        include: { createdBy: true },
+      });
+      for (const assigneeId of task.assigneeIds || []) {
+        await prismaAny.taskNotification.create({
+          data: {
+            userId: assigneeId,
+            workspaceId,
+            taskId,
+            taskTitle: task.title,
+            type: 'ACCEPTED',
+          },
+        });
+      }
+      return updated;
+    } else {
+      const updated = await prismaAny.task.update({
+        where: { id: taskId },
+        data: { status: 'IN_PROGRESS', reviewByIds: [], completedByIds: [] },
+        include: { createdBy: true },
+      });
+      for (const assigneeId of task.assigneeIds || []) {
+        await prismaAny.taskNotification.create({
+          data: {
+            userId: assigneeId,
+            workspaceId,
+            taskId,
+            taskTitle: task.title,
+            type: 'RETURNED',
+            comment: comment || null,
+          },
+        });
+      }
+      return updated;
+    }
   }
 
   async updateTask(
@@ -859,11 +986,11 @@ export class WorkspacesService {
       if (updates.status === 'IN_PROGRESS') {
         if (!newInProgress.includes(requesterId)) newInProgress.push(requesterId);
         newCompleted = newCompleted.filter((id) => id !== requesterId);
-      } else if (updates.status === 'DONE') {
+      } else if (updates.status === 'DONE' || updates.status === 'REVIEW') {
         if (!newCompleted.includes(requesterId)) newCompleted.push(requesterId);
         newInProgress = newInProgress.filter((id) => id !== requesterId);
         if (assigneeIds.length > 0 && assigneeIds.every((id) => newCompleted.includes(id))) {
-          globalStatus = 'DONE';
+          globalStatus = updates.status;
         }
       } else if (updates.status === 'TODO') {
         newInProgress = newInProgress.filter((id) => id !== requesterId);

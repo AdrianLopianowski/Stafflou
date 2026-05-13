@@ -406,6 +406,22 @@ export class WorkspacesController {
     );
   }
 
+  @Post(':id/tasks/:taskId/review')
+  reviewTask(
+    @Param('id') workspaceId: string,
+    @Param('taskId') taskId: string,
+    @Body() body: { action: 'ACCEPT' | 'RETURN'; comment?: string },
+    @Req() req: any,
+  ) {
+    return this.workspacesService.reviewTask(
+      workspaceId,
+      taskId,
+      req.user.uid,
+      body.action,
+      body.comment,
+    );
+  }
+
   @Post(':id/tasks/:taskId/submit')
   @UseInterceptors(
     FilesInterceptor('files', 4, {
@@ -469,6 +485,54 @@ export class WorkspacesController {
     @Req() req: any,
   ) {
     return this.workspacesService.deleteTask(workspaceId, taskId, req.user.uid);
+  }
+
+  @Get(':id/categories')
+  getCategories(@Param('id') workspaceId: string) {
+    return this.workspacesService.getCategories(workspaceId);
+  }
+
+  @Post(':id/categories')
+  createCategory(
+    @Param('id') workspaceId: string,
+    @Body('name') name: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.createCategory(workspaceId, name, req.user.uid);
+  }
+
+  @Patch(':id/categories/:categoryId')
+  updateCategory(
+    @Param('id') workspaceId: string,
+    @Param('categoryId') categoryId: string,
+    @Body('name') name: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.updateCategory(workspaceId, categoryId, name, req.user.uid);
+  }
+
+  @Delete(':id/categories/:categoryId')
+  deleteCategory(
+    @Param('id') workspaceId: string,
+    @Param('categoryId') categoryId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.deleteCategory(workspaceId, categoryId, req.user.uid);
+  }
+
+  @Patch(':id/channels/:channelId/category')
+  assignChannelToCategory(
+    @Param('id') workspaceId: string,
+    @Param('channelId') channelId: string,
+    @Body('categoryId') categoryId: string,
+    @Req() req: any,
+  ) {
+    return this.workspacesService.assignChannelToCategory(
+      workspaceId,
+      channelId,
+      categoryId || null,
+      req.user.uid,
+    );
   }
 
   @Get(':id/dm')
