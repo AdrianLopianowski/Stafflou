@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StaffFlow – Diagram ERD i Model Implementacyjny</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #1e293b;
+      background: #f8fafc;
+    }
+
+    /* Cover */
+    .cover {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      color: #fff;
+      padding: 64px 80px;
+      min-height: 200px;
+    }
+    .cover h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+    .cover p  { font-size: 1rem; opacity: .75; margin-top: 6px; }
+    .cover .meta { margin-top: 32px; display: flex; gap: 40px; }
+    .cover .meta div span { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: .6; }
+    .cover .meta div strong { font-size: 0.95rem; }
+
+    /* Layout */
+    .content { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+
+    /* Section headers */
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #1e1b4b;
+      border-left: 4px solid #4338ca;
+      padding-left: 14px;
+      margin: 48px 0 20px;
+    }
+    .section-subtitle {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #312e81;
+      margin: 32px 0 10px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid #e0e7ff;
+    }
+
+    /* Intro text */
+    .intro { color: #475569; margin-bottom: 24px; font-size: 0.88rem; }
+
+    /* ERD wrapper */
+    .erd-wrapper {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+    .mermaid { min-width: 900px; }
+
+    /* Table */
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    thead tr { background: #1e1b4b; color: #fff; }
+    thead th { padding: 9px 12px; text-align: left; font-weight: 600; letter-spacing: .3px; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:hover { background: #eef2ff; }
+    tbody td { padding: 7px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    .td-name { font-family: 'Courier New', monospace; font-weight: 700; color: #1e40af; white-space: nowrap; }
+    .td-type { font-family: 'Courier New', monospace; color: #7c3aed; white-space: nowrap; }
+    .td-pk  { background: #fef9c3 !important; }
+    .td-fk  { background: #f0fdf4 !important; }
+    .td-uk  { background: #fdf4ff !important; }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+    }
+    .badge-pk  { background: #fde68a; color: #92400e; }
+    .badge-fk  { background: #bbf7d0; color: #14532d; }
+    .badge-uk  { background: #e9d5ff; color: #581c87; }
+    .badge-nn  { background: #fee2e2; color: #7f1d1d; }
+    .badge-def { background: #e0f2fe; color: #0c4a6e; }
+
+    /* Index table */
+    .index-list { margin-top: 8px; }
+    .index-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 5px 10px;
+      background: #f8fafc;
+      border-left: 3px solid #6366f1;
+      margin-bottom: 5px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.8rem;
+    }
+    .index-item code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: #1e40af;
+      background: #eff6ff;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .index-type { font-weight: 700; color: #7c3aed; min-width: 90px; }
+
+    /* Enum box */
+    .enum-box {
+      display: inline-block;
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin: 6px 8px 6px 0;
+      vertical-align: top;
+      min-width: 160px;
+    }
+    .enum-box .enum-name { font-family: 'Courier New', monospace; font-weight: 700; color: #312e81; font-size: 0.82rem; margin-bottom: 6px; }
+    .enum-box ul { list-style: none; padding: 0; }
+    .enum-box li { font-family: 'Courier New', monospace; font-size: 0.78rem; color: #374151; padding: 1px 0; }
+    .enum-box li::before { content: '• '; color: #6366f1; }
+
+    /* Relation legend */
+    .rel-box { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .rel-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+    .rel-symbol { font-family: monospace; font-weight: 700; color: #4338ca; }
+
+    /* DDL block */
+    .ddl {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.76rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin: 8px 0 0;
+    }
+    .ddl .kw  { color: #7dd3fc; }
+    .ddl .tp  { color: #c084fc; }
+    .ddl .cn  { color: #86efac; }
+    .ddl .cm  { color: #64748b; }
+    .ddl .str { color: #fde68a; }
+
+    /* Table card */
+    .table-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .table-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .table-card-header h3 {
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1e1b4b;
+    }
+    .table-card-header .desc { font-size: 0.8rem; color: #64748b; }
+    .table-card-header .dot { width: 10px; height: 10px; border-radius: 50%; background: #4338ca; shrink: 0; }
+
+    /* Print */
+    @media print {
+      body { background: #fff; font-size: 11px; }
+      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section-title, .section-subtitle { page-break-after: avoid; }
+      .table-card { page-break-inside: avoid; }
+      .erd-wrapper { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ COVER ═══════════════════════════════ -->
+<div class="cover">
+  <h1>StaffFlow — Dokumentacja bazy danych</h1>
+  <p>Diagram ERD oraz Model Implementacyjny (PostgreSQL)</p>
+  <div class="meta">
+    <div><span>Projekt</span><strong>System zarządzania pracownikami</strong></div>
+    <div><span>Baza danych</span><strong>PostgreSQL 15</strong></div>
+    <div><span>ORM</span><strong>Prisma 6</strong></div>
+    <div><span>Data</span><strong id="date-val"></strong></div>
+  </div>
+</div>
+<script>document.getElementById('date-val').textContent = new Date().toLocaleDateString('pl-PL',{year:'numeric',month:'long',day:'numeric'});</script>
+
+<div class="content">
+
+<!-- ═══════════════════════════════ ENUMERACJE ═══════════════════════════════ -->
+<div class="section-title">1. Typy wyliczeniowe (ENUM)</div>
+<p class="intro">Poniższe typy wyliczeniowe są zdefiniowane jako natywne typy PostgreSQL (<code>CREATE TYPE … AS ENUM</code>) i używane jako ograniczenia kolumn.</p>
+
+<div>
+  <div class="enum-box">
+    <div class="enum-name">Role</div>
+    <ul>
+      <li>OWNER</li>
+      <li>ADMIN</li>
+      <li>MEMBER</li>
+    </ul>
+  </div>
+  <div class="enum-box">
+    <div class="enum-name">ChannelType</div>
+    <ul>
+      <li>TEXT</li>
+      <li>INFO</li>
+    </ul>
+  </div>
+  <div class="enum-box">
+    <div class="enum-name">TaskStatus</div>
+    <ul>
+      <li>TODO</li>
+      <li>IN_PROGRESS</li>
+      <li>REVIEW</li>
+      <li>DONE</li>
+    </ul>
+  </div>
+  <div class="enum-box">
+    <div class="enum-name">TaskPriority</div>
+    <ul>
+      <li>LOW</li>
+      <li>MEDIUM</li>
+      <li>HIGH</li>
+      <li>URGENT</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ERD ═══════════════════════════════ -->
+<div class="section-title">2. Diagram związków encji (ERD)</div>
+<p class="intro">Diagram przedstawia wszystkie encje systemu oraz powiązania między nimi z oznaczoną krotnością.</p>
+
+<div class="rel-box">
+  <div class="rel-item"><span class="rel-symbol">||</span> — dokładnie jeden (obowiązkowy)</div>
+  <div class="rel-item"><span class="rel-symbol">o{</span> — zero lub wiele</div>
+  <div class="rel-item"><span class="rel-symbol">||--o{</span> — jeden do wielu</div>
+  <div class="rel-item"><span class="rel-symbol">o|--o{</span> — zero lub jeden do wielu</div>
+</div>
+
+<div class="erd-wrapper">
+<div class="mermaid">
+erDiagram
+    User {
+        uuid id PK
+        varchar email UK
+        varchar firstName
+        varchar lastName
+        varchar location
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    Workspace {
+        uuid id PK
+        varchar name
+        uuid inviteCode UK
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    WorkspaceMember {
+        uuid id PK
+        uuid userId FK
+        uuid workspaceId FK
+        varchar role
+        text_arr customRoleIds
+        timestamp joinedAt
+    }
+    WorkspaceRole {
+        uuid id PK
+        uuid workspaceId FK
+        varchar name
+        varchar color
+        timestamp createdAt
+    }
+    ChannelCategory {
+        uuid id PK
+        uuid workspaceId FK
+        varchar name
+        int position
+        timestamp createdAt
+    }
+    Channel {
+        uuid id PK
+        varchar name
+        varchar type
+        uuid workspaceId FK
+        uuid categoryId FK
+        timestamp createdAt
+    }
+    Message {
+        uuid id PK
+        uuid channelId FK
+        uuid userId FK
+        text content
+        varchar fileUrl
+        boolean isEdited
+        boolean isPinned
+        text_arr mentionedIds
+        timestamp createdAt
+    }
+    Reaction {
+        uuid id PK
+        uuid messageId FK
+        uuid userId FK
+        varchar emoji
+        timestamp createdAt
+    }
+    Poll {
+        uuid id PK
+        uuid channelId FK
+        uuid workspaceId FK
+        uuid createdById
+        text question
+        boolean isMultiple
+        boolean isClosed
+        timestamp createdAt
+    }
+    PollOption {
+        uuid id PK
+        uuid pollId FK
+        text text
+        text_arr voterIds
+    }
+    Task {
+        uuid id PK
+        uuid workspaceId FK
+        uuid createdById FK
+        varchar title
+        text description
+        varchar status
+        varchar priority
+        text_arr assigneeIds
+        timestamp dueDate
+        varchar submissionType
+        varchar submissionMode
+        text_arr inProgressByIds
+        text_arr reviewByIds
+        text_arr completedByIds
+        timestamp createdAt
+    }
+    TaskSubmission {
+        uuid id PK
+        uuid taskId FK
+        uuid submittedById
+        text textContent
+        text_arr fileUrls
+        timestamp createdAt
+    }
+    TaskNotification {
+        uuid id PK
+        uuid userId FK
+        uuid workspaceId
+        uuid taskId
+        varchar taskTitle
+        varchar type
+        text comment
+        boolean isRead
+        timestamp createdAt
+    }
+    DeleteNotification {
+        uuid id PK
+        uuid userId FK
+        uuid workspaceId
+        varchar channelName
+        text messagePreview
+        varchar deletedByRole
+        boolean isRead
+        timestamp createdAt
+    }
+    Invitation {
+        uuid id PK
+        uuid workspaceId FK
+        uuid invitedById FK
+        varchar email
+        varchar status
+        timestamp createdAt
+    }
+    DirectMessage {
+        uuid id PK
+        uuid workspaceId FK
+        uuid senderId
+        uuid recipientId
+        text content
+        varchar fileUrl
+        boolean isRead
+        boolean isEdited
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    User ||--o{ WorkspaceMember : "należy do"
+    Workspace ||--o{ WorkspaceMember : "posiada"
+    Workspace ||--o{ WorkspaceRole : "definiuje"
+    Workspace ||--o{ ChannelCategory : "grupuje w"
+    Workspace ||--o{ Channel : "zawiera"
+    Workspace ||--o{ Task : "ma"
+    Workspace ||--o{ DirectMessage : "przechowuje"
+    Workspace ||--o{ Invitation : "wysyła"
+    ChannelCategory o|--o{ Channel : "kategoryzuje"
+    Channel ||--o{ Message : "zawiera"
+    Channel ||--o{ Poll : "ma"
+    User ||--o{ Message : "pisze"
+    Message ||--o{ Reaction : "otrzymuje"
+    User ||--o{ Reaction : "dodaje"
+    Poll ||--o{ PollOption : "posiada"
+    User ||--o{ Task : "tworzy"
+    Task ||--o{ TaskSubmission : "przyjmuje"
+    User ||--o{ TaskNotification : "otrzymuje"
+    User ||--o{ DeleteNotification : "otrzymuje"
+    User ||--o{ Invitation : "wysyła"
+</div>
+</div>
+
+<!-- ═══════════════════════════════ MODEL IMPLEMENTACYJNY ═══════════════════════════════ -->
+<div class="section-title">3. Model implementacyjny — tabele PostgreSQL</div>
+<p class="intro">
+  Każda tabela zawiera definicję kolumn (nazwa, typ danych PostgreSQL, ograniczenia) oraz listę indeksów.
+  Kolumny <span class="badge badge-pk">PK</span> stanowią klucze główne,
+  <span class="badge badge-fk">FK</span> — klucze obce,
+  <span class="badge badge-uk">UK</span> — ograniczenia unikatowości,
+  <span class="badge badge-nn">NOT NULL</span> — wymagane wartości.
+</p>
+
+<!-- ───────── User ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"User"</h3>
+    <span class="desc">Konto użytkownika synchronizowane z Firebase Authentication</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator (UID Firebase)</td></tr>
+        <tr><td class="td-name">email</td><td class="td-type">VARCHAR(255)</td><td><span class="badge badge-uk">UNIQUE</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Adres e-mail</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(255)</td><td>NULL</td><td>NULL</td><td>Nazwa wyświetlana (legacy)</td></tr>
+        <tr><td class="td-name">firstName</td><td class="td-type">VARCHAR(100)</td><td>NULL</td><td>NULL</td><td>Imię</td></tr>
+        <tr><td class="td-name">lastName</td><td class="td-type">VARCHAR(100)</td><td>NULL</td><td>NULL</td><td>Nazwisko</td></tr>
+        <tr><td class="td-name">location</td><td class="td-type">VARCHAR(255)</td><td>NULL</td><td>NULL</td><td>Miejscowość</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data rejestracji</td></tr>
+        <tr><td class="td-name">updatedAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Ostatnia modyfikacja</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_user_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">UNIQUE</span><code>idx_user_email</code> ON <code>(email)</code></div>
+  </div>
+</div>
+
+<!-- ───────── Workspace ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"Workspace"</h3>
+    <span class="desc">Przestrzeń robocza organizacji</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator przestrzeni</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Nazwa</td></tr>
+        <tr class="td-uk"><td class="td-name">inviteCode</td><td class="td-type">UUID</td><td><span class="badge badge-uk">UNIQUE</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Kod zaproszenia</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data utworzenia</td></tr>
+        <tr><td class="td-name">updatedAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Ostatnia modyfikacja</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_workspace_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">UNIQUE</span><code>idx_workspace_invitecode</code> ON <code>(inviteCode)</code></div>
+  </div>
+</div>
+
+<!-- ───────── WorkspaceMember ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"WorkspaceMember"</h3>
+    <span class="desc">Przynależność użytkownika do przestrzeni roboczej (tabela asocjacyjna)</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">userId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ User(id) CASCADE DELETE</td></tr>
+        <tr class="td-fk"><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Workspace(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">role</td><td class="td-type">Role</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'MEMBER'</code></td><td>Rola w przestrzeni</td></tr>
+        <tr><td class="td-name">customRoleIds</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>ID niestandardowych ról</td></tr>
+        <tr><td class="td-name">joinedAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data dołączenia</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_workspacemember_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">UNIQUE</span><code>idx_workspacemember_user_ws</code> ON <code>(userId, workspaceId)</code> — jeden użytkownik może być tylko raz w przestrzeni</div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_workspacemember_userid</code> ON <code>(userId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_workspacemember_workspaceid</code> ON <code>(workspaceId)</code></div>
+  </div>
+</div>
+
+<!-- ───────── WorkspaceRole ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"WorkspaceRole"</h3>
+    <span class="desc">Niestandardowe etykiety ról definiowane przez administratorów przestrzeni</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Workspace(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Nazwa roli</td></tr>
+        <tr><td class="td-name">color</td><td class="td-type">VARCHAR(20)</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'#6366f1'</code></td><td>Kolor w formacie hex</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data utworzenia</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_workspacerole_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_workspacerole_workspaceid</code> ON <code>(workspaceId)</code></div>
+  </div>
+</div>
+
+<!-- ───────── ChannelCategory ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"ChannelCategory"</h3>
+    <span class="desc">Kategoria grupująca kanały w obrębie przestrzeni roboczej</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Workspace(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Nazwa kategorii</td></tr>
+        <tr><td class="td-name">position</td><td class="td-type">INTEGER</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>0</code></td><td>Kolejność wyświetlania</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data utworzenia</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_channelcategory_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_channelcategory_workspaceid</code> ON <code>(workspaceId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_channelcategory_ws_pos</code> ON <code>(workspaceId, position)</code> — sortowanie kategorii w ramach przestrzeni</div>
+  </div>
+</div>
+
+<!-- ───────── Channel ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"Channel"</h3>
+    <span class="desc">Kanał komunikacji w przestrzeni roboczej (tekstowy lub informacyjny)</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Nazwa kanału</td></tr>
+        <tr><td class="td-name">type</td><td class="td-type">ChannelType</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'TEXT'</code></td><td>Typ: TEXT lub INFO</td></tr>
+        <tr class="td-fk"><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Workspace(id) CASCADE DELETE</td></tr>
+        <tr class="td-fk"><td class="td-name">categoryId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> NULL</td><td>NULL</td><td>→ ChannelCategory(id) SET NULL</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data utworzenia</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_channel_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_channel_workspaceid</code> ON <code>(workspaceId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_channel_categoryid</code> ON <code>(categoryId)</code> WHERE categoryId IS NOT NULL</div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_channel_ws_created</code> ON <code>(workspaceId, createdAt ASC)</code> — sortowane listy kanałów</div>
+  </div>
+</div>
+
+<!-- ───────── Message ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"Message"</h3>
+    <span class="desc">Wiadomość wysłana na kanale, może zawierać treść tekstową lub załącznik</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr><td class="td-name">content</td><td class="td-type">TEXT</td><td>NULL</td><td>NULL</td><td>Treść tekstowa</td></tr>
+        <tr><td class="td-name">fileUrl</td><td class="td-type">VARCHAR(500)</td><td>NULL</td><td>NULL</td><td>Ścieżka pliku na serwerze</td></tr>
+        <tr><td class="td-name">fileName</td><td class="td-type">VARCHAR(255)</td><td>NULL</td><td>NULL</td><td>Oryginalna nazwa pliku</td></tr>
+        <tr><td class="td-name">fileType</td><td class="td-type">VARCHAR(20)</td><td>NULL</td><td>NULL</td><td>Typ pliku: image / video / document</td></tr>
+        <tr><td class="td-name">isEdited</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Flaga edycji</td></tr>
+        <tr><td class="td-name">isPinned</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Flaga przypięcia</td></tr>
+        <tr><td class="td-name">mentionedIds</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>UUID użytkowników oznaczonych @</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data wysłania</td></tr>
+        <tr><td class="td-name">updatedAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Ostatnia modyfikacja</td></tr>
+        <tr class="td-fk"><td class="td-name">channelId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Channel(id) CASCADE DELETE</td></tr>
+        <tr class="td-fk"><td class="td-name">userId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ User(id) CASCADE DELETE</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_message_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_message_channelid</code> ON <code>(channelId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_message_userid</code> ON <code>(userId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_message_channel_created</code> ON <code>(channelId, createdAt ASC)</code> — chronologiczne ładowanie historii</div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_message_pinned</code> ON <code>(channelId, isPinned)</code> WHERE isPinned = true — lista przypiętych</div>
+  </div>
+</div>
+
+<!-- ───────── Reaction ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"Reaction"</h3>
+    <span class="desc">Reakcja emoji użytkownika na wiadomość</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">messageId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Message(id) CASCADE DELETE</td></tr>
+        <tr class="td-fk"><td class="td-name">userId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ User(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">emoji</td><td class="td-type">VARCHAR(10)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Znak emoji</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data dodania</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_reaction_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">UNIQUE</span><code>idx_reaction_msg_user_emoji</code> ON <code>(messageId, userId, emoji)</code> — jeden użytkownik, jedna reakcja danego emoji</div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_reaction_messageid</code> ON <code>(messageId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_reaction_userid</code> ON <code>(userId)</code></div>
+  </div>
+</div>
+
+<!-- ───────── Poll ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"Poll"</h3>
+    <span class="desc">Ankieta osadzona w kanale</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">channelId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Channel(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Denormalizacja — szybki filtr</td></tr>
+        <tr><td class="td-name">createdById</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>ID twórcy (brak FK — soft ref)</td></tr>
+        <tr><td class="td-name">question</td><td class="td-type">TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Treść pytania</td></tr>
+        <tr><td class="td-name">isMultiple</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Zezwolenie na wiele odpowiedzi</td></tr>
+        <tr><td class="td-name">isClosed</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Ankieta zamknięta</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data utworzenia</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_poll_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_poll_channelid</code> ON <code>(channelId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_poll_workspaceid</code> ON <code>(workspaceId)</code></div>
+  </div>
+</div>
+
+<!-- ───────── PollOption ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"PollOption"</h3>
+    <span class="desc">Opcja odpowiedzi w ankiecie, przechowuje listę głosujących</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">pollId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Poll(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">text</td><td class="td-type">TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Treść opcji</td></tr>
+        <tr><td class="td-name">voterIds</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>UUID głosujących użytkowników</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_polloption_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_polloption_pollid</code> ON <code>(pollId)</code></div>
+  </div>
+</div>
+
+<!-- ───────── DirectMessage ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"DirectMessage"</h3>
+    <span class="desc">Wiadomość prywatna 1:1 w obrębie przestrzeni roboczej</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Workspace(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">senderId</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>UUID nadawcy (soft ref → User)</td></tr>
+        <tr><td class="td-name">recipientId</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>UUID odbiorcy (soft ref → User)</td></tr>
+        <tr><td class="td-name">content</td><td class="td-type">TEXT</td><td>NULL</td><td>NULL</td><td>Treść wiadomości</td></tr>
+        <tr><td class="td-name">fileUrl</td><td class="td-type">VARCHAR(500)</td><td>NULL</td><td>NULL</td><td>Ścieżka pliku</td></tr>
+        <tr><td class="td-name">fileName</td><td class="td-type">VARCHAR(255)</td><td>NULL</td><td>NULL</td><td>Nazwa pliku</td></tr>
+        <tr><td class="td-name">fileType</td><td class="td-type">VARCHAR(20)</td><td>NULL</td><td>NULL</td><td>Typ: image / video / document</td></tr>
+        <tr><td class="td-name">isRead</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Odczytana przez odbiorcę</td></tr>
+        <tr><td class="td-name">isEdited</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Flaga edycji</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data wysłania</td></tr>
+        <tr><td class="td-name">updatedAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Ostatnia modyfikacja</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_dm_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_dm_workspaceid</code> ON <code>(workspaceId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_dm_conversation</code> ON <code>(workspaceId, senderId, recipientId, createdAt ASC)</code> — historia rozmowy</div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_dm_unread</code> ON <code>(workspaceId, recipientId, isRead)</code> WHERE isRead = false — licznik nieprzeczytanych</div>
+  </div>
+</div>
+
+<!-- ───────── Task ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"Task"</h3>
+    <span class="desc">Zadanie przypisane do przestrzeni; obsługuje tryb indywidualny i grupowy z przepływem weryfikacji</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr><td class="td-name">title</td><td class="td-type">VARCHAR(500)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Tytuł zadania</td></tr>
+        <tr><td class="td-name">description</td><td class="td-type">TEXT</td><td>NULL</td><td>NULL</td><td>Opis zadania</td></tr>
+        <tr><td class="td-name">status</td><td class="td-type">TaskStatus</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'TODO'</code></td><td>Globalny status: TODO / IN_PROGRESS / REVIEW / DONE</td></tr>
+        <tr><td class="td-name">priority</td><td class="td-type">TaskPriority</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'MEDIUM'</code></td><td>Priorytet: LOW / MEDIUM / HIGH / URGENT</td></tr>
+        <tr class="td-fk"><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Workspace(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">assigneeIds</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>UUID przypisanych pracowników</td></tr>
+        <tr><td class="td-name">dueDate</td><td class="td-type">TIMESTAMPTZ</td><td>NULL</td><td>NULL</td><td>Termin wykonania</td></tr>
+        <tr class="td-fk"><td class="td-name">createdById</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ User(id) (brak CASCADE — zachowanie audytu)</td></tr>
+        <tr><td class="td-name">attachmentUrl</td><td class="td-type">VARCHAR(500)</td><td>NULL</td><td>NULL</td><td>Plik załączony do opisu zadania</td></tr>
+        <tr><td class="td-name">attachmentName</td><td class="td-type">VARCHAR(255)</td><td>NULL</td><td>NULL</td><td>Nazwa załącznika</td></tr>
+        <tr><td class="td-name">attachmentType</td><td class="td-type">VARCHAR(20)</td><td>NULL</td><td>NULL</td><td>Typ załącznika</td></tr>
+        <tr><td class="td-name">submissionType</td><td class="td-type">VARCHAR(10)</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'NONE'</code></td><td>Wymagany rodzaj przesłania: NONE / TEXT / FILE / BOTH</td></tr>
+        <tr><td class="td-name">submissionMode</td><td class="td-type">VARCHAR(10)</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'INDIVIDUAL'</code></td><td>Tryb: INDIVIDUAL / GROUP</td></tr>
+        <tr><td class="td-name">inProgressByIds</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>UUID pracowników w trakcie pracy</td></tr>
+        <tr><td class="td-name">reviewByIds</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>UUID pracowników oczekujących na weryfikację</td></tr>
+        <tr><td class="td-name">completedByIds</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>UUID pracowników z zaakceptowaną pracą</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data utworzenia</td></tr>
+        <tr><td class="td-name">updatedAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Ostatnia modyfikacja</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_task_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_task_workspaceid</code> ON <code>(workspaceId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_task_createdbyid</code> ON <code>(createdById)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_task_ws_status</code> ON <code>(workspaceId, status)</code> — filtrowanie Kanbana</div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_task_ws_duedate</code> ON <code>(workspaceId, dueDate ASC)</code> WHERE dueDate IS NOT NULL — widok terminów</div>
+    <div class="index-item"><span class="index-type">GIN INDEX</span><code>idx_task_assigneeids_gin</code> ON <code>(assigneeIds)</code> USING GIN — wyszukiwanie zadań przypisanych do użytkownika</div>
+  </div>
+</div>
+
+<!-- ───────── TaskSubmission ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"TaskSubmission"</h3>
+    <span class="desc">Przesłany wynik zadania przez pracownika (tekst i/lub pliki)</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">taskId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Task(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">submittedById</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>UUID autora przesłania</td></tr>
+        <tr><td class="td-name">textContent</td><td class="td-type">TEXT</td><td>NULL</td><td>NULL</td><td>Treść opisowa</td></tr>
+        <tr><td class="td-name">fileUrls</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>Ścieżki załączonych plików</td></tr>
+        <tr><td class="td-name">fileNames</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>Oryginalne nazwy plików</td></tr>
+        <tr><td class="td-name">fileTypes</td><td class="td-type">TEXT[]</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>ARRAY[]::TEXT[]</code></td><td>Typy plików</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data przesłania</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_tasksubmission_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_tasksubmission_taskid</code> ON <code>(taskId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_tasksubmission_task_submitter</code> ON <code>(taskId, submittedById, createdAt DESC)</code> — ostatnie przesłanie per użytkownik</div>
+  </div>
+</div>
+
+<!-- ───────── TaskNotification ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"TaskNotification"</h3>
+    <span class="desc">Powiadomienie związane z zadaniem (przypisanie, przesłanie, weryfikacja)</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">userId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ User(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Denormalizacja — soft ref</td></tr>
+        <tr><td class="td-name">taskId</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Soft ref — zachowanie po usunięciu zadania</td></tr>
+        <tr><td class="td-name">taskTitle</td><td class="td-type">VARCHAR(500)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Tytuł w chwili powiadomienia (snapshot)</td></tr>
+        <tr><td class="td-name">type</td><td class="td-type">VARCHAR(20)</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'ASSIGNED'</code></td><td>ASSIGNED / SUBMITTED / ACCEPTED / RETURNED</td></tr>
+        <tr><td class="td-name">comment</td><td class="td-type">TEXT</td><td>NULL</td><td>NULL</td><td>Komentarz przy RETURNED</td></tr>
+        <tr><td class="td-name">isRead</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Flaga odczytania</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data wysłania powiadomienia</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_tasknotif_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_tasknotif_userid</code> ON <code>(userId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_tasknotif_unread</code> ON <code>(userId, isRead, createdAt DESC)</code> WHERE isRead = false — pobieranie nieprzeczytanych</div>
+  </div>
+</div>
+
+<!-- ───────── DeleteNotification ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"DeleteNotification"</h3>
+    <span class="desc">Powiadomienie o usunięciu wiadomości przez administratora</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr class="td-fk"><td class="td-name">userId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ User(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Soft ref</td></tr>
+        <tr><td class="td-name">channelName</td><td class="td-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>Snapshot nazwy kanału</td></tr>
+        <tr><td class="td-name">messagePreview</td><td class="td-type">VARCHAR(100)</td><td>NULL</td><td>NULL</td><td>Fragment usuniętej wiadomości</td></tr>
+        <tr><td class="td-name">deletedByRole</td><td class="td-type">VARCHAR(10)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>OWNER lub ADMIN</td></tr>
+        <tr><td class="td-name">isRead</td><td class="td-type">BOOLEAN</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>false</code></td><td>Flaga odczytania</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data usunięcia</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_deletenotif_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_deletenotif_userid</code> ON <code>(userId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_deletenotif_unread</code> ON <code>(userId, isRead)</code> WHERE isRead = false</div>
+  </div>
+</div>
+
+<!-- ───────── Invitation ───────── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="dot"></div>
+    <h3>"Invitation"</h3>
+    <span class="desc">Zaproszenie do przestrzeni roboczej wysłane na adres e-mail</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Kolumna</th><th>Typ PostgreSQL</th><th>Ograniczenia</th><th>Wartość domyślna</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr class="td-pk"><td class="td-name">id</td><td class="td-type">UUID</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td><code>gen_random_uuid()</code></td><td>Identyfikator</td></tr>
+        <tr><td class="td-name">email</td><td class="td-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>E-mail zapraszanego</td></tr>
+        <tr class="td-fk"><td class="td-name">workspaceId</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ Workspace(id) CASCADE DELETE</td></tr>
+        <tr><td class="td-name">status</td><td class="td-type">VARCHAR(20)</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>'PENDING'</code></td><td>PENDING / ACCEPTED / DECLINED</td></tr>
+        <tr class="td-fk"><td class="td-name">invitedById</td><td class="td-type">UUID</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>—</td><td>→ User(id)</td></tr>
+        <tr><td class="td-name">createdAt</td><td class="td-type">TIMESTAMPTZ</td><td><span class="badge badge-nn">NOT NULL</span></td><td><code>NOW()</code></td><td>Data wysłania</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="index-list">
+    <div class="index-item"><span class="index-type">PRIMARY KEY</span><code>idx_invitation_pkey</code> ON <code>(id)</code></div>
+    <div class="index-item"><span class="index-type">UNIQUE</span><code>idx_invitation_email_ws</code> ON <code>(email, workspaceId)</code> — jeden e-mail może mieć tylko jedno aktywne zaproszenie</div>
+    <div class="index-item"><span class="index-type">INDEX (FK)</span><code>idx_invitation_workspaceid</code> ON <code>(workspaceId)</code></div>
+    <div class="index-item"><span class="index-type">INDEX</span><code>idx_invitation_email_status</code> ON <code>(email, status)</code> — wyszukiwanie zaproszeń dla e-maila</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PODSUMOWANIE ═══════════════════════════════ -->
+<div class="section-title">4. Podsumowanie modelu</div>
+
+<div class="table-wrapper">
+  <table>
+    <thead><tr><th>Tabela</th><th>Liczba kolumn</th><th>Klucze obce</th><th>Unikalne ograniczenia</th><th>Indeksy</th></tr></thead>
+    <tbody>
+      <tr><td class="td-name">User</td><td>8</td><td>0</td><td>1 (email)</td><td>2</td></tr>
+      <tr><td class="td-name">Workspace</td><td>5</td><td>0</td><td>1 (inviteCode)</td><td>2</td></tr>
+      <tr><td class="td-name">WorkspaceMember</td><td>6</td><td>2</td><td>1 (userId, workspaceId)</td><td>4</td></tr>
+      <tr><td class="td-name">WorkspaceRole</td><td>5</td><td>1</td><td>0</td><td>2</td></tr>
+      <tr><td class="td-name">ChannelCategory</td><td>5</td><td>1</td><td>0</td><td>3</td></tr>
+      <tr><td class="td-name">Channel</td><td>6</td><td>2</td><td>0</td><td>4</td></tr>
+      <tr><td class="td-name">Message</td><td>12</td><td>2</td><td>0</td><td>5</td></tr>
+      <tr><td class="td-name">Reaction</td><td>5</td><td>2</td><td>1 (messageId, userId, emoji)</td><td>4</td></tr>
+      <tr><td class="td-name">Poll</td><td>8</td><td>1</td><td>0</td><td>3</td></tr>
+      <tr><td class="td-name">PollOption</td><td>4</td><td>1</td><td>0</td><td>2</td></tr>
+      <tr><td class="td-name">DirectMessage</td><td>12</td><td>1</td><td>0</td><td>4</td></tr>
+      <tr><td class="td-name">Task</td><td>20</td><td>2</td><td>0</td><td>6</td></tr>
+      <tr><td class="td-name">TaskSubmission</td><td>8</td><td>1</td><td>0</td><td>3</td></tr>
+      <tr><td class="td-name">TaskNotification</td><td>9</td><td>1</td><td>0</td><td>3</td></tr>
+      <tr><td class="td-name">DeleteNotification</td><td>8</td><td>1</td><td>0</td><td>3</td></tr>
+      <tr><td class="td-name">Invitation</td><td>6</td><td>2</td><td>1 (email, workspaceId)</td><td>4</td></tr>
+      <tr style="background:#e0e7ff;font-weight:700"><td>RAZEM</td><td>127</td><td>20</td><td>5</td><td>54</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p style="margin-top:20px;color:#64748b;font-size:.82rem;">
+  <strong>Uwagi projektowe:</strong>
+  Pola tablicowe <code>TEXT[]</code> (np. <code>assigneeIds</code>, <code>mentionedIds</code>, <code>customRoleIds</code>) są świadomą decyzją — w systemie HR o ograniczonej liczbie współpracowników PostgreSQL arrays są wystarczające i upraszczają zapytania.
+  Dla skalowania powyżej kilku tysięcy pracowników na przestrzeń zaleca się przeniesienie relacji M:N do dedykowanych tabel asocjacyjnych z indeksami GIN zastąpionymi indeksami B-tree na kluczach obcych.
+</p>
+
+</div><!-- /content -->
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    er: { diagramPadding: 20, layoutDirection: 'TB', minEntityWidth: 100, minEntityHeight: 75, entityPadding: 15 },
+    securityLevel: 'loose'
+  });
+</script>
+</body>
+</html>

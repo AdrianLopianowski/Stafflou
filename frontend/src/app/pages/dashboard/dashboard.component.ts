@@ -152,7 +152,13 @@ export class DashboardComponent implements OnInit {
 
   reviewModalTask: any = null;
   reviewComment = '';
+  reviewModalPhase: 'view' | 'return' = 'view';
   isReviewingTask = false;
+
+  // Per-submission return state (INDIVIDUAL mode)
+  reviewingTargetUser: string | null = null;
+  reviewTargetComment = '';
+  isReviewingTarget = false;
 
   categories: any[] = [];
   isCategoryModalOpen = false;
@@ -1207,7 +1213,17 @@ export class DashboardComponent implements OnInit {
 
   effectiveStatus(task: any): string {
     const uid = this.auth.currentUser?.uid;
-    if (task.submissionMode === 'INDIVIDUAL' && uid && task.assigneeIds?.includes(uid)) {
+    if (!uid) return task.status;
+
+    // Creator and admins always see the global REVIEW/DONE status directly —
+    // so they land in the right column regardless of whether they're also an assignee.
+    const isCreator = task.createdById === uid;
+    const isAdminOrOwner = ['OWNER', 'ADMIN'].includes(this.currentUserRole);
+    if ((isCreator || isAdminOrOwner) && (task.status === 'REVIEW' || task.status === 'DONE')) {
+      return task.status;
+    }
+
+    if (task.submissionMode === 'INDIVIDUAL' && task.assigneeIds?.includes(uid)) {
       if (task.reviewByIds?.includes(uid)) return 'REVIEW';
       if (task.completedByIds?.includes(uid)) return 'DONE';
       if (task.inProgressByIds?.includes(uid)) return 'IN_PROGRESS';
@@ -1588,9 +1604,13 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  async acceptTask(task: any) {
-    this.reviewModalTask = task;
-    await this.submitReview('ACCEPT');
+  reviewSubmissionProgress(task: any): { submitted: number; total: number } {
+    if (task.submissionMode === 'GROUP') {
+      return { submitted: task.submissions?.length ?? 0, total: task.assigneeIds?.length ?? 0 };
+    }
+    const total = task.assigneeIds?.length ?? 0;
+    const submitted = task.reviewByIds?.length ?? 0;
+    return { submitted, total };
   }
 
   canReviewTask(task: any): boolean {
@@ -1604,11 +1624,92 @@ export class DashboardComponent implements OnInit {
   openReviewModal(task: any) {
     this.reviewModalTask = task;
     this.reviewComment = '';
+    this.reviewModalPhase = 'view';
   }
 
   closeReviewModal() {
     this.reviewModalTask = null;
     this.reviewComment = '';
+    this.reviewModalPhase = 'view';
+    this.reviewingTargetUser = null;
+    this.reviewTargetComment = '';
+  }
+
+  private async refreshReviewModal(taskId: string) {
+    await this.loadTasks(this.activeWorkspace.id);
+    await this.loadTaskNotifications();
+    const fresh = this.tasks.find((t) => t.id === taskId) ?? null;
+    if (!fresh || fresh.status === 'DONE') {
+      this.closeReviewModal();
+    } else {
+      this.reviewModalTask = fresh;
+      this.reviewingTargetUser = null;
+      this.reviewTargetComment = '';
+    }
+  }
+
+  async acceptSubmission(userId: string) {
+    if (!this.reviewModalTask || !this.activeWorkspace) return;
+    const taskId = this.reviewModalTask.id;
+    this.isReviewingTarget = true;
+    try {
+      await this.workspaceService.reviewTask(
+        this.activeWorkspace.id,
+        taskId,
+        'ACCEPT',
+        undefined,
+        userId,
+      );
+      await this.refreshReviewModal(taskId);
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się zaakceptować.');
+    } finally {
+      this.isReviewingTarget = false;
+    }
+  }
+
+  openReturnForUser(userId: string) {
+    this.reviewingTargetUser = this.reviewingTargetUser === userId ? null : userId;
+    this.reviewTargetComment = '';
+  }
+
+  async submitReturnFor(userId: string) {
+    if (!this.reviewModalTask || !this.activeWorkspace) return;
+    const taskId = this.reviewModalTask.id;
+    this.isReviewingTarget = true;
+    try {
+      await this.workspaceService.reviewTask(
+        this.activeWorkspace.id,
+        taskId,
+        'RETURN',
+        this.reviewTargetComment || undefined,
+        userId,
+      );
+      await this.refreshReviewModal(taskId);
+    } catch (e: any) {
+      alert(e?.error?.message || 'Nie udało się zwrócić zadania.');
+    } finally {
+      this.isReviewingTarget = false;
+    }
+  }
+
+  latestSubmissionPerAssignee(task: any): { member: any; submission: any }[] {
+    if (!task?.submissions?.length) return [];
+    const result: { member: any; submission: any }[] = [];
+    const reviewers: string[] = task.submissionMode === 'INDIVIDUAL'
+      ? (task.reviewByIds ?? task.assigneeIds ?? [])
+      : [...new Set((task.submissions as any[]).map((s: any) => s.submittedById))];
+
+    for (const uid of reviewers) {
+      const subs = (task.submissions as any[]).filter((s: any) => s.submittedById === uid);
+      const latest = subs.sort((a: any, b: any) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )[0];
+      if (latest) {
+        result.push({ member: this.members.find((m) => m.userId === uid) ?? null, submission: latest });
+      }
+    }
+    return result;
   }
 
   async submitReview(action: 'ACCEPT' | 'RETURN') {
@@ -1629,6 +1730,10 @@ export class DashboardComponent implements OnInit {
     } finally {
       this.isReviewingTask = false;
     }
+  }
+
+  isSubmissionAccepted(userId: string): boolean {
+    return this.reviewModalTask?.completedByIds?.includes(userId) ?? false;
   }
 
   channelsByCategory(): { category: any; channels: any[] }[] {

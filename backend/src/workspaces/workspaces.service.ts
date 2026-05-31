@@ -84,19 +84,35 @@ export class WorkspacesService {
 
   async createCategory(workspaceId: string, name: string, requesterId: string) {
     const member = await this.prisma.workspaceMember.findFirst({
-      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+      where: {
+        workspaceId,
+        userId: requesterId,
+        role: { in: ['OWNER', 'ADMIN'] },
+      },
     });
-    if (!member) throw new ForbiddenException('Brak uprawnień do tworzenia kategorii');
+    if (!member)
+      throw new ForbiddenException('Brak uprawnień do tworzenia kategorii');
     const prismaAny = this.prisma as any;
-    const count = await prismaAny.channelCategory.count({ where: { workspaceId } });
+    const count = await prismaAny.channelCategory.count({
+      where: { workspaceId },
+    });
     return prismaAny.channelCategory.create({
       data: { workspaceId, name, position: count },
     });
   }
 
-  async updateCategory(workspaceId: string, categoryId: string, name: string, requesterId: string) {
+  async updateCategory(
+    workspaceId: string,
+    categoryId: string,
+    name: string,
+    requesterId: string,
+  ) {
     const member = await this.prisma.workspaceMember.findFirst({
-      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+      where: {
+        workspaceId,
+        userId: requesterId,
+        role: { in: ['OWNER', 'ADMIN'] },
+      },
     });
     if (!member) throw new ForbiddenException('Brak uprawnień');
     const prismaAny = this.prisma as any;
@@ -106,9 +122,17 @@ export class WorkspacesService {
     });
   }
 
-  async deleteCategory(workspaceId: string, categoryId: string, requesterId: string) {
+  async deleteCategory(
+    workspaceId: string,
+    categoryId: string,
+    requesterId: string,
+  ) {
     const member = await this.prisma.workspaceMember.findFirst({
-      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+      where: {
+        workspaceId,
+        userId: requesterId,
+        role: { in: ['OWNER', 'ADMIN'] },
+      },
     });
     if (!member) throw new ForbiddenException('Brak uprawnień');
     const prismaAny = this.prisma as any;
@@ -126,7 +150,11 @@ export class WorkspacesService {
     requesterId: string,
   ) {
     const member = await this.prisma.workspaceMember.findFirst({
-      where: { workspaceId, userId: requesterId, role: { in: ['OWNER', 'ADMIN'] } },
+      where: {
+        workspaceId,
+        userId: requesterId,
+        role: { in: ['OWNER', 'ADMIN'] },
+      },
     });
     if (!member) throw new ForbiddenException('Brak uprawnień');
     const prismaAny = this.prisma as any;
@@ -195,7 +223,9 @@ export class WorkspacesService {
     });
     if (!member) throw new ForbiddenException('Brak uprawnień');
     const prismaAny = this.prisma as any;
-    const msg = await prismaAny.message.findUnique({ where: { id: messageId } });
+    const msg = await prismaAny.message.findUnique({
+      where: { id: messageId },
+    });
     return prismaAny.message.update({
       where: { id: messageId },
       data: { isPinned: !msg.isPinned },
@@ -271,14 +301,20 @@ export class WorkspacesService {
       where: { id: pollId },
       include: { options: true },
     });
-    if (!poll || poll.isClosed) throw new ForbiddenException('Ankieta zamknięta');
+    if (!poll || poll.isClosed)
+      throw new ForbiddenException('Ankieta zamknięta');
 
     if (!poll.isMultiple) {
       for (const opt of poll.options) {
-        if (opt.id !== optionId && (opt.voterIds as string[]).includes(userId)) {
+        if (
+          opt.id !== optionId &&
+          (opt.voterIds as string[]).includes(userId)
+        ) {
           await prismaAny.pollOption.update({
             where: { id: opt.id },
-            data: { voterIds: opt.voterIds.filter((id: string) => id !== userId) },
+            data: {
+              voterIds: opt.voterIds.filter((id: string) => id !== userId),
+            },
           });
         }
       }
@@ -466,11 +502,16 @@ export class WorkspacesService {
     return { success: true };
   }
 
-  private async extractMentionedIds(workspaceId: string, content: string): Promise<string[]> {
+  private async extractMentionedIds(
+    workspaceId: string,
+    content: string,
+  ): Promise<string[]> {
     const lower = content.toLowerCase();
     const members = await this.prisma.workspaceMember.findMany({
       where: { workspaceId },
-      include: { user: { select: { id: true, firstName: true, lastName: true } } },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true } },
+      },
     });
 
     if (lower.includes('@all')) {
@@ -479,7 +520,9 @@ export class WorkspacesService {
 
     const mentioned: string[] = [];
     for (const m of members) {
-      const fullName = `${m.user?.firstName || ''} ${m.user?.lastName || ''}`.trim().toLowerCase();
+      const fullName = `${m.user?.firstName || ''} ${m.user?.lastName || ''}`
+        .trim()
+        .toLowerCase();
       if (fullName && lower.includes(`@${fullName}`)) {
         mentioned.push(m.userId);
       }
@@ -548,7 +591,8 @@ export class WorkspacesService {
     const member = await this.prisma.workspaceMember.findFirst({
       where: { workspaceId, userId },
     });
-    if (!member) throw new ForbiddenException('Brak dostępu do tej przestrzeni');
+    if (!member)
+      throw new ForbiddenException('Brak dostępu do tej przestrzeni');
 
     const channel = await this.prisma.channel.findUnique({
       where: { id: channelId },
@@ -606,7 +650,9 @@ export class WorkspacesService {
     const isAdminOrOwner = ['OWNER', 'ADMIN'].includes(requester.role);
 
     if (!isOwn && !isAdminOrOwner) {
-      throw new ForbiddenException('Brak uprawnień do usunięcia tej wiadomości');
+      throw new ForbiddenException(
+        'Brak uprawnień do usunięcia tej wiadomości',
+      );
     }
 
     if (!isOwn && isAdminOrOwner) {
@@ -834,16 +880,19 @@ export class WorkspacesService {
       },
     });
 
-    if ((task as any)?.submissionMode === 'GROUP') {
+    let taskEnteredReview = false;
+
+    if (task?.submissionMode === 'GROUP') {
       await prismaAny.task.update({
         where: { id: taskId },
         data: { status: 'REVIEW' },
       });
+      taskEnteredReview = true;
     } else {
-      const currentReview: string[] = (task as any)?.reviewByIds || [];
+      const currentReview: string[] = task?.reviewByIds || [];
       if (!currentReview.includes(submittedById)) {
         const updatedReview = [...currentReview, submittedById];
-        const assigneeIds: string[] = (task as any)?.assigneeIds || [];
+        const assigneeIds: string[] = task?.assigneeIds || [];
         const allReview =
           assigneeIds.length > 0 &&
           assigneeIds.every((id: string) => updatedReview.includes(id));
@@ -854,7 +903,20 @@ export class WorkspacesService {
             ...(allReview ? { status: 'REVIEW' } : {}),
           },
         });
+        if (allReview) taskEnteredReview = true;
       }
+    }
+
+    if (taskEnteredReview && task?.createdById && task.createdById !== submittedById) {
+      await prismaAny.taskNotification.create({
+        data: {
+          userId: task.createdById,
+          workspaceId,
+          taskId,
+          taskTitle: task.title,
+          type: 'SUBMITTED',
+        },
+      });
     }
 
     return submission;
@@ -866,6 +928,7 @@ export class WorkspacesService {
     requesterId: string,
     action: 'ACCEPT' | 'RETURN',
     comment?: string,
+    targetUserId?: string,
   ) {
     const member = await this.prisma.workspaceMember.findFirst({
       where: { workspaceId, userId: requesterId },
@@ -882,21 +945,62 @@ export class WorkspacesService {
       throw new ForbiddenException('Tylko zlecający lub administrator może weryfikować zadanie');
     }
 
+    const reviewByIds: string[] = task.reviewByIds || [];
+    const completedByIds: string[] = task.completedByIds || [];
+    const assigneeIds: string[] = task.assigneeIds || [];
+
+    // Per-assignee review (INDIVIDUAL mode only)
+    if (targetUserId && task.submissionMode === 'INDIVIDUAL') {
+      if (action === 'ACCEPT') {
+        const newReviewByIds = reviewByIds.filter((id) => id !== targetUserId);
+        const newCompletedByIds = completedByIds.includes(targetUserId)
+          ? completedByIds
+          : [...completedByIds, targetUserId];
+
+        const allDone = assigneeIds.length > 0 && assigneeIds.every((id) => newCompletedByIds.includes(id));
+        const anyInReview = newReviewByIds.length > 0;
+        const newStatus = allDone ? 'DONE' : anyInReview ? 'REVIEW' : 'IN_PROGRESS';
+
+        const updated = await prismaAny.task.update({
+          where: { id: taskId },
+          data: { reviewByIds: newReviewByIds, completedByIds: newCompletedByIds, status: newStatus },
+          include: { createdBy: true, submissions: true },
+        });
+
+        await prismaAny.taskNotification.create({
+          data: { userId: targetUserId, workspaceId, taskId, taskTitle: task.title, type: 'ACCEPTED' },
+        });
+
+        return updated;
+      } else {
+        const newReviewByIds = reviewByIds.filter((id) => id !== targetUserId);
+        const anyInReview = newReviewByIds.length > 0;
+        const newStatus = anyInReview ? 'REVIEW' : 'IN_PROGRESS';
+
+        const updated = await prismaAny.task.update({
+          where: { id: taskId },
+          data: { reviewByIds: newReviewByIds, status: newStatus },
+          include: { createdBy: true, submissions: true },
+        });
+
+        await prismaAny.taskNotification.create({
+          data: { userId: targetUserId, workspaceId, taskId, taskTitle: task.title, type: 'RETURNED', comment: comment || null },
+        });
+
+        return updated;
+      }
+    }
+
+    // All-at-once (GROUP mode or explicit all-review)
     if (action === 'ACCEPT') {
       const updated = await prismaAny.task.update({
         where: { id: taskId },
-        data: { status: 'DONE', reviewByIds: [], completedByIds: task.assigneeIds || [] },
-        include: { createdBy: true },
+        data: { status: 'DONE', reviewByIds: [], completedByIds: assigneeIds },
+        include: { createdBy: true, submissions: true },
       });
-      for (const assigneeId of task.assigneeIds || []) {
+      for (const assigneeId of assigneeIds) {
         await prismaAny.taskNotification.create({
-          data: {
-            userId: assigneeId,
-            workspaceId,
-            taskId,
-            taskTitle: task.title,
-            type: 'ACCEPTED',
-          },
+          data: { userId: assigneeId, workspaceId, taskId, taskTitle: task.title, type: 'ACCEPTED' },
         });
       }
       return updated;
@@ -904,18 +1008,11 @@ export class WorkspacesService {
       const updated = await prismaAny.task.update({
         where: { id: taskId },
         data: { status: 'IN_PROGRESS', reviewByIds: [], completedByIds: [] },
-        include: { createdBy: true },
+        include: { createdBy: true, submissions: true },
       });
-      for (const assigneeId of task.assigneeIds || []) {
+      for (const assigneeId of assigneeIds) {
         await prismaAny.taskNotification.create({
-          data: {
-            userId: assigneeId,
-            workspaceId,
-            taskId,
-            taskTitle: task.title,
-            type: 'RETURNED',
-            comment: comment || null,
-          },
+          data: { userId: assigneeId, workspaceId, taskId, taskTitle: task.title, type: 'RETURNED', comment: comment || null },
         });
       }
       return updated;
@@ -947,7 +1044,11 @@ export class WorkspacesService {
       currentTask = await prismaAny.task.findUnique({ where: { id: taskId } });
     }
 
-    if (updates.assigneeIds !== undefined && updates.assigneeIds !== null && currentTask) {
+    if (
+      updates.assigneeIds !== undefined &&
+      updates.assigneeIds !== null &&
+      currentTask
+    ) {
       const oldIds: string[] = currentTask.assigneeIds || [];
       const newIds: string[] = updates.assigneeIds ?? [];
       const taskTitle: string = updates.title ?? currentTask.title;
@@ -962,9 +1063,13 @@ export class WorkspacesService {
 
     const baseData = {
       ...(updates.title !== undefined && { title: updates.title }),
-      ...(updates.description !== undefined && { description: updates.description }),
+      ...(updates.description !== undefined && {
+        description: updates.description,
+      }),
       ...(updates.priority !== undefined && { priority: updates.priority }),
-      ...(updates.assigneeIds !== undefined && { assigneeIds: updates.assigneeIds ?? [] }),
+      ...(updates.assigneeIds !== undefined && {
+        assigneeIds: updates.assigneeIds ?? [],
+      }),
       ...(updates.dueDate !== undefined && {
         dueDate: updates.dueDate ? new Date(updates.dueDate) : null,
       }),
@@ -984,12 +1089,16 @@ export class WorkspacesService {
       let globalStatus: string | undefined;
 
       if (updates.status === 'IN_PROGRESS') {
-        if (!newInProgress.includes(requesterId)) newInProgress.push(requesterId);
+        if (!newInProgress.includes(requesterId))
+          newInProgress.push(requesterId);
         newCompleted = newCompleted.filter((id) => id !== requesterId);
       } else if (updates.status === 'DONE' || updates.status === 'REVIEW') {
         if (!newCompleted.includes(requesterId)) newCompleted.push(requesterId);
         newInProgress = newInProgress.filter((id) => id !== requesterId);
-        if (assigneeIds.length > 0 && assigneeIds.every((id) => newCompleted.includes(id))) {
+        if (
+          assigneeIds.length > 0 &&
+          assigneeIds.every((id) => newCompleted.includes(id))
+        ) {
           globalStatus = updates.status;
         }
       } else if (updates.status === 'TODO') {
@@ -1087,7 +1196,12 @@ export class WorkspacesService {
   async getDMHistory(workspaceId: string, userId: string, otherUserId: string) {
     const prismaAny = this.prisma as any;
     await prismaAny.directMessage.updateMany({
-      where: { workspaceId, senderId: otherUserId, recipientId: userId, isRead: false },
+      where: {
+        workspaceId,
+        senderId: otherUserId,
+        recipientId: userId,
+        isRead: false,
+      },
       data: { isRead: true },
     });
     return prismaAny.directMessage.findMany({
@@ -1111,7 +1225,8 @@ export class WorkspacesService {
     const member = await this.prisma.workspaceMember.findUnique({
       where: { userId_workspaceId: { userId: senderId, workspaceId } },
     });
-    if (!member) throw new ForbiddenException('Nie jesteś członkiem tej przestrzeni.');
+    if (!member)
+      throw new ForbiddenException('Nie jesteś członkiem tej przestrzeni.');
     const prismaAny = this.prisma as any;
     return prismaAny.directMessage.create({
       data: { workspaceId, senderId, recipientId, content },
@@ -1129,7 +1244,15 @@ export class WorkspacesService {
   ) {
     const prismaAny = this.prisma as any;
     return prismaAny.directMessage.create({
-      data: { workspaceId, senderId, recipientId, fileUrl, fileName, fileType, content },
+      data: {
+        workspaceId,
+        senderId,
+        recipientId,
+        fileUrl,
+        fileName,
+        fileType,
+        content,
+      },
     });
   }
 
@@ -1140,7 +1263,9 @@ export class WorkspacesService {
     content: string,
   ) {
     const prismaAny = this.prisma as any;
-    const msg = await prismaAny.directMessage.findUnique({ where: { id: messageId } });
+    const msg = await prismaAny.directMessage.findUnique({
+      where: { id: messageId },
+    });
     if (!msg || msg.workspaceId !== workspaceId)
       throw new NotFoundException('Wiadomość nie istnieje.');
     if (msg.senderId !== userId)
@@ -1153,7 +1278,9 @@ export class WorkspacesService {
 
   async deleteDM(workspaceId: string, messageId: string, userId: string) {
     const prismaAny = this.prisma as any;
-    const msg = await prismaAny.directMessage.findUnique({ where: { id: messageId } });
+    const msg = await prismaAny.directMessage.findUnique({
+      where: { id: messageId },
+    });
     if (!msg || msg.workspaceId !== workspaceId)
       throw new NotFoundException('Wiadomość nie istnieje.');
     if (msg.senderId !== userId)

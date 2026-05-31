@@ -146,7 +146,11 @@ export class WorkspacesController {
     @Param('messageId') messageId: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.togglePinMessage(workspaceId, messageId, req.user.uid);
+    return this.workspacesService.togglePinMessage(
+      workspaceId,
+      messageId,
+      req.user.uid,
+    );
   }
 
   @Get(':id/channels/:channelId/polls')
@@ -178,7 +182,12 @@ export class WorkspacesController {
     @Body('optionId') optionId: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.voteOnPoll(workspaceId, pollId, optionId, req.user.uid);
+    return this.workspacesService.voteOnPoll(
+      workspaceId,
+      pollId,
+      optionId,
+      req.user.uid,
+    );
   }
 
   @Patch(':id/channels/:channelId/polls/:pollId/close')
@@ -410,7 +419,7 @@ export class WorkspacesController {
   reviewTask(
     @Param('id') workspaceId: string,
     @Param('taskId') taskId: string,
-    @Body() body: { action: 'ACCEPT' | 'RETURN'; comment?: string },
+    @Body() body: { action: 'ACCEPT' | 'RETURN'; comment?: string; targetUserId?: string },
     @Req() req: any,
   ) {
     return this.workspacesService.reviewTask(
@@ -419,6 +428,7 @@ export class WorkspacesController {
       req.user.uid,
       body.action,
       body.comment,
+      body.targetUserId,
     );
   }
 
@@ -498,7 +508,11 @@ export class WorkspacesController {
     @Body('name') name: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.createCategory(workspaceId, name, req.user.uid);
+    return this.workspacesService.createCategory(
+      workspaceId,
+      name,
+      req.user.uid,
+    );
   }
 
   @Patch(':id/categories/:categoryId')
@@ -508,7 +522,12 @@ export class WorkspacesController {
     @Body('name') name: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.updateCategory(workspaceId, categoryId, name, req.user.uid);
+    return this.workspacesService.updateCategory(
+      workspaceId,
+      categoryId,
+      name,
+      req.user.uid,
+    );
   }
 
   @Delete(':id/categories/:categoryId')
@@ -517,7 +536,11 @@ export class WorkspacesController {
     @Param('categoryId') categoryId: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.deleteCategory(workspaceId, categoryId, req.user.uid);
+    return this.workspacesService.deleteCategory(
+      workspaceId,
+      categoryId,
+      req.user.uid,
+    );
   }
 
   @Patch(':id/channels/:channelId/category')
@@ -547,7 +570,12 @@ export class WorkspacesController {
     @Body('content') content: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.editDM(workspaceId, messageId, req.user.uid, content);
+    return this.workspacesService.editDM(
+      workspaceId,
+      messageId,
+      req.user.uid,
+      content,
+    );
   }
 
   @Delete(':id/dm/messages/:messageId')
@@ -556,7 +584,11 @@ export class WorkspacesController {
     @Param('messageId') messageId: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.deleteDM(workspaceId, messageId, req.user.uid);
+    return this.workspacesService.deleteDM(
+      workspaceId,
+      messageId,
+      req.user.uid,
+    );
   }
 
   @Get(':id/dm/:userId')
@@ -565,7 +597,11 @@ export class WorkspacesController {
     @Param('userId') otherUserId: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.getDMHistory(workspaceId, req.user.uid, otherUserId);
+    return this.workspacesService.getDMHistory(
+      workspaceId,
+      req.user.uid,
+      otherUserId,
+    );
   }
 
   @Post(':id/dm/:userId')
@@ -575,7 +611,12 @@ export class WorkspacesController {
     @Body('content') content: string,
     @Req() req: any,
   ) {
-    return this.workspacesService.sendDM(workspaceId, req.user.uid, recipientId, content);
+    return this.workspacesService.sendDM(
+      workspaceId,
+      req.user.uid,
+      recipientId,
+      content,
+    );
   }
 
   @Post(':id/dm/:userId/upload')

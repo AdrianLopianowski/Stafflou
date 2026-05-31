@@ -385,12 +385,18 @@ export class WorkspaceService {
     );
   }
 
-  async reviewTask(workspaceId: string, taskId: string, action: 'ACCEPT' | 'RETURN', comment?: string) {
+  async reviewTask(
+    workspaceId: string,
+    taskId: string,
+    action: 'ACCEPT' | 'RETURN',
+    comment?: string,
+    targetUserId?: string,
+  ) {
     const headers = await this.getHeaders();
     return firstValueFrom(
       this.http.post(
         `${this.apiUrl}/${workspaceId}/tasks/${taskId}/review`,
-        { action, comment },
+        { action, comment, targetUserId },
         { headers },
       ),
     );
