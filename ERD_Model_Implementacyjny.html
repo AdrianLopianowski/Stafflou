@@ -953,6 +953,1180 @@ erDiagram
   Dla skalowania powyżej kilku tysięcy pracowników na przestrzeń zaleca się przeniesienie relacji M:N do dedykowanych tabel asocjacyjnych z indeksami GIN zastąpionymi indeksami B-tree na kluczach obcych.
 </p>
 
+<!-- ═══════════════════════════════ DIAGRAM KLAS ═══════════════════════════════ -->
+<div class="section-title">5. Diagram klas (Class Diagram)</div>
+<p class="intro">
+  Diagram klas przedstawia statyczną strukturę systemu — klasy z atrybutami i metodami oraz relacje między nimi
+  (asocjacja, kompozycja, agregacja). Metodologia obiektowa (UML).
+</p>
+
+<div class="rel-box">
+  <div class="rel-item"><span class="rel-symbol">--|&gt;</span> — dziedziczenie</div>
+  <div class="rel-item"><span class="rel-symbol">*--</span> — kompozycja (silna zawartość)</div>
+  <div class="rel-item"><span class="rel-symbol">o--</span> — agregacja (słaba zawartość)</div>
+  <div class="rel-item"><span class="rel-symbol">--&gt;</span> — asocjacja kierunkowa</div>
+  <div class="rel-item"><span class="rel-symbol">..&gt;</span> — zależność</div>
+</div>
+
+<div class="erd-wrapper">
+<div class="mermaid">
+classDiagram
+    class User {
+        UUID id
+        String email
+        String firstName
+        String lastName
+        String location
+        DateTime createdAt
+        DateTime updatedAt
+        getFullName() String
+        getInitials() String
+        getIdToken() String
+    }
+    class Workspace {
+        UUID id
+        String name
+        UUID inviteCode
+        DateTime createdAt
+        DateTime updatedAt
+        addMember(userId, role) WorkspaceMember
+        removeMember(userId) void
+        generateInviteLink() String
+    }
+    class WorkspaceMember {
+        UUID id
+        UUID userId
+        UUID workspaceId
+        String role
+        String customRoleIds
+        DateTime joinedAt
+        isAdminOrOwner() Boolean
+        hasRole(role) Boolean
+        getCustomRoles() WorkspaceRole
+    }
+    class WorkspaceRole {
+        UUID id
+        UUID workspaceId
+        String name
+        String color
+        DateTime createdAt
+        getMembers() WorkspaceMember
+    }
+    class ChannelCategory {
+        UUID id
+        UUID workspaceId
+        String name
+        int position
+        DateTime createdAt
+        getChannels() Channel
+    }
+    class Channel {
+        UUID id
+        String name
+        String type
+        UUID workspaceId
+        UUID categoryId
+        DateTime createdAt
+        canWrite(member) Boolean
+        isInfo() Boolean
+    }
+    class Message {
+        UUID id
+        UUID channelId
+        UUID userId
+        String content
+        String fileUrl
+        String fileType
+        Boolean isEdited
+        Boolean isPinned
+        String mentionedIds
+        DateTime createdAt
+        DateTime updatedAt
+        canEdit(userId) Boolean
+        canDelete(member) Boolean
+        getReactionGroups() Reaction
+    }
+    class Reaction {
+        UUID id
+        UUID messageId
+        UUID userId
+        String emoji
+        DateTime createdAt
+        toggle(userId, emoji) void
+    }
+    class Poll {
+        UUID id
+        UUID channelId
+        UUID createdById
+        String question
+        Boolean isMultiple
+        Boolean isClosed
+        DateTime createdAt
+        vote(userId, optionId) PollOption
+        close() void
+        getTotalVotes() int
+    }
+    class PollOption {
+        UUID id
+        UUID pollId
+        String text
+        String voterIds
+        hasVoted(userId) Boolean
+        getVoteCount() int
+    }
+    class Task {
+        UUID id
+        UUID workspaceId
+        UUID createdById
+        String title
+        String description
+        String status
+        String priority
+        String assigneeIds
+        DateTime dueDate
+        String submissionType
+        String submissionMode
+        String inProgressByIds
+        String reviewByIds
+        String completedByIds
+        DateTime createdAt
+        DateTime updatedAt
+        effectiveStatusFor(userId) String
+        canSubmit(userId) Boolean
+        canReview(userId) Boolean
+        submit(userId, data) TaskSubmission
+        reviewSingle(targetId, action, comment) Task
+        reviewAll(action, comment) Task
+    }
+    class TaskSubmission {
+        UUID id
+        UUID taskId
+        UUID submittedById
+        String textContent
+        String fileUrls
+        DateTime createdAt
+        getFiles() String
+    }
+    class TaskNotification {
+        UUID id
+        UUID userId
+        UUID taskId
+        String taskTitle
+        String type
+        String comment
+        Boolean isRead
+        DateTime createdAt
+        markRead() void
+    }
+    class DeleteNotification {
+        UUID id
+        UUID userId
+        String channelName
+        String messagePreview
+        String deletedByRole
+        Boolean isRead
+        DateTime createdAt
+        markRead() void
+    }
+    class DirectMessage {
+        UUID id
+        UUID workspaceId
+        UUID senderId
+        UUID recipientId
+        String content
+        String fileUrl
+        Boolean isRead
+        Boolean isEdited
+        DateTime createdAt
+        DateTime updatedAt
+        markRead() void
+        edit(content) DirectMessage
+    }
+    class Invitation {
+        UUID id
+        String email
+        UUID workspaceId
+        String status
+        UUID invitedById
+        DateTime createdAt
+        accept(userId) WorkspaceMember
+        decline() void
+    }
+
+    User "1" --> "0..*" WorkspaceMember : nalezy do
+    Workspace "1" *-- "1..*" WorkspaceMember : posiada
+    Workspace "1" *-- "0..*" WorkspaceRole : definiuje
+    Workspace "1" *-- "0..*" ChannelCategory : grupuje w
+    Workspace "1" *-- "0..*" Channel : zawiera
+    ChannelCategory "0..1" o-- "0..*" Channel : kategoryzuje
+    Channel "1" *-- "0..*" Message : zawiera
+    Channel "1" *-- "0..*" Poll : ma
+    User "1" --> "0..*" Message : pisze
+    Message "1" *-- "0..*" Reaction : otrzymuje
+    Poll "1" *-- "1..*" PollOption : posiada
+    Workspace "1" *-- "0..*" Task : ma
+    User "1" --> "0..*" Task : tworzy
+    Task "1" *-- "0..*" TaskSubmission : przyjmuje
+    User "1" *-- "0..*" TaskNotification : otrzymuje
+    User "1" *-- "0..*" DeleteNotification : otrzymuje
+    Workspace "1" *-- "0..*" DirectMessage : przechowuje
+    Workspace "1" *-- "0..*" Invitation : wysyla
+    User "1" --> "0..*" Invitation : wysyla
+</div>
+</div>
+
+<!-- ─── Tabela klas ─── -->
+<div class="section-subtitle" style="margin-top:32px">Zestawienie tabelaryczne klas</div>
+<p class="intro">Każda klasa z atrybutami (typ, ograniczenie) oraz operacjami dostępnymi w warstwie serwisowej.</p>
+
+<style>
+  .cls-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(480px,1fr)); gap:18px; margin-bottom:8px; }
+  .cls-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .cls-head { background:#1e1b4b; color:#fff; padding:8px 14px; display:flex; align-items:baseline; gap:10px; }
+  .cls-head .cls-name { font-family:'Courier New',monospace; font-size:.95rem; font-weight:800; }
+  .cls-head .cls-stereo { font-size:.68rem; color:#a5b4fc; text-transform:uppercase; letter-spacing:.5px; }
+  .cls-body table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  .cls-body thead tr { background:#e0e7ff; }
+  .cls-body thead th { padding:5px 10px; text-align:left; font-weight:700; color:#312e81; font-size:.72rem; text-transform:uppercase; letter-spacing:.3px; }
+  .cls-body tbody tr:nth-child(even) { background:#f8fafc; }
+  .cls-body tbody td { padding:4px 10px; border-bottom:1px solid #f1f5f9; }
+  .cls-body .cn { font-family:'Courier New',monospace; color:#1e40af; font-weight:600; }
+  .cls-body .ct { font-family:'Courier New',monospace; color:#7c3aed; }
+  .cls-body .cc { font-size:.68rem; }
+  .cls-sep { background:#f0f4ff; }
+  .cls-sep td { padding:3px 10px; font-size:.72rem; font-weight:700; color:#4338ca; text-transform:uppercase; letter-spacing:.5px; }
+  .cls-method td { background:#fafafa; }
+  .cls-method .cn { color:#0f766e; font-style:italic; }
+</style>
+
+<div class="cls-grid">
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">User</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK, NOT NULL</td></tr>
+      <tr><td class="cn">email</td><td class="ct">VARCHAR(255)</td><td class="cc">UNIQUE, NOT NULL</td></tr>
+      <tr><td class="cn">firstName</td><td class="ct">VARCHAR(100)</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">lastName</td><td class="ct">VARCHAR(100)</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">location</td><td class="ct">VARCHAR(255)</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">updatedAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">getFullName()</td><td class="ct">String</td><td class="cc">—</td></tr>
+      <tr class="cls-method"><td class="cn">getInitials()</td><td class="ct">String</td><td class="cc">—</td></tr>
+      <tr class="cls-method"><td class="cn">getIdToken()</td><td class="ct">Promise&lt;String&gt;</td><td class="cc">via Firebase</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">aggregate root</span><span class="cls-name">Workspace</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK, NOT NULL</td></tr>
+      <tr><td class="cn">name</td><td class="ct">VARCHAR(255)</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">inviteCode</td><td class="ct">UUID</td><td class="cc">UNIQUE, NOT NULL</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">updatedAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">addMember(userId, role)</td><td class="ct">WorkspaceMember</td><td class="cc">—</td></tr>
+      <tr class="cls-method"><td class="cn">removeMember(userId)</td><td class="ct">void</td><td class="cc">—</td></tr>
+      <tr class="cls-method"><td class="cn">generateInviteLink()</td><td class="ct">String</td><td class="cc">—</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">association class</span><span class="cls-name">WorkspaceMember</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">userId</td><td class="ct">UUID</td><td class="cc">FK → User CASCADE</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">FK → Workspace CASCADE</td></tr>
+      <tr><td class="cn">role</td><td class="ct">Role</td><td class="cc">NOT NULL, def: MEMBER</td></tr>
+      <tr><td class="cn">customRoleIds</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">joinedAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">isAdminOrOwner()</td><td class="ct">Boolean</td><td class="cc">—</td></tr>
+      <tr class="cls-method"><td class="cn">hasRole(role)</td><td class="ct">Boolean</td><td class="cc">—</td></tr>
+      <tr class="cls-method"><td class="cn">getCustomRoles(ws)</td><td class="ct">WorkspaceRole[]</td><td class="cc">—</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">WorkspaceRole</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">FK → Workspace CASCADE</td></tr>
+      <tr><td class="cn">name</td><td class="ct">VARCHAR(100)</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">color</td><td class="ct">VARCHAR(20)</td><td class="cc">NOT NULL, def: #6366f1</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">getMembers(ws)</td><td class="ct">WorkspaceMember[]</td><td class="cc">—</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">ChannelCategory</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">FK → Workspace CASCADE</td></tr>
+      <tr><td class="cn">name</td><td class="ct">VARCHAR(100)</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">position</td><td class="ct">INTEGER</td><td class="cc">NOT NULL, def: 0</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">getChannels()</td><td class="ct">Channel[]</td><td class="cc">—</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">Channel</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">name</td><td class="ct">VARCHAR(100)</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">type</td><td class="ct">ChannelType</td><td class="cc">NOT NULL, def: TEXT</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">FK → Workspace CASCADE</td></tr>
+      <tr><td class="cn">categoryId</td><td class="ct">UUID</td><td class="cc">FK → ChannelCategory SET NULL</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">canWrite(member)</td><td class="ct">Boolean</td><td class="cc">INFO → tylko ADMIN/OWNER</td></tr>
+      <tr class="cls-method"><td class="cn">isInfo()</td><td class="ct">Boolean</td><td class="cc">type === INFO</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">Message</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">content</td><td class="ct">TEXT</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">fileUrl</td><td class="ct">VARCHAR(500)</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">fileName</td><td class="ct">VARCHAR(255)</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">fileType</td><td class="ct">VARCHAR(20)</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">isEdited</td><td class="ct">BOOLEAN</td><td class="cc">NOT NULL, def: false</td></tr>
+      <tr><td class="cn">isPinned</td><td class="ct">BOOLEAN</td><td class="cc">NOT NULL, def: false</td></tr>
+      <tr><td class="cn">mentionedIds</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">createdAt / updatedAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">channelId</td><td class="ct">UUID</td><td class="cc">FK → Channel CASCADE</td></tr>
+      <tr><td class="cn">userId</td><td class="ct">UUID</td><td class="cc">FK → User CASCADE</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">canEdit(userId)</td><td class="ct">Boolean</td><td class="cc">własna + nie plik</td></tr>
+      <tr class="cls-method"><td class="cn">canDelete(member)</td><td class="ct">Boolean</td><td class="cc">własna lub ADMIN/OWNER</td></tr>
+      <tr class="cls-method"><td class="cn">getReactionGroups()</td><td class="ct">ReactionGroup[]</td><td class="cc">grupuj po emoji</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">value object</span><span class="cls-name">Reaction</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">messageId</td><td class="ct">UUID</td><td class="cc">FK → Message CASCADE</td></tr>
+      <tr><td class="cn">userId</td><td class="ct">UUID</td><td class="cc">FK → User CASCADE</td></tr>
+      <tr><td class="cn">emoji</td><td class="ct">VARCHAR(10)</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Ograniczenie unikatowości</td></tr>
+      <tr><td class="cn" colspan="3">UNIQUE (messageId, userId, emoji)</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">toggle(userId, emoji)</td><td class="ct">void</td><td class="cc">dodaj lub usuń</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">Poll</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">channelId</td><td class="ct">UUID</td><td class="cc">FK → Channel CASCADE</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">NOT NULL (denorm.)</td></tr>
+      <tr><td class="cn">createdById</td><td class="ct">UUID</td><td class="cc">NOT NULL (soft ref)</td></tr>
+      <tr><td class="cn">question</td><td class="ct">TEXT</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">isMultiple</td><td class="ct">BOOLEAN</td><td class="cc">def: false</td></tr>
+      <tr><td class="cn">isClosed</td><td class="ct">BOOLEAN</td><td class="cc">def: false</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">vote(userId, optionId)</td><td class="ct">PollOption</td><td class="cc">toggle głos</td></tr>
+      <tr class="cls-method"><td class="cn">close()</td><td class="ct">void</td><td class="cc">isClosed = true</td></tr>
+      <tr class="cls-method"><td class="cn">getTotalVotes()</td><td class="ct">int</td><td class="cc">suma voterIds</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">value object</span><span class="cls-name">PollOption</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">pollId</td><td class="ct">UUID</td><td class="cc">FK → Poll CASCADE</td></tr>
+      <tr><td class="cn">text</td><td class="ct">TEXT</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">voterIds</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">hasVoted(userId)</td><td class="ct">Boolean</td><td class="cc">—</td></tr>
+      <tr class="cls-method"><td class="cn">getVoteCount()</td><td class="ct">int</td><td class="cc">voterIds.length</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">aggregate root</span><span class="cls-name">Task</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">FK → Workspace CASCADE</td></tr>
+      <tr><td class="cn">createdById</td><td class="ct">UUID</td><td class="cc">FK → User</td></tr>
+      <tr><td class="cn">title</td><td class="ct">VARCHAR(500)</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">description</td><td class="ct">TEXT</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">status</td><td class="ct">TaskStatus</td><td class="cc">def: TODO</td></tr>
+      <tr><td class="cn">priority</td><td class="ct">TaskPriority</td><td class="cc">def: MEDIUM</td></tr>
+      <tr><td class="cn">assigneeIds</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">dueDate</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">submissionType</td><td class="ct">VARCHAR(10)</td><td class="cc">NONE|TEXT|FILE|BOTH</td></tr>
+      <tr><td class="cn">submissionMode</td><td class="ct">VARCHAR(10)</td><td class="cc">INDIVIDUAL|GROUP</td></tr>
+      <tr><td class="cn">inProgressByIds</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">reviewByIds</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">completedByIds</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">createdAt / updatedAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">effectiveStatusFor(userId)</td><td class="ct">TaskStatus</td><td class="cc">per-user dla INDIVIDUAL</td></tr>
+      <tr class="cls-method"><td class="cn">canSubmit(userId)</td><td class="ct">Boolean</td><td class="cc">IN_PROGRESS + assignee</td></tr>
+      <tr class="cls-method"><td class="cn">canReview(userId, role)</td><td class="ct">Boolean</td><td class="cc">creator lub ADMIN/OWNER</td></tr>
+      <tr class="cls-method"><td class="cn">submit(userId, data)</td><td class="ct">TaskSubmission</td><td class="cc">→ REVIEW</td></tr>
+      <tr class="cls-method"><td class="cn">reviewSingle(targetId, action, comment)</td><td class="ct">Task</td><td class="cc">per-assignee INDIVIDUAL</td></tr>
+      <tr class="cls-method"><td class="cn">reviewAll(action, comment)</td><td class="ct">Task</td><td class="cc">GROUP / całość</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">TaskSubmission</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">taskId</td><td class="ct">UUID</td><td class="cc">FK → Task CASCADE</td></tr>
+      <tr><td class="cn">submittedById</td><td class="ct">UUID</td><td class="cc">NOT NULL (soft ref)</td></tr>
+      <tr><td class="cn">textContent</td><td class="ct">TEXT</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">fileUrls</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">fileNames</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">fileTypes</td><td class="ct">TEXT[]</td><td class="cc">NOT NULL, def: []</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">TaskNotification</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">userId</td><td class="ct">UUID</td><td class="cc">FK → User CASCADE</td></tr>
+      <tr><td class="cn">workspaceId / taskId</td><td class="ct">UUID</td><td class="cc">NOT NULL (soft ref)</td></tr>
+      <tr><td class="cn">taskTitle</td><td class="ct">VARCHAR(500)</td><td class="cc">snapshot tytułu</td></tr>
+      <tr><td class="cn">type</td><td class="ct">VARCHAR(20)</td><td class="cc">ASSIGNED|SUBMITTED|ACCEPTED|RETURNED</td></tr>
+      <tr><td class="cn">comment</td><td class="ct">TEXT</td><td class="cc">NULL (przy RETURNED)</td></tr>
+      <tr><td class="cn">isRead</td><td class="ct">BOOLEAN</td><td class="cc">def: false</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">markRead()</td><td class="ct">void</td><td class="cc">isRead = true</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">DeleteNotification</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">userId</td><td class="ct">UUID</td><td class="cc">FK → User CASCADE</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">NOT NULL (soft ref)</td></tr>
+      <tr><td class="cn">channelName</td><td class="ct">VARCHAR(100)</td><td class="cc">snapshot nazwy kanału</td></tr>
+      <tr><td class="cn">messagePreview</td><td class="ct">VARCHAR(100)</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">deletedByRole</td><td class="ct">VARCHAR(10)</td><td class="cc">OWNER lub ADMIN</td></tr>
+      <tr><td class="cn">isRead</td><td class="ct">BOOLEAN</td><td class="cc">def: false</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">markRead()</td><td class="ct">void</td><td class="cc">—</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">DirectMessage</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">FK → Workspace CASCADE</td></tr>
+      <tr><td class="cn">senderId</td><td class="ct">UUID</td><td class="cc">NOT NULL (soft ref)</td></tr>
+      <tr><td class="cn">recipientId</td><td class="ct">UUID</td><td class="cc">NOT NULL (soft ref)</td></tr>
+      <tr><td class="cn">content</td><td class="ct">TEXT</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">fileUrl / fileName / fileType</td><td class="ct">VARCHAR</td><td class="cc">NULL</td></tr>
+      <tr><td class="cn">isRead</td><td class="ct">BOOLEAN</td><td class="cc">def: false</td></tr>
+      <tr><td class="cn">isEdited</td><td class="ct">BOOLEAN</td><td class="cc">def: false</td></tr>
+      <tr><td class="cn">createdAt / updatedAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">markRead()</td><td class="ct">void</td><td class="cc">isRead = true</td></tr>
+      <tr class="cls-method"><td class="cn">edit(content)</td><td class="ct">DirectMessage</td><td class="cc">isEdited = true</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="cls-card">
+  <div class="cls-head"><span class="cls-stereo">entity</span><span class="cls-name">Invitation</span></div>
+  <div class="cls-body"><table>
+    <thead><tr><th>Atrybut / Metoda</th><th>Typ</th><th>Ograniczenie</th></tr></thead>
+    <tbody>
+      <tr><td class="cn">id</td><td class="ct">UUID</td><td class="cc">PK</td></tr>
+      <tr><td class="cn">email</td><td class="ct">VARCHAR(255)</td><td class="cc">NOT NULL</td></tr>
+      <tr><td class="cn">workspaceId</td><td class="ct">UUID</td><td class="cc">FK → Workspace CASCADE</td></tr>
+      <tr><td class="cn">status</td><td class="ct">VARCHAR(20)</td><td class="cc">PENDING|ACCEPTED|DECLINED</td></tr>
+      <tr><td class="cn">invitedById</td><td class="ct">UUID</td><td class="cc">FK → User</td></tr>
+      <tr><td class="cn">createdAt</td><td class="ct">TIMESTAMPTZ</td><td class="cc">NOT NULL</td></tr>
+      <tr class="cls-sep"><td colspan="3">Ograniczenie unikatowości</td></tr>
+      <tr><td class="cn" colspan="3">UNIQUE (email, workspaceId)</td></tr>
+      <tr class="cls-sep"><td colspan="3">Operacje</td></tr>
+      <tr class="cls-method"><td class="cn">accept(userId)</td><td class="ct">WorkspaceMember</td><td class="cc">status = ACCEPTED</td></tr>
+      <tr class="cls-method"><td class="cn">decline()</td><td class="ct">void</td><td class="cc">status = DECLINED</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+</div><!-- /cls-grid -->
+
+<!-- ═══════════════════════════════ 6. DIAGRAMY INTERAKCJI ═══════════════════════════════ -->
+<div class="section-title">6. Diagramy przejść i interakcji (Sequence Diagrams)</div>
+<p class="intro">Diagramy sekwencji ilustrują dynamiczny aspekt systemu — kolejność komunikatów wymienianych między obiektami podczas realizacji kluczowych przypadków użycia.</p>
+
+<!-- ─── SD1 ─── -->
+<div class="section-subtitle">SD1 — Uwierzytelnienie użytkownika</div>
+<div class="erd-wrapper" style="margin-bottom:16px">
+<div class="mermaid">
+sequenceDiagram
+    actor U as Uzytkownik
+    participant FE as Frontend Angular
+    participant FB as Firebase Auth
+    participant API as Backend NestJS
+    participant DB as PostgreSQL
+
+    U->>FE: Wprowadza email i haslo
+    FE->>FB: zalogowanie
+    FB-->>FE: IdToken JWT
+    FE->>API: GET /users/me  Bearer IdToken
+    API->>FB: auth.verifyIdToken(token)
+    FB-->>API: uid, email
+    API->>DB: SELECT FROM User WHERE id = uid
+    DB-->>API: User lub brak rekordu
+    alt Brak rekordu
+        API->>DB: INSERT INTO User (id, email)
+        DB-->>API: nowy User
+    end
+    API-->>FE: HTTP 200  UserProfile
+    FE-->>U: Wyswietla panel glowny
+</div>
+</div>
+
+<div class="table-wrapper" style="margin-bottom:28px">
+<table>
+  <thead><tr><th style="width:40px">Nr</th><th style="width:160px">Nadawca</th><th style="width:160px">Odbiorca</th><th>Komunikat / Akcja</th></tr></thead>
+  <tbody>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">1</td><td>Użytkownik</td><td>Frontend</td><td>Wprowadza e-mail i hasło w formularzu logowania</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">2</td><td>Frontend</td><td>Firebase Auth SDK</td><td><code>signInWithEmailAndPassword(email, password)</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">3</td><td>Firebase Auth</td><td>Frontend</td><td>Zwraca: <code>IdToken</code> (JWT podpisany przez Google)</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">4</td><td>Frontend</td><td>Backend API</td><td><code>GET /users/me</code>  nagłówek: <code>Authorization: Bearer &lt;token&gt;</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">5</td><td>Backend API</td><td>Firebase Admin</td><td><code>auth.verifyIdToken(token)</code> — weryfikacja podpisu</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">6</td><td>Firebase Admin</td><td>Backend API</td><td>Zwraca: <code>{uid, email}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">7</td><td>Backend API</td><td>PostgreSQL</td><td><code>SELECT * FROM "User" WHERE id = uid</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">8</td><td>PostgreSQL</td><td>Backend API</td><td>Wiersz User (lub brak → krok 8a)</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">8a</td><td>Backend API</td><td>PostgreSQL</td><td>[alt: brak rekordu] <code>INSERT INTO "User" (id, email)</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">9</td><td>Backend API</td><td>Frontend</td><td><code>HTTP 200</code>  <code>UserProfile {id, email, firstName, lastName, …}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">10</td><td>Frontend</td><td>Użytkownik</td><td>Wyświetla panel główny (Dashboard)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ─── SD2 ─── -->
+<div class="section-subtitle">SD2 — Wysyłanie wiadomości na kanale</div>
+<div class="erd-wrapper" style="margin-bottom:16px">
+<div class="mermaid">
+sequenceDiagram
+    actor U as Uzytkownik
+    participant FE as Frontend
+    participant API as Backend API
+    participant DB as PostgreSQL
+
+    U->>FE: Wpisuje treść i naciska Enter
+    FE->>API: POST /workspaces/:wid/channels/:cid/messages  content
+    API->>DB: SELECT WorkspaceMember WHERE userId AND workspaceId
+    DB-->>API: WorkspaceMember (weryfikacja dostępu)
+    API->>DB: SELECT Channel WHERE id = cid
+    DB-->>API: Channel (sprawdź typ INFO)
+    alt Kanał INFO i rola MEMBER
+        API-->>FE: HTTP 403 Forbidden
+    else
+        API->>DB: INSERT INTO Message (content, channelId, userId, mentionedIds)
+        DB-->>API: Zapisana wiadomość
+        API-->>FE: HTTP 201 Message
+        FE-->>U: Przewija chat do nowych wiadomości
+    end
+</div>
+</div>
+
+<div class="table-wrapper" style="margin-bottom:28px">
+<table>
+  <thead><tr><th style="width:40px">Nr</th><th style="width:160px">Nadawca</th><th style="width:160px">Odbiorca</th><th>Komunikat / Akcja</th></tr></thead>
+  <tbody>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">1</td><td>Użytkownik</td><td>Frontend</td><td>Wpisuje treść wiadomości i naciska Enter / klik „Wyślij"</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">2</td><td>Frontend</td><td>Backend API</td><td><code>POST /workspaces/:wid/channels/:cid/messages  {content}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">3</td><td>Backend API</td><td>PostgreSQL</td><td><code>SELECT FROM "WorkspaceMember" WHERE userId=uid AND workspaceId=wid</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">4</td><td>PostgreSQL</td><td>Backend API</td><td>WorkspaceMember — weryfikacja dostępu i roli</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">5</td><td>Backend API</td><td>PostgreSQL</td><td><code>SELECT FROM "Channel" WHERE id=cid</code> — sprawdzenie typu INFO</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">5a</td><td>Backend API</td><td>Frontend</td><td>[alt: kanał INFO + rola MEMBER] <code>HTTP 403 Forbidden</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">6</td><td>Backend API</td><td>PostgreSQL</td><td><code>INSERT INTO "Message" {content, channelId, userId, mentionedIds}</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">7</td><td>PostgreSQL</td><td>Backend API</td><td>Zapisana wiadomość <code>{id, createdAt, user {…}}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">8</td><td>Backend API</td><td>Frontend</td><td><code>HTTP 201</code>  Message</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">9</td><td>Frontend</td><td>Użytkownik</td><td>Przewija chat do nowych wiadomości</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ─── SD3 ─── -->
+<div class="section-subtitle">SD3 — Tworzenie zadania z przypisaniem</div>
+<div class="erd-wrapper" style="margin-bottom:16px">
+<div class="mermaid">
+sequenceDiagram
+    actor A as ADMIN lub OWNER
+    participant FE as Frontend
+    participant API as Backend API
+    participant DB as PostgreSQL
+
+    A->>FE: Otwiera modal Nowe zadanie, wypełnia formularz
+    FE->>API: POST /workspaces/:wid/tasks  FormData
+    API->>DB: INSERT INTO Task (title, status=TODO, assigneeIds, submissionMode, ...)
+    DB-->>API: Zapisane zadanie
+    loop Dla każdego assigneeId różnego od createdById
+        API->>DB: INSERT INTO TaskNotification (type=ASSIGNED)
+    end
+    API-->>FE: HTTP 201 Task
+    FE-->>A: Kanban odświeżony, nowa karta w kolumnie Do zrobienia
+    note over FE: Pracownicy widzą powiadomienie: Zostałeś przypisany do zadania X
+</div>
+</div>
+
+<div class="table-wrapper" style="margin-bottom:28px">
+<table>
+  <thead><tr><th style="width:40px">Nr</th><th style="width:160px">Nadawca</th><th style="width:160px">Odbiorca</th><th>Komunikat / Akcja</th></tr></thead>
+  <tbody>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">1</td><td>ADMIN / OWNER</td><td>Frontend</td><td>Otwiera modal „Nowe zadanie", wypełnia: tytuł, priorytet, przypisani, tryb, termin, typ przesłania</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">2</td><td>Frontend</td><td>Backend API</td><td><code>POST /workspaces/:wid/tasks</code>  <code>FormData {title, priority, assigneeIds, submissionType, …}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">3</td><td>Backend API</td><td>PostgreSQL</td><td><code>INSERT INTO "Task" {title, status=TODO, assigneeIds, submissionMode, …}</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">4</td><td>PostgreSQL</td><td>Backend API</td><td>Zapisane zadanie <code>{id, …}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">5</td><td>Backend API</td><td>PostgreSQL</td><td>[loop] <code>INSERT INTO "TaskNotification" {userId=assigneeId, type=ASSIGNED}</code> dla każdego przypisanego ≠ createdById</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">6</td><td>Backend API</td><td>Frontend</td><td><code>HTTP 201</code>  Task</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">7</td><td>Frontend</td><td>ADMIN / OWNER</td><td>Odświeża Kanban; karta w kolumnie „Do zrobienia"</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">8</td><td>Frontend</td><td>Pracownicy</td><td>Przy kolejnym załadowaniu — dzwonek z powiadomieniem „Zostałeś przypisany do zadania X"</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ─── SD4 ─── -->
+<div class="section-subtitle">SD4 — Przesłanie i weryfikacja zadania (tryb INDIVIDUAL)</div>
+<div class="erd-wrapper" style="margin-bottom:16px">
+<div class="mermaid">
+sequenceDiagram
+    actor P as Pracownik
+    actor Z as Zlecajacy
+    participant FE as Frontend
+    participant API as Backend API
+    participant DB as PostgreSQL
+
+    P->>FE: Klik Prześlij na zadaniu W toku
+    FE->>P: Modal formularza przesłania
+    P->>FE: Wypełnia i klik Prześlij wynik
+    FE->>API: POST /workspaces/:wid/tasks/:tid/submit  FormData
+    API->>DB: INSERT INTO TaskSubmission
+    API->>DB: UPDATE Task SET reviewByIds += userId
+    alt Wszyscy przypisani przesłali
+        API->>DB: UPDATE Task SET status = REVIEW
+        API->>DB: INSERT INTO TaskNotification (createdById, type=SUBMITTED)
+    end
+    API-->>FE: HTTP 201 TaskSubmission
+    FE-->>P: Karta przeniesiona do kolumny Do weryfikacji
+
+    Z->>FE: Klik Przejrzyj na karcie
+    FE->>Z: Modal z listą odpowiedzi
+    alt Akceptacja pracownika A
+        Z->>FE: Klik Akceptuj przy pracowniku A
+        FE->>API: POST /review  action=ACCEPT, targetUserId=A
+        API->>DB: UPDATE Task  completedByIds += A, reviewByIds -= A
+        API->>DB: INSERT INTO TaskNotification (A, type=ACCEPTED)
+        API-->>FE: HTTP 200 Task
+    else Zwrot do poprawy
+        Z->>FE: Klik Zwróć, wpisuje komentarz
+        FE->>API: POST /review  action=RETURN, targetUserId=A, comment
+        API->>DB: UPDATE Task  reviewByIds -= A, status = IN_PROGRESS
+        API->>DB: INSERT INTO TaskNotification (A, type=RETURNED, comment)
+        API-->>FE: HTTP 200 Task
+    end
+    FE-->>Z: Kanban odświeżony
+</div>
+</div>
+
+<div class="table-wrapper" style="margin-bottom:28px">
+<table>
+  <thead><tr><th style="width:40px">Nr</th><th style="width:160px">Nadawca</th><th style="width:160px">Odbiorca</th><th>Komunikat / Akcja</th></tr></thead>
+  <tbody>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">1</td><td>Pracownik</td><td>Frontend</td><td>Klik „Prześlij →" na zadaniu w kolumnie „W toku"</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">2</td><td>Frontend</td><td>Pracownik</td><td>Modal przesłania (tekst / plik wg submissionType)</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">3</td><td>Pracownik</td><td>Frontend</td><td>Wypełnia formularz, klik „Prześlij wynik"</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">4</td><td>Frontend</td><td>Backend API</td><td><code>POST /workspaces/:wid/tasks/:tid/submit</code>  FormData</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">5</td><td>Backend API</td><td>PostgreSQL</td><td><code>INSERT INTO "TaskSubmission"</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">6</td><td>Backend API</td><td>PostgreSQL</td><td><code>UPDATE "Task" SET reviewByIds += userId</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">7</td><td>Backend API</td><td>PostgreSQL</td><td>[jeśli wszyscy przesłali] <code>UPDATE "Task" SET status=REVIEW</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">8</td><td>Backend API</td><td>PostgreSQL</td><td>[jeśli wszyscy przesłali] <code>INSERT INTO "TaskNotification" {userId=createdById, type=SUBMITTED}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">9</td><td>Backend API</td><td>Frontend</td><td><code>HTTP 201</code>  TaskSubmission</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">10</td><td>Zlecający</td><td>Frontend</td><td>Klik „Przejrzyj →" na karcie w kolumnie „Do weryfikacji"</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">11</td><td>Frontend</td><td>Zlecający</td><td>Modal z listą odpowiedzi (po jednej na osobę)</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">12a</td><td>Zlecający</td><td>Frontend</td><td>[ACCEPT] Klik „✓ Akceptuj" przy pracowniku A</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">13a</td><td>Frontend</td><td>Backend API</td><td><code>POST /review  {action=ACCEPT, targetUserId=A}</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">14a</td><td>Backend API</td><td>PostgreSQL</td><td><code>UPDATE "Task" SET completedByIds+=A, reviewByIds-=A</code>; jeśli wszyscy: <code>status=DONE</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">15a</td><td>Backend API</td><td>PostgreSQL</td><td><code>INSERT INTO "TaskNotification" {userId=A, type=ACCEPTED}</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">12b</td><td>Zlecający</td><td>Frontend</td><td>[RETURN] Klik „↩ Zwróć", wpisuje komentarz, klik „Wyślij zwrot"</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">13b</td><td>Frontend</td><td>Backend API</td><td><code>POST /review  {action=RETURN, targetUserId=A, comment}</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">14b</td><td>Backend API</td><td>PostgreSQL</td><td><code>UPDATE "Task" SET reviewByIds-=A</code>; jeśli brak innych w REVIEW: <code>status=IN_PROGRESS</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">15b</td><td>Backend API</td><td>PostgreSQL</td><td><code>INSERT INTO "TaskNotification" {userId=A, type=RETURNED, comment}</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">16</td><td>Backend API</td><td>Frontend</td><td><code>HTTP 200</code>  Task (zaktualizowany)</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">17</td><td>Frontend</td><td>Zlecający</td><td>Modal odświeżony lub zamknięty; Kanban zaktualizowany</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ─── SD5 ─── -->
+<div class="section-subtitle">SD5 — Wiadomość prywatna (Direct Message)</div>
+<div class="erd-wrapper" style="margin-bottom:16px">
+<div class="mermaid">
+sequenceDiagram
+    actor A as Uzytkownik A
+    actor B as Uzytkownik B
+    participant FE as Frontend
+    participant API as Backend API
+    participant DB as PostgreSQL
+
+    A->>FE: Klik na imię użytkownika B w panelu DM
+    FE->>API: GET /workspaces/:wid/dm/:userId
+    API->>DB: UPDATE DirectMessage SET isRead=true WHERE sender=B AND recipient=A
+    API->>DB: SELECT FROM DirectMessage WHERE rozmowa A-B
+    DB-->>API: Lista wiadomości
+    API-->>FE: HTTP 200 historia
+    FE-->>A: Wyświetla chat, przewija do dołu
+    A->>FE: Wpisuje wiadomość, klik Wyślij
+    FE->>API: POST /workspaces/:wid/dm/:userId  content
+    API->>DB: INSERT INTO DirectMessage
+    DB-->>API: Zapisana wiadomość
+    API-->>FE: HTTP 201
+    FE-->>A: Wiadomość widoczna, chat przewinięty na dół
+    note over B,FE: Przy następnym odświeżeniu B widzi licznik nieprzeczytanych
+</div>
+</div>
+
+<div class="table-wrapper" style="margin-bottom:28px">
+<table>
+  <thead><tr><th style="width:40px">Nr</th><th style="width:160px">Nadawca</th><th style="width:160px">Odbiorca</th><th>Komunikat / Akcja</th></tr></thead>
+  <tbody>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">1</td><td>Użytkownik A</td><td>Frontend</td><td>Klik na imię Użytkownika B w sekcji „Wiadomości prywatne"</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">2</td><td>Frontend</td><td>Backend API</td><td><code>GET /workspaces/:wid/dm/:userId</code>  (historia + auto-oznaczanie jako przeczytane)</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">3</td><td>Backend API</td><td>PostgreSQL</td><td><code>UPDATE "DirectMessage" SET isRead=true WHERE senderId=B AND recipientId=A</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">4</td><td>Backend API</td><td>PostgreSQL</td><td><code>SELECT FROM "DirectMessage" WHERE (sender=A AND recipient=B) OR (sender=B AND recipient=A) ORDER BY createdAt ASC</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">5</td><td>Backend API</td><td>Frontend</td><td><code>HTTP 200</code>  <code>DirectMessage[]</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">6</td><td>Frontend</td><td>Użytkownik A</td><td>Wyświetla historię rozmowy, auto-scroll na dół</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">7</td><td>Użytkownik A</td><td>Frontend</td><td>Wpisuje treść wiadomości, klik „Wyślij"</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">8</td><td>Frontend</td><td>Backend API</td><td><code>POST /workspaces/:wid/dm/:userId  {content}</code></td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">9</td><td>Backend API</td><td>PostgreSQL</td><td><code>INSERT INTO "DirectMessage" {senderId=A, recipientId=B, content, isRead=false}</code></td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">10</td><td>Backend API</td><td>Frontend</td><td><code>HTTP 201</code>  DirectMessage</td></tr>
+    <tr><td style="text-align:center;font-weight:700;color:#4338ca">11</td><td>Frontend</td><td>Użytkownik A</td><td>Wiadomość dołączona do chatu, scroll na dół</td></tr>
+    <tr style="background:#f8fafc"><td style="text-align:center;font-weight:700;color:#4338ca">12</td><td>Frontend</td><td>Użytkownik B</td><td>Przy kolejnym odświeżeniu — licznik nieprzeczytanych w sidebarze</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════ 7. ANALIZA OBIEKTOWA ═══════════════════════════════ -->
+<div class="section-title">7. Analiza obiektowa</div>
+<p class="intro">
+  System StaffFlow projektowany jest w metodologii obiektowej (OOP). Każdy element rzeczywistości
+  organizacyjnej odwzorowany jest jako obiekt posiadający tożsamość (id), stan (atrybuty) i zachowanie (metody).
+  Warstwa backendowa (NestJS) realizuje wzorzec <strong>Repository / Service</strong>,
+  warstwa frontendowa (Angular) — <strong>Component / Service</strong>.
+</p>
+
+<div class="section-subtitle">7.1 Identyfikacja obiektów i odpowiedzialności klas</div>
+<div class="table-wrapper" style="margin-bottom:24px">
+<table>
+  <thead><tr><th>Klasa</th><th>Stereotyp</th><th>Odpowiedzialność</th><th>Kluczowe relacje</th></tr></thead>
+  <tbody>
+    <tr><td class="td-name">User</td><td>entity</td><td>Konto użytkownika. Zarządza tożsamością i profilem. Uwierzytelnienie przez Firebase (JWT).</td><td>WorkspaceMember (1..*), Message (0..*), Task (0..* tworzy)</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Workspace</td><td>aggregate root</td><td>Centralny agregat systemu. Scala kanały, zadania, członków. Każda przestrzeń ma unikalny kod zaproszenia.</td><td>WorkspaceMember (1..*), Channel (0..*), Task (0..*), DirectMessage (0.*)</td></tr>
+    <tr><td class="td-name">WorkspaceMember</td><td>association class</td><td>Łączy User z Workspace. Przechowuje rolę (OWNER/ADMIN/MEMBER) i listę etykiet. Tabela asocjacyjna z UNIQUE(userId, workspaceId).</td><td>User (N:1), Workspace (N:1)</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">WorkspaceRole</td><td>entity</td><td>Niestandardowa etykieta roli (np. „Scrum Master"). Tworzona przez ADMIN/OWNER, przypisywana do WorkspaceMember.</td><td>Workspace (N:1)</td></tr>
+    <tr><td class="td-name">ChannelCategory</td><td>entity</td><td>Logiczna grupa kanałów widoczna w sidebarze jako zwijana sekcja. Umożliwia organizację tematyczną.</td><td>Workspace (N:1), Channel (0..*)</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Channel</td><td>entity</td><td>Kanał komunikacji. TEXT — zapis dla wszystkich; INFO — tylko ADMIN/OWNER. Może należeć do kategorii.</td><td>Workspace (N:1), ChannelCategory (0..1), Message (0..*), Poll (0.*)</td></tr>
+    <tr><td class="td-name">Message</td><td>entity</td><td>Wiadomość kanałowa. Obsługuje tekst, pliki, edycję, przypinanie i wzmianki (@userId). Reakcje emoji jako kolekcja.</td><td>Channel (N:1), User (N:1), Reaction (0.*)</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Reaction</td><td>value object</td><td>Reakcja emoji użytkownika. Unikalność (messageId, userId, emoji) — toggle: dodaj lub usuń.</td><td>Message (N:1), User (N:1)</td></tr>
+    <tr><td class="td-name">Poll / PollOption</td><td>entity / value object</td><td>Ankieta kanałowa. Obsługuje tryb jednokrotny i wielokrotny. Wyniki przechowywane w voterIds[].</td><td>Channel (N:1), PollOption (1..*)</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Task</td><td>aggregate root</td><td>Centralny agregat modułu zadań. Czterostanowy cykl (TODO→IN_PROGRESS→REVIEW→DONE). Dwa tryby: INDIVIDUAL (per-user tracking) i GROUP.</td><td>Workspace (N:1), User (N:1 tworzy), TaskSubmission (0.*)</td></tr>
+    <tr><td class="td-name">TaskSubmission</td><td>entity</td><td>Wynik przesłany przez pracownika (tekst + pliki). Wielokrotne przesłanie po zwrocie zadania.</td><td>Task (N:1)</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">TaskNotification</td><td>entity</td><td>Powiadomienie o zdarzeniu zadania. Typy: ASSIGNED, SUBMITTED, ACCEPTED, RETURNED. Snapshot tytułu.</td><td>User (N:1)</td></tr>
+    <tr><td class="td-name">DeleteNotification</td><td>entity</td><td>Powiadomienie o usunięciu wiadomości przez ADMIN/OWNER. Zawiera snapshot kanału i fragmentu wiadomości.</td><td>User (N:1)</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">DirectMessage</td><td>entity</td><td>Wiadomość prywatna 1:1. Obsługuje tekst, pliki, edycję, usuwanie. isRead śledzone per wiadomość.</td><td>Workspace (N:1)</td></tr>
+    <tr><td class="td-name">Invitation</td><td>entity</td><td>Zaproszenie e-mail do przestrzeni. UNIQUE(email, workspaceId). Akceptacja tworzy WorkspaceMember.</td><td>Workspace (N:1), User (N:1 wysyła)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="section-subtitle">7.2 Wzorce projektowe zastosowane w systemie</div>
+<div class="table-wrapper" style="margin-bottom:24px">
+<table>
+  <thead><tr><th>Wzorzec</th><th>Warstwa</th><th>Zastosowanie w projekcie</th></tr></thead>
+  <tbody>
+    <tr><td class="td-name">Repository / Service</td><td>Backend</td><td>Cała logika dostępu do bazy danych zebrana jest w jednym miejscu (WorkspacesService). Reszta kodu pyta ten serwis o dane — nie musi wiedzieć, jak baza działa pod spodem.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Guard</td><td>Backend</td><td>Strażnik przy każdym żądaniu do API — zanim cokolwiek się wykona, sprawdza czy użytkownik jest zalogowany. Jeśli nie — żądanie zostaje odrzucone.</td></tr>
+    <tr><td class="td-name">DTO (Data Transfer Object)</td><td>Backend</td><td>Specjalne obiekty, które określają dokładnie jakie dane mogą trafić do serwera. Chronią przed przesłaniem błędnych lub zbędnych pól przez użytkownika.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Observer / Event Binding</td><td>Frontend</td><td>Aplikacja „nasłuchuje" na działania użytkownika (klik, wpisanie tekstu, naciśnięcie Enter) i reaguje automatycznie — bez konieczności ręcznego sprawdzania co się zmieniło.</td></tr>
+    <tr><td class="td-name">Two-Way Data Binding</td><td>Frontend</td><td>To co użytkownik wpisuje w formularzu jest od razu widoczne w kodzie i odwrotnie — zmiana w kodzie natychmiast aktualizuje pole na ekranie.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Aggregate Root</td><td>Dziedzina</td><td>Workspace i Task działają jako „szefowie" swoich danych — żeby coś zrobić z kanałem czy zadaniem, trzeba przejść przez przestrzeń. Pilnuje to porządku i bezpieczeństwa.</td></tr>
+    <tr><td class="td-name">Snapshot / Denormalizacja</td><td>Dziedzina</td><td>Powiadomienie zapamiętuje tytuł zadania i nazwę kanału w chwili zdarzenia. Dzięki temu treść powiadomienia pozostaje czytelna nawet jeśli zadanie zostanie później usunięte.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Cascade Delete</td><td>Baza danych</td><td>Usunięcie przestrzeni roboczej automatycznie usuwa wszystkie jej kanały, wiadomości i zadania. Nie trzeba tego robić ręcznie — baza danych robi to sama.</td></tr>
+    <tr><td class="td-name">Soft Reference</td><td>Baza danych</td><td>Niektóre powiązania (autor ankiety, nadawca DM) przechowują tylko ID użytkownika bez twardego powiązania. Dzięki temu dane pozostają nawet gdy konto zostanie usunięte.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Strategy (per-user vs global)</td><td>Dziedzina</td><td>Zadanie może mieć różny status dla różnych osób. Każdy pracownik widzi swój własny postęp (Indywidualnie), lub wszyscy widzą ten sam status gdy zadanie jest grupowe.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="section-subtitle">7.3 Typy wyliczeniowe — stany i ograniczenia dziedzinowe</div>
+<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+  <div class="enum-box">
+    <div class="enum-name">Role</div>
+    <ul><li>OWNER — właściciel przestrzeni (pełne uprawnienia)</li><li>ADMIN — administrator (zarządzanie, brak transferu własności)</li><li>MEMBER — członek (komunikacja, wykonanie zadań)</li></ul>
+  </div>
+  <div class="enum-box">
+    <div class="enum-name">TaskStatus</div>
+    <ul><li>TODO — zadanie oczekujące</li><li>IN_PROGRESS — w trakcie realizacji</li><li>REVIEW — przesłane, oczekuje weryfikacji</li><li>DONE — zaakceptowane, ukończone</li></ul>
+  </div>
+  <div class="enum-box">
+    <div class="enum-name">TaskPriority</div>
+    <ul><li>LOW — niski priorytet</li><li>MEDIUM — standardowy (domyślny)</li><li>HIGH — wysoki priorytet</li><li>URGENT — pilne (czerwony badge)</li></ul>
+  </div>
+  <div class="enum-box">
+    <div class="enum-name">ChannelType</div>
+    <ul><li>TEXT — kanał ogólny (zapis dla wszystkich)</li><li>INFO — kanał informacyjny (zapis tylko ADMIN/OWNER)</li></ul>
+  </div>
+  <div class="enum-box">
+    <div class="enum-name">TaskNotification.type</div>
+    <ul><li>ASSIGNED — nowe przypisanie do zadania</li><li>SUBMITTED — zadanie przesłane do weryfikacji (do tworzącego)</li><li>ACCEPTED — praca zaakceptowana (do pracownika)</li><li>RETURNED — praca zwrócona z komentarzem</li></ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ 8. KATALOG FUNKCJI ═══════════════════════════════ -->
+<div class="section-title">8. Katalog funkcji systemu</div>
+<p class="intro">
+  Zestawienie wszystkich publicznych funkcji warstwy serwisowej (NestJS <code>WorkspacesService</code>)
+  oraz kontrolera API. Funkcje pogrupowane tematycznie według modułu.
+</p>
+
+<style>
+  .fn-group { margin-bottom: 28px; }
+  .fn-group-title {
+    font-size: .78rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .6px; color: #fff; background: #312e81;
+    padding: 5px 14px; border-radius: 6px 6px 0 0; display: inline-block;
+    margin-bottom: 0;
+  }
+  .fn-table { width: 100%; border-collapse: collapse; font-size: .82rem;
+    background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .fn-table thead tr { background: #e0e7ff; }
+  .fn-table thead th { padding: 7px 12px; text-align: left; font-weight: 700;
+    color: #312e81; font-size: .75rem; text-transform: uppercase; letter-spacing: .3px; }
+  .fn-table tbody tr:nth-child(even) { background: #f8fafc; }
+  .fn-table tbody tr:hover { background: #eef2ff; }
+  .fn-table tbody td { padding: 6px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  .fn-name { font-family: 'Courier New', monospace; font-weight: 700; color: #1e40af; white-space: nowrap; }
+  .fn-perm { font-size: .72rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+  .p-all  { background: #dcfce7; color: #14532d; }
+  .p-adm  { background: #fef9c3; color: #713f12; }
+  .p-own  { background: #fee2e2; color: #7f1d1d; }
+  .p-sys  { background: #f3f4f6; color: #374151; }
+</style>
+
+<!-- ─── Przestrzeń robocza ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Przestrzeń robocza (Workspace)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">create(dto)</td><td>Tworzy nową przestrzeń roboczą i automatycznie przypisuje twórcę jako OWNER</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">findAllForUser(userId)</td><td>Zwraca listę wszystkich przestrzeni, do których należy zalogowany użytkownik</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">findOne(id)</td><td>Pobiera szczegóły pojedynczej przestrzeni wraz z listą członków</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">update(id, dto)</td><td>Aktualizuje nazwę lub inne dane przestrzeni</td><td><span class="fn-perm p-own">OWNER</span></td></tr>
+      <tr><td class="fn-name">remove(id)</td><td>Usuwa przestrzeń i kaskadowo wszystkie powiązane dane</td><td><span class="fn-perm p-own">OWNER</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Członkowie ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Członkowie przestrzeni (Members)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getMembers(workspaceId)</td><td>Pobiera listę wszystkich członków przestrzeni wraz z danymi użytkownika i etykietami ról</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">updateMemberRole(wsId, userId, role, requesterId)</td><td>Zmienia rolę systemową członka (MEMBER/ADMIN/OWNER). ADMIN nie może zmienić roli innego ADMIN ani nadać OWNER</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">removeMember(wsId, targetId, requesterId)</td><td>Usuwa członka z przestrzeni. OWNER może opuścić przestrzeń tylko jeśli jest inny OWNER</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">toggleCustomRole(wsId, userId, roleId, requesterId)</td><td>Przypisuje lub odbiera niestandardową etykietę roli danemu członkowi (toggle)</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Role niestandardowe ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Role niestandardowe (WorkspaceRoles)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getWorkspaceRoles(workspaceId)</td><td>Pobiera listę wszystkich niestandardowych etykiet ról zdefiniowanych w przestrzeni</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">createWorkspaceRole(wsId, name, color, requesterId)</td><td>Tworzy nową etykietę roli z nazwą i kolorem wyświetlanym przy awatarze</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">updateWorkspaceRole(wsId, roleId, name, color, requesterId)</td><td>Zmienia nazwę lub kolor istniejącej etykiety roli</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">deleteWorkspaceRole(wsId, roleId, requesterId)</td><td>Usuwa etykietę roli — zostaje automatycznie odebrana wszystkim członkom</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Kategorie kanałów ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Kategorie kanałów (ChannelCategories)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getCategories(workspaceId)</td><td>Pobiera posortowaną (po position) listę kategorii kanałów w przestrzeni</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">createCategory(wsId, name, requesterId)</td><td>Tworzy nową kategorię; position ustawiana automatycznie na koniec listy</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">updateCategory(wsId, categoryId, name, requesterId)</td><td>Zmienia nazwę istniejącej kategorii kanałów</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">deleteCategory(wsId, categoryId, requesterId)</td><td>Usuwa kategorię; kanały przypisane do niej przechodzą do „bez kategorii" (SET NULL)</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">assignChannelToCategory(wsId, channelId, categoryId, requesterId)</td><td>Przypisuje kanał do wybranej kategorii lub usuwa przypisanie (categoryId = null)</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Kanały ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Kanały (Channels)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getChannels(workspaceId)</td><td>Pobiera wszystkie kanały przestrzeni wraz z przypisaną kategorią (include: category)</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">createChannel(wsId, name, type, userId)</td><td>Tworzy kanał tekstowy (TEXT) lub informacyjny (INFO). Na INFO pisać mogą tylko ADMIN/OWNER</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Wiadomości ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Wiadomości kanałowe (Messages)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getMessages(channelId)</td><td>Pobiera chronologiczną historię wiadomości kanału z danymi autora i reakcjami</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">sendMessage(wsId, channelId, userId, content)</td><td>Wysyła wiadomość tekstową. Automatycznie wykrywa wzmianki (@imię) i zapisuje mentionedIds</td><td><span class="fn-perm p-all">Każdy*</span></td></tr>
+      <tr><td class="fn-name">sendFileMessage(wsId, channelId, userId, fileUrl, ...)</td><td>Wysyła wiadomość z załącznikiem (obraz, wideo, dokument). Plik zapisany na dysku serwera</td><td><span class="fn-perm p-all">Każdy*</span></td></tr>
+      <tr><td class="fn-name">editMessage(wsId, messageId, content, requesterId)</td><td>Edytuje treść własnej wiadomości tekstowej. Ustawia flagę isEdited = true</td><td><span class="fn-perm p-all">Autor</span></td></tr>
+      <tr><td class="fn-name">deleteMessage(wsId, messageId, requesterId)</td><td>Usuwa wiadomość. Jeśli usuwa ADMIN/OWNER wiadomość innego — wysyła DeleteNotification do autora</td><td><span class="fn-perm p-adm">Autor / ADMIN</span></td></tr>
+      <tr><td class="fn-name">togglePinMessage(wsId, messageId, userId)</td><td>Przypina lub odpina wiadomość (toggle isPinned). Widoczna w panelu przypiętych</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">getPinnedMessages(channelId)</td><td>Pobiera wszystkie przypięte wiadomości kanału w odwrotnej kolejności chronologicznej</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">toggleReaction(wsId, messageId, emoji, userId)</td><td>Dodaje lub usuwa reakcję emoji na wiadomości (toggle). UNIQUE(messageId, userId, emoji)</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:.75rem;color:#64748b;margin-top:4px">* Kanał INFO — tylko ADMIN/OWNER</p>
+</div>
+
+<!-- ─── Ankiety ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Ankiety (Polls)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getPolls(channelId)</td><td>Pobiera wszystkie ankiety kanału wraz z opcjami i listami głosujących</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">createPoll(wsId, channelId, userId, question, options, isMultiple)</td><td>Tworzy ankietę z co najmniej 2 opcjami. isMultiple zezwala na wielokrotny wybór</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">voteOnPoll(wsId, pollId, optionId, userId)</td><td>Oddaje lub cofa głos na opcję. Przy isMultiple=false automatycznie cofa poprzedni głos</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">closePoll(wsId, pollId, userId)</td><td>Zamyka ankietę (isClosed = true). Po zamknięciu głosowanie jest zablokowane</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Zadania ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Zadania (Tasks)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getTasks(workspaceId)</td><td>Pobiera wszystkie zadania przestrzeni z twórcą i listą przesłań (include: createdBy, submissions)</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">createTask(wsId, title, desc, priority, assigneeIds, ...)</td><td>Tworzy zadanie i automatycznie wysyła TaskNotification (ASSIGNED) do każdego przypisanego</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">updateTask(wsId, taskId, updates, requesterId)</td><td>Aktualizuje tytuł, opis, priorytet, termin lub listę przypisanych. Przy dodaniu nowych wysyła powiadomienie</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">deleteTask(wsId, taskId, requesterId)</td><td>Usuwa zadanie wraz z przesłaniami i powiadomieniami (CASCADE)</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">submitTask(wsId, taskId, submittedById, textContent, files)</td><td>Przesyła wynik zadania. Dodaje userId do reviewByIds; gdy wszyscy przesłali — status = REVIEW i powiadomienie do tworzącego (SUBMITTED)</td><td><span class="fn-perm p-all">Przypisany</span></td></tr>
+      <tr><td class="fn-name">reviewTask(wsId, taskId, requesterId, action, comment, targetUserId)</td><td>Weryfikuje zadanie: ACCEPT → completedByIds, RETURN → IN_PROGRESS z komentarzem. Obsługuje per-person (targetUserId) i grupowo</td><td><span class="fn-perm p-adm">Tworzący / ADMIN</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Powiadomienia ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Powiadomienia (Notifications)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getTaskNotifications(userId)</td><td>Pobiera nieprzeczytane powiadomienia o zadaniach zalogowanego użytkownika (typy: ASSIGNED, SUBMITTED, ACCEPTED, RETURNED)</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+      <tr><td class="fn-name">markTaskNotificationsRead(userId)</td><td>Oznacza wszystkie powiadomienia o zadaniach użytkownika jako przeczytane (isRead = true)</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+      <tr><td class="fn-name">getDeleteNotifications(userId)</td><td>Pobiera nieprzeczytane powiadomienia o wiadomościach usuniętych przez ADMIN/OWNER</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+      <tr><td class="fn-name">markNotificationsRead(userId)</td><td>Oznacza wszystkie powiadomienia o usunięciach jako przeczytane</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── DM ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Wiadomości prywatne (Direct Messages)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getDMConversations(wsId, userId)</td><td>Pobiera listę wszystkich członków przestrzeni z ostatnią wiadomością i licznikiem nieprzeczytanych</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+      <tr><td class="fn-name">getDMHistory(wsId, userId, otherUserId)</td><td>Pobiera chronologiczną historię DM z danym użytkownikiem. Automatycznie oznacza odebrane jako przeczytane</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+      <tr><td class="fn-name">sendDM(wsId, senderId, recipientId, content)</td><td>Wysyła wiadomość prywatną tekstową do innego członka tej samej przestrzeni</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">sendDMFile(wsId, senderId, recipientId, fileUrl, ...)</td><td>Wysyła plik w wiadomości prywatnej (obraz, wideo, dokument). Limit 50 MB</td><td><span class="fn-perm p-all">Każdy</span></td></tr>
+      <tr><td class="fn-name">editDM(wsId, messageId, userId, content)</td><td>Edytuje treść własnej wiadomości prywatnej. Ustawia isEdited = true</td><td><span class="fn-perm p-sys">Autor</span></td></tr>
+      <tr><td class="fn-name">deleteDM(wsId, messageId, userId)</td><td>Usuwa własną wiadomość prywatną. Jeśli zawierała plik — usuwa go z dysku</td><td><span class="fn-perm p-sys">Autor</span></td></tr>
+      <tr><td class="fn-name">markDMsRead(wsId, userId, otherUserId)</td><td>Ręcznie oznacza wszystkie wiadomości od danego użytkownika jako przeczytane (isRead = true)</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Zaproszenia ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Zaproszenia (Invitations)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">inviteUser(wsId, email)</td><td>Wysyła zaproszenie do przestrzeni na podany adres e-mail. UNIQUE(email, workspaceId)</td><td><span class="fn-perm p-adm">ADMIN/OWNER</span></td></tr>
+      <tr><td class="fn-name">getMyInvitations()</td><td>Pobiera listę oczekujących zaproszeń (status = PENDING) dla zalogowanego użytkownika</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+      <tr><td class="fn-name">acceptInvitation(invitationId)</td><td>Akceptuje zaproszenie: zmienia status na ACCEPTED i tworzy rekord WorkspaceMember z rolą MEMBER</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── Profil ─── -->
+<div class="fn-group">
+  <div class="fn-group-title">Profil użytkownika (User Profile)</div>
+  <table class="fn-table">
+    <thead><tr><th style="width:240px">Nazwa funkcji</th><th>Krótki opis</th><th style="width:110px">Uprawnienia</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-name">getMyProfile()</td><td>Pobiera pełny profil zalogowanego użytkownika na podstawie uid z tokenu JWT</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+      <tr><td class="fn-name">updateMyProfile(firstName, lastName, location)</td><td>Aktualizuje imię, nazwisko i lokalizację. Zmiana imienia nie wpływa na istniejące mentionedIds — wzmianki są przechowywane jako UUID</td><td><span class="fn-perm p-sys">Własne</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- legenda -->
+<div class="rel-box" style="margin-top:8px">
+  <div class="rel-item"><span class="fn-perm p-all" style="font-size:.75rem">Każdy</span> — każdy zalogowany członek przestrzeni</div>
+  <div class="rel-item"><span class="fn-perm p-adm" style="font-size:.75rem">ADMIN/OWNER</span> — wymagana rola administratora lub właściciela</div>
+  <div class="rel-item"><span class="fn-perm p-own" style="font-size:.75rem">OWNER</span> — tylko właściciel przestrzeni</div>
+  <div class="rel-item"><span class="fn-perm p-sys" style="font-size:.75rem">Własne</span> — tylko na własnych zasobach użytkownika</div>
+</div>
+
+<!-- ═══════════════════════════════ ANEKSY ═══════════════════════════════ -->
+<div class="section-title">Aneksy</div>
+<p class="intro">
+  Aneksy zawierają na ogół słowniki z dziedziny przedmiotowej systemu, przeznaczone dla twórców systemu,
+  słowniki terminów informatycznych, przeznaczone dla zamawiającego system.
+</p>
+
+<!-- ─── Aneks A ─── -->
+<div class="section-subtitle">Aneks A — Słownik terminów dziedzinowych</div>
+<p class="intro">Terminy z obszaru działania systemu — przeznaczone dla programistów i analityków rozwijających StaffFlow.</p>
+<div class="table-wrapper" style="margin-bottom:28px">
+<table>
+  <thead><tr><th style="width:220px">Termin</th><th>Definicja</th></tr></thead>
+  <tbody>
+    <tr><td class="td-name">Przestrzeń robocza (Workspace)</td><td>Wyodrębniony obszar aplikacji reprezentujący firmę, dział lub projekt. Zawiera kanały, zadania i listę członków z określonymi rolami.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Kanał (Channel)</td><td>Wątek komunikacyjny w przestrzeni roboczej. Typ TEXT umożliwia zapis wszystkim członkom; typ INFO ogranicza zapis wyłącznie do ADMIN i OWNER.</td></tr>
+    <tr><td class="td-name">Kategoria kanałów (ChannelCategory)</td><td>Logiczna grupa kanałów widoczna w sidebarze jako zwijana sekcja. Umożliwia organizację kanałów tematycznie.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Zadanie (Task)</td><td>Jednostka pracy przypisana do jednego lub wielu pracowników, posiadająca czterostanowy cykl życia: Do zrobienia → W toku → Do weryfikacji → Ukończone.</td></tr>
+    <tr><td class="td-name">Tryb INDIVIDUAL</td><td>Tryb zadania, w którym każdy przypisany pracownik realizuje zadanie niezależnie. Postęp każdej osoby śledzony jest osobno.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Tryb GROUP</td><td>Tryb zadania, w którym cały zespół współdzieli jeden status. Pierwsza przesłana odpowiedź przenosi zadanie do weryfikacji.</td></tr>
+    <tr><td class="td-name">Przesłanie wyników (Submission)</td><td>Efekt pracy pracownika — treść tekstowa i/lub pliki wysyłane do oceny przez zlecającego. Po zwrocie możliwe jest ponowne przesłanie.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Weryfikacja zadania (Task Review)</td><td>Proces oceny przesłanych wyników przez tworzącego lub ADMIN/OWNER. Możliwe akcje: Akceptuj (przeniesienie do Ukończone) lub Zwróć z komentarzem (powrót do W toku).</td></tr>
+    <tr><td class="td-name">Wzmianka (Mention)</td><td>Odwołanie do użytkownika za pomocą @ w treści wiadomości. Identyfikatory wzmiankowanych przechowywane są trwale, niezależnie od późniejszych zmian nazwy.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Ankieta (Poll)</td><td>Forma interaktywna w kanale z pytaniem i opcjami odpowiedzi. Obsługuje tryb jednokrotnego i wielokrotnego wyboru. Administrator może zamknąć ankietę.</td></tr>
+    <tr><td class="td-name">Reakcja (Reaction)</td><td>Emoji dodane przez użytkownika do wiadomości. Jeden użytkownik może dodać tylko jedno emoji danego rodzaju do tej samej wiadomości.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Rola systemowa (Role)</td><td>Jedna z trzech ról w przestrzeni: OWNER (właściciel), ADMIN (administrator), MEMBER (członek). Decyduje o uprawnieniach do wykonywania operacji.</td></tr>
+    <tr><td class="td-name">Etykieta roli (WorkspaceRole)</td><td>Opcjonalna niestandardowa nazwa stanowiska (np. „Kierownik projektu") przypisywana przez ADMIN/OWNER do członków przestrzeni.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Wiadomość prywatna (Direct Message)</td><td>Wiadomość 1:1 wysyłana bezpośrednio między dwoma członkami tej samej przestrzeni roboczej. Obsługuje tekst, pliki, edycję i usuwanie.</td></tr>
+    <tr><td class="td-name">Zaproszenie (Invitation)</td><td>Mechanizm dodawania nowych użytkowników do przestrzeni przez wysłanie e-maila. Zaproszony może przyjąć lub odrzucić zaproszenie.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Kod zaproszenia (Invite Code)</td><td>Unikalny identyfikator UUID wygenerowany dla przestrzeni, służący jako alternatywna metoda dołączenia bez konieczności wysyłania e-maila.</td></tr>
+    <tr><td class="td-name">Termin zadania (Due Date)</td><td>Opcjonalna data graniczna wykonania zadania. Pasek na karcie Kanban zmienia kolor w zależności od zbliżającego się terminu lub jego przekroczenia.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ─── Aneks B ─── -->
+<div class="section-subtitle">Aneks B — Słownik terminów informatycznych</div>
+<p class="intro">Terminy techniczne używane w dokumentacji — przeznaczone dla zamawiającego system, nieposiadającego wiedzy programistycznej.</p>
+<div class="table-wrapper" style="margin-bottom:28px">
+<table>
+  <thead><tr><th style="width:220px">Termin</th><th>Definicja</th></tr></thead>
+  <tbody>
+    <tr><td class="td-name">Angular 19</td><td>Framework — gotowe narzędzie do budowy aplikacji webowych. Odpowiada za całą warstwę widoczną dla użytkownika w przeglądarce.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">NestJS 11</td><td>Framework do budowy serwera aplikacji. Odbiera zapytania z przeglądarki, przetwarza je i odpowiada danymi. Działa „za kulisami", niewidoczny dla użytkownika.</td></tr>
+    <tr><td class="td-name">PostgreSQL 15</td><td>Baza danych — program przechowujący wszystkie dane systemu (użytkowników, wiadomości, zadania) w postaci tabel, podobnych do arkuszy kalkulacyjnych.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Prisma ORM</td><td>Narzędzie pośredniczące między kodem aplikacji a bazą danych. Pozwala programistom pracować z danymi bez pisania zapytań SQL w surowej formie.</td></tr>
+    <tr><td class="td-name">Firebase Authentication</td><td>Usługa Google odpowiedzialna za logowanie użytkowników. Sprawdza hasło i wystawia „przepustkę" (token), którą aplikacja wysyła przy każdym kolejnym żądaniu.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">JWT (JSON Web Token)</td><td>Cyfrowa „przepustka" generowana po zalogowaniu. Zawiera zaszyfrowane informacje o użytkowniku. Serwer weryfikuje ją przy każdym żądaniu, by potwierdzić tożsamość.</td></tr>
+    <tr><td class="td-name">REST API</td><td>Sposób komunikacji między przeglądarką a serwerem przez internet. Przeglądarka wysyła zapytania (np. „pobierz wiadomości"), a serwer odsyła odpowiedź z danymi.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">UUID</td><td>Unikalny numer identyfikacyjny generowany losowo dla każdego rekordu. Gwarantuje, że żadne dwa elementy w systemie nie mają tego samego ID.</td></tr>
+    <tr><td class="td-name">SPA (Single Page Application)</td><td>Aplikacja, która ładuje się raz w przeglądarce i dalej działa bez przeładowania strony. Nawigacja między widokami odbywa się natychmiastowo, jak w programach desktopowych.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Tailwind CSS</td><td>Biblioteka gotowych stylów wizualnych. Pozwala szybko nadawać wygląd elementom interfejsu (kolory, rozmiary, odstępy) bez pisania własnych arkuszy CSS.</td></tr>
+    <tr><td class="td-name">Baza relacyjna</td><td>Typ bazy danych, w której dane przechowywane są w tabelach powiązanych ze sobą. Na przykład tabela wiadomości jest powiązana z tabelą użytkowników przez ID autora.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Klucz główny (PK)</td><td>Unikalna wartość jednoznacznie identyfikująca każdy wiersz w tabeli bazy danych. W systemie StaffFlow jest to zawsze UUID.</td></tr>
+    <tr><td class="td-name">Klucz obcy (FK)</td><td>Pole w tabeli, które wskazuje na rekord w innej tabeli. Na przykład wiadomość przechowuje ID kanału, do którego należy — to jest właśnie klucz obcy.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">Indeks (Index)</td><td>Wewnętrzna struktura bazy danych przyspieszająca wyszukiwanie. Działa podobnie jak spis treści w książce — zamiast czytać wszystko, baza od razu trafia do właściwego miejsca.</td></tr>
+    <tr><td class="td-name">Cascade Delete</td><td>Zasada bazy danych: usunięcie rekordu nadrzędnego automatycznie usuwa wszystkie powiązane rekordy. Np. usunięcie przestrzeni usuwa też wszystkie jej kanały i wiadomości.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">CORS</td><td>Mechanizm bezpieczeństwa przeglądarki kontrolujący, które aplikacje webowe mogą rozmawiać z danym serwerem. Serwer StaffFlow zezwala wyłącznie zapytaniom z własnego frontendu.</td></tr>
+    <tr><td class="td-name">Multer</td><td>Moduł serwera obsługujący wysyłanie plików przez użytkowników. Odbiera plik z przeglądarki i zapisuje go na dysku serwera pod unikalną nazwą.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">FormData</td><td>Sposób pakowania danych do wysłania, gdy w żądaniu znajdują się zarówno teksty jak i pliki. Odpowiednik wypełnionego formularza w tradycyjnej poczcie.</td></tr>
+    <tr><td class="td-name">HTTP 200 / 201 / 403 / 404</td><td>Kody odpowiedzi serwera: 200 = OK, 201 = utworzono pomyślnie, 403 = brak uprawnień, 404 = nie znaleziono. Informują przeglądarkę o wyniku wykonywanej operacji.</td></tr>
+    <tr style="background:#f8fafc"><td class="td-name">ORM (Object-Relational Mapping)</td><td>Technika, dzięki której programista pracuje z danymi jak z obiektami w kodzie, zamiast pisać zapytania SQL. Prisma jest ORM-em używanym w tym projekcie.</td></tr>
+  </tbody>
+</table>
+</div>
+
 </div><!-- /content -->
 
 <script>
@@ -960,6 +2134,7 @@ erDiagram
     startOnLoad: true,
     theme: 'default',
     er: { diagramPadding: 20, layoutDirection: 'TB', minEntityWidth: 100, minEntityHeight: 75, entityPadding: 15 },
+    classDiagram: { diagramPadding: 20 },
     securityLevel: 'loose'
   });
 </script>
