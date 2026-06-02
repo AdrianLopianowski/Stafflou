@@ -27,16 +27,16 @@ Projekt zbudowany jest w architekturze Full-Stack z podziałem na warstwę front
 
 ---
 
-## ✨ Zrealizowane Funkcjonalności
+## Zrealizowane Funkcjonalności
 
-### 🔒 Uwierzytelnianie i kontrola dostępu
+### Uwierzytelnianie i kontrola dostępu
 
 - Rejestracja i logowanie przez **Firebase Authentication** (e-mail + hasło, Google OAuth).
 - Weryfikacja tokenów JWT po stronie backendu (`FirebaseAuthGuard`).
 - Ochrona ścieżek frontendu (`AuthGuard`, `GuestGuard`).
 - Onboarding nowego użytkownika (uzupełnienie profilu przy pierwszym logowaniu).
 
-### 🏢 Przestrzenie robocze i zespoły
+### Przestrzenie robocze i zespoły
 
 - Tworzenie wielu **przestrzeni roboczych** (workspace) i przełączanie się między nimi.
 - System ról: **OWNER**, **ADMIN**, **MEMBER** z odpowiednimi uprawnieniami.
@@ -44,7 +44,7 @@ Projekt zbudowany jest w architekturze Full-Stack z podziałem na warstwę front
 - Zapraszanie członków przez e-mail oraz zarządzanie zespołem.
 - Statystyki zadań per członek (przypisane, w toku, ukończone).
 
-### 💬 Komunikacja
+### Komunikacja
 
 - **Kanały** tekstowe (TEXT) i informacyjne (INFO — zapis tylko dla ADMIN/OWNER).
 - **Grupowanie kanałów w kategorie** ze zwijanymi sekcjami w sidebarze.
@@ -53,7 +53,7 @@ Projekt zbudowany jest w architekturze Full-Stack z podziałem na warstwę front
 - **Reakcje emoji**, **przypinanie wiadomości** i **ankiety** (jedno- i wielokrotnego wyboru).
 - **Wiadomości prywatne (DM)** 1:1 z licznikiem nieprzeczytanych i auto-scroll.
 
-### ✅ Zarządzanie zadaniami (Kanban)
+### Zarządzanie zadaniami (Kanban)
 
 - Tablica **Kanban** z czterema kolumnami: _Do zrobienia → W toku → Do weryfikacji → Ukończone_.
 - Dwa tryby realizacji: **indywidualny** (śledzenie postępu każdej osoby osobno) i **grupowy**.
@@ -62,7 +62,7 @@ Projekt zbudowany jest w architekturze Full-Stack z podziałem na warstwę front
 - **Przesyłanie wyników** (tekst i/lub pliki) przez wykonawców.
 - **Przepływ weryfikacji**: zlecający przegląda przesłane wyniki i może je **zaakceptować** lub **zwrócić z komentarzem** do poprawy — indywidualnie dla każdego wykonawcy.
 
-### 🔔 Powiadomienia
+### Powiadomienia
 
 - Powiadomienia o zadaniach (przypisanie, przesłanie, akceptacja, zwrot z komentarzem).
 - Powiadomienia o usunięciu wiadomości przez administratora.
@@ -95,38 +95,112 @@ HR-management-system-app/
 
 ## Uruchomienie projektu (Środowisko deweloperskie)
 
+> **Czytasz to po otrzymaniu projektu w paczce ZIP?** Przejdź najpierw do sekcji
+> [Pełny poradnik uruchomienia od zera](#-pełny-poradnik-uruchomienia-od-zera).
+
 ### Wymagania wstępne
 
-- Node.js (wersja 20+)
-- Angular CLI (`npm install -g @angular/cli`)
-- Docker i Docker Compose (dla bazy danych)
+- **Node.js** (wersja 20+) — [nodejs.org](https://nodejs.org)
+- **Angular CLI** — `npm install -g @angular/cli`
+- **Docker Desktop** — [docker.com](https://www.docker.com/products/docker-desktop) (dla bazy danych)
 
-### 1. Baza danych (PostgreSQL przez Docker)
+### Szybki start
 
-W katalogu głównym uruchom kontener bazy danych:
+```bash
+# 1. Baza danych (z katalogu głównego)
+docker compose up -d
+
+# 2. Backend
+cd backend
+npm install
+npx prisma db push
+npm run start:dev          # API na http://localhost:3000
+
+# 3. Frontend (w nowym terminalu)
+cd frontend
+npm install
+ng serve                   # aplikacja na http://localhost:4200
+```
+
+> Baza nasłuchuje na porcie **5435** (mapowanie `5435:5432`). Dane logowania definiowane są w pliku `backend/.env`.
+
+---
+
+## 📦 Pełny poradnik uruchomienia od zera
+
+Instrukcja dla osoby, która uruchamia go po raz pierwszy.
+
+### Krok 1 — Zainstaluj wymagane programy
+
+| Program            | Do czego                            | Skąd pobrać                                                  |
+| ------------------ | ----------------------------------- | ------------------------------------------------------------ |
+| **Node.js 20+**    | uruchomienie frontendu i backendu   | [nodejs.org](https://nodejs.org)                             |
+| **Docker Desktop** | baza danych PostgreSQL w kontenerze | [docker.com](https://www.docker.com/products/docker-desktop) |
+
+> **Docker Desktop musi być uruchomiony** zanim wykonasz kolejne kroki.
+> Angular CLI nie jest wymagane globalnie — w instrukcji używamy `npx`.
+
+### Krok 2 — Sprawdź pliki konfiguracyjne
+
+Projekt wymaga dwóch plików z konfiguracją. **W tej paczce powinny już się znajdować** —
+sprawdź, czy istnieją:
+
+- `backend/.env` — dane połączenia z bazą i klucze Firebase (po stronie serwera)
+- `frontend/src/environments/environment.ts` — konfiguracja Firebase (po stronie przeglądarki)
+
+### Krok 3 — Uruchom bazę danych
+
+W katalogu głównym projektu (tam gdzie jest `docker-compose.yml`):
 
 ```bash
 docker compose up -d
 ```
 
-> Baza nasłuchuje na porcie **5435** (mapowanie `5435:5432`). Dane logowania definiowane są w pliku `backend/.env`.
+Spowoduje to pobranie i uruchomienie PostgreSQL w kontenerze na porcie **5435**.
+Sprawdź, czy działa: `docker ps` — powinien być widoczny kontener `stafflou_db`.
 
-### 2. Backend (NestJS)
+### Krok 4 — Uruchom backend
 
 ```bash
 cd backend
-npm install
-npx prisma db push        # synchronizacja schematu z bazą
-npm run start:dev         # serwer dev na http://localhost:3000
+npm install                # instalacja zależności (kilka minut)
+npx prisma db push         # utworzenie tabel w bazie
+npm run start:dev          # uruchomienie serwera API
 ```
 
-### 3. Frontend (Angular)
+Backend działa, gdy w konsoli pojawi się komunikat nasłuchiwania na **http://localhost:3000**.
+Zostaw ten terminal otwarty.
+
+### Krok 5 — Uruchom frontend
+
+Otwórz **nowy terminal** (backend musi działać równolegle):
 
 ```bash
 cd frontend
-npm install
-ng serve                  # aplikacja na http://localhost:4200
+npm install                # instalacja zależności (kilka minut)
+npx ng serve               # uruchomienie aplikacji
 ```
+
+### Krok 6 — Otwórz aplikację
+
+Wejdź w przeglądarce na **http://localhost:4200**, zarejestruj nowe konto
+i utwórz swoją pierwszą przestrzeń roboczą.
+
+> **Baza startuje pusta** — po rejestracji konta wszystko tworzysz od zera
+> (przestrzenie, kanały, zadania).
+
+---
+
+## Najczęstsze problemy
+
+| Problem                                | Przyczyna i rozwiązanie                                                                          |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `docker: command not found`            | Docker Desktop nie jest zainstalowany lub nie został uruchomiony.                                |
+| Backend: `Can't reach database server` | Kontener bazy nie działa — uruchom `docker compose up -d` i poczekaj kilka sekund.               |
+| Port `5435` / `3000` / `4200` zajęty   | Inny program używa portu. Zatrzymaj go lub zmień port (np. `ng serve --port 4300`).              |
+| Logowanie nie działa / błąd Firebase   | Brakuje lub błędny `environment.ts`, albo projekt Firebase nie zezwala na daną metodę logowania. |
+| `prisma db push` zgłasza błąd          | Baza nie wystartowała jeszcze w pełni — odczekaj chwilę i powtórz.                               |
+| Frontend nie łączy się z API           | Backend nie działa lub działa na innym porcie niż `http://localhost:3000`.                       |
 
 ---
 
@@ -139,5 +213,3 @@ ng serve                  # aplikacja na http://localhost:4200
   - Diagramy sekwencji (interakcji)
   - Analiza obiektowa i katalog funkcji systemu
   - Słowniki terminów (dziedzinowych i informatycznych)
-- **`Projekt.docx`** — dokumentacja projektowa zgodna z wymaganiami pracy inżynierskiej.
-- **`diagrams/`** — diagramy wyeksportowane do plików PNG.
