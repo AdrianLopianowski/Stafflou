@@ -19,6 +19,7 @@ import {
   signOut,
 } from '@angular/fire/auth';
 
+// Walidator hasla
 function passwordValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value || '';
   const hasUppercase = /[A-Z]/.test(value);
@@ -31,6 +32,7 @@ function passwordValidator(control: AbstractControl): ValidationErrors | null {
   return Object.keys(errors).length > 0 ? errors : null;
 }
 
+// Komponent rejestracji
 @Component({
   selector: 'app-register',
   imports: [RouterLink, ReactiveFormsModule],
@@ -45,6 +47,7 @@ export class RegisterComponent {
   errorMessage: string | null = null;
   isLoading: boolean = false;
 
+  // Definicja formularza
   registerForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -55,6 +58,7 @@ export class RegisterComponent {
     ]),
   });
 
+  // Obsluga wyslania
   async onSubmit() {
     if (this.registerForm.valid) {
       this.isLoading = true;
@@ -91,6 +95,7 @@ export class RegisterComponent {
     }
   }
 
+  // Logowanie przez Google
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
     try {
@@ -102,3 +107,4 @@ export class RegisterComponent {
     }
   }
 }
+

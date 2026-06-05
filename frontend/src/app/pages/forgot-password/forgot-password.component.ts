@@ -9,6 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 
+// Komponent resetowania hasla
 @Component({
   selector: 'app-forgot-password',
   imports: [RouterLink, ReactiveFormsModule],
@@ -18,10 +19,12 @@ import {
 export class ForgotPasswordComponent {
   public themeService = inject(ThemeService);
 
+  // Definicja formularza
   forgotPasswordForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
   });
 
+  // Obsluga wyslania
   onSubmit() {
     if (this.forgotPasswordForm.valid) {
       console.log(
@@ -33,3 +36,4 @@ export class ForgotPasswordComponent {
     }
   }
 }
+

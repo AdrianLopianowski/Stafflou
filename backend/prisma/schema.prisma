@@ -4,15 +4,18 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// Generator klienta
 generator client {
   provider = "prisma-client-js"
 }
 
+// Polaczenie z baza danych
 datasource db {
   provider = "postgresql"
   url = env("DATABASE_URL")
 }
 
+// Sekcja kanaly i kategorie
 enum ChannelType {
   TEXT
   INFO
@@ -42,6 +45,7 @@ model Channel {
   polls     Poll[]
 }
 
+// Sekcja uzytkownicy
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -62,6 +66,7 @@ model User {
   tasksCreated        Task[]       @relation("TaskCreator")
 }
 
+// Sekcja przestrzenie i role
 model Workspace {
   id         String   @id @default(uuid())
   name       String
@@ -107,6 +112,7 @@ enum Role {
   ADMIN    
   MEMBER   
 }
+// Sekcja komunikacja i wiadomosci
 model Message {
   id           String   @id @default(uuid())
   content      String?
@@ -176,6 +182,7 @@ model DeleteNotification {
 
   user  User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+// Sekcja zadania i weryfikacja
 enum TaskStatus {
   TODO
   IN_PROGRESS
@@ -238,11 +245,12 @@ model TaskNotification {
   type        String   @default("ASSIGNED")
   comment     String?
   isRead      Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  createdAt      DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Sekcja zaproszenia
 model Invitation {
   id          String   @id @default(uuid())
   email       String
@@ -256,15 +264,16 @@ model Invitation {
   @@unique([email, workspaceId])
 }
 
+// Sekcja wiadomosci prywatne
 model DirectMessage {
   id          String   @id @default(uuid())
   workspaceId String
   senderId    String
   recipientId String
   content     String?
-  fileUrl     String?
-  fileName    String?
-  fileType    String?
+  fileUrl      String?
+  fileName     String?
+  fileType     String?
   isRead      Boolean  @default(false)
   isEdited    Boolean  @default(false)
   createdAt   DateTime @default(now())

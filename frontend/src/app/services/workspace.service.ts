@@ -6,12 +6,14 @@ import { firstValueFrom } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
+// Serwis API
 export class WorkspaceService {
   private http = inject(HttpClient);
   private auth = inject(Auth);
 
   private apiUrl = 'http://localhost:3000/workspaces';
 
+  // Pobieranie tokenu
   private async getHeaders() {
     const user = this.auth.currentUser;
     if (!user) throw new Error('Użytkownik nie jest zalogowany!');
@@ -19,6 +21,7 @@ export class WorkspaceService {
     return { Authorization: `Bearer ${token}` };
   }
 
+  // Sekcja przestrzenie
   async createWorkspace(name: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(this.apiUrl, { name }, { headers }));
@@ -35,6 +38,7 @@ export class WorkspaceService {
       this.http.get(`${this.apiUrl}/${workspaceId}/channels`, { headers }),
     );
   }
+  // Sekcja profil
   async getMyProfile() {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -53,6 +57,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja kanaly
   async createChannel(workspaceId: string, name: string, type: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -81,6 +86,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja ankiety
   async getPolls(workspaceId: string, channelId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -125,6 +131,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja wiadomosci
   async getMessages(workspaceId: string, channelId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -228,6 +235,7 @@ export class WorkspaceService {
       ),
     );
   }
+  // Sekcja zaproszenia
   async getMyInvitations() {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -246,6 +254,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja czlonkowie
   async getMembers(workspaceId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -288,6 +297,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja role
   async getWorkspaceRoles(workspaceId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -346,6 +356,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja kategorie
   async getCategories(workspaceId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -402,6 +413,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja zadania
   async getTasks(workspaceId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(
@@ -504,6 +516,7 @@ export class WorkspaceService {
     );
   }
 
+  // Sekcja wiadomosci prywatne
   async getDMConversations(workspaceId: string) {
     const headers = await this.getHeaders();
     return firstValueFrom(

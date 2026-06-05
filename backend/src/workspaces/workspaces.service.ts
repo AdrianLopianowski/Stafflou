@@ -11,8 +11,9 @@ import * as path from 'path';
 
 @Injectable()
 export class WorkspacesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
+  // Sekcja przestrzenie
   create(createWorkspaceDto: CreateWorkspaceDto) {
     return this.prisma.workspace.create({
       data: {
@@ -65,6 +66,7 @@ export class WorkspacesService {
     });
   }
 
+  // Sekcja kanaly i kategorie
   async getChannels(workspaceId: string) {
     const prismaAny = this.prisma as any;
     return prismaAny.channel.findMany({
@@ -190,6 +192,7 @@ export class WorkspacesService {
     });
   }
 
+  // Sekcja wiadomosci i ankiety
   async getMessages(channelId: string) {
     const prismaAny = this.prisma as any;
     const messages = await prismaAny.message.findMany({
@@ -408,6 +411,7 @@ export class WorkspacesService {
     }
   }
 
+  // Sekcja czlonkowie i role
   async getMembers(workspaceId: string) {
     const prismaAny = this.prisma as any;
     const members = await prismaAny.workspaceMember.findMany({
@@ -673,7 +677,7 @@ export class WorkspacesService {
       const filePath = path.join(process.cwd(), 'uploads', filename);
       try {
         fs.unlinkSync(filePath);
-      } catch {}
+      } catch { }
     }
 
     await this.prisma.message.delete({ where: { id: messageId } });
@@ -788,6 +792,7 @@ export class WorkspacesService {
     });
   }
 
+  // Sekcja zadania i weryfikacja
   async getTasks(workspaceId: string) {
     const prismaAny = this.prisma as any;
     return prismaAny.task.findMany({
@@ -949,7 +954,7 @@ export class WorkspacesService {
     const completedByIds: string[] = task.completedByIds || [];
     const assigneeIds: string[] = task.assigneeIds || [];
 
-    // Per-assignee review (INDIVIDUAL mode only)
+    // Weryfikacja indywidualna
     if (targetUserId && task.submissionMode === 'INDIVIDUAL') {
       if (action === 'ACCEPT') {
         const newReviewByIds = reviewByIds.filter((id) => id !== targetUserId);
@@ -991,7 +996,7 @@ export class WorkspacesService {
       }
     }
 
-    // All-at-once (GROUP mode or explicit all-review)
+    // Weryfikacja grupowa
     if (action === 'ACCEPT') {
       const updated = await prismaAny.task.update({
         where: { id: taskId },
@@ -1156,6 +1161,7 @@ export class WorkspacesService {
     return { success: true };
   }
 
+  // Sekcja wiadomosci prywatne
   async getDMConversations(workspaceId: string, userId: string) {
     const members = await this.prisma.workspaceMember.findMany({
       where: { workspaceId, NOT: { userId } },

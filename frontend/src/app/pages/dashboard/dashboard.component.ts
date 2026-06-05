@@ -13,6 +13,7 @@ import { ThemeService } from '../../services/theme.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
+// Glowny panel aplikacji
 export class DashboardComponent implements OnInit {
   public auth = inject(Auth);
   private router = inject(Router);
@@ -28,9 +29,11 @@ export class DashboardComponent implements OnInit {
     setTimeout(() => {
       try {
         el.nativeElement.scrollTop = el.nativeElement.scrollHeight;
-      } catch (_) {}
+      } catch (_) { }
     }, 0);
   }
+
+  // Stan komponentu
   workspaces: any[] = [];
   activeWorkspace: any = null;
   activeChannel: any = null;
@@ -155,7 +158,6 @@ export class DashboardComponent implements OnInit {
   reviewModalPhase: 'view' | 'return' = 'view';
   isReviewingTask = false;
 
-  // Per-submission return state (INDIVIDUAL mode)
   reviewingTargetUser: string | null = null;
   reviewTargetComment = '';
   isReviewingTarget = false;
@@ -170,6 +172,7 @@ export class DashboardComponent implements OnInit {
   assignChannelCategoryTarget: any = null;
   isAssigningCategory = false;
 
+  // Inicjalizacja komponentu
   ngOnInit() {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
@@ -190,6 +193,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  // Sekcja przestrzenie
   async loadWorkspaces() {
     this.isLoadingWorkspaces = true;
     try {
@@ -212,6 +216,7 @@ export class DashboardComponent implements OnInit {
       this.isLoadingWorkspaces = false;
     }
   }
+  // Sekcja kanaly i wiadomosci
   async loadMessages() {
     if (!this.activeWorkspace || !this.activeChannel) return;
     try {
@@ -649,7 +654,7 @@ export class DashboardComponent implements OnInit {
       await this.workspaceService.updateMyProfile(this.settingsData);
       this.myProfile = { ...this.myProfile, ...this.settingsData };
       this.isSettingsModalOpen = false;
-      // Refresh members and messages so new name appears immediately everywhere
+
       if (this.activeWorkspace) {
         await this.loadMembers(this.activeWorkspace.id);
         if (this.activeChannel) await this.loadMessages();
@@ -1074,6 +1079,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  // Sekcja wiadomosci prywatne
   async loadDMConversations() {
     if (!this.activeWorkspace) return;
     try {
@@ -1203,6 +1209,7 @@ export class DashboardComponent implements OnInit {
     return this.members.filter((m) => m.userId !== uid);
   }
 
+  // Sekcja zadania
   async loadTasks(workspaceId: string) {
     try {
       this.tasks = (await this.workspaceService.getTasks(workspaceId)) as any[];
@@ -1215,8 +1222,6 @@ export class DashboardComponent implements OnInit {
     const uid = this.auth.currentUser?.uid;
     if (!uid) return task.status;
 
-    // Creator and admins always see the global REVIEW/DONE status directly —
-    // so they land in the right column regardless of whether they're also an assignee.
     const isCreator = task.createdById === uid;
     const isAdminOrOwner = ['OWNER', 'ADMIN'].includes(this.currentUserRole);
     if ((isCreator || isAdminOrOwner) && (task.status === 'REVIEW' || task.status === 'DONE')) {
@@ -1300,7 +1305,7 @@ export class DashboardComponent implements OnInit {
   priorityLabel(priority: string): string {
     return (
       { LOW: 'Niski', MEDIUM: 'Średni', HIGH: 'Wysoki', URGENT: 'Pilny' }[
-        priority
+      priority
       ] ?? priority
     );
   }
@@ -1494,7 +1499,7 @@ export class DashboardComponent implements OnInit {
   submissionTypeLabel(type: string): string {
     return (
       { NONE: 'Brak', TEXT: 'Opis tekstowy', FILE: 'Plik', BOTH: 'Opis i plik' }[
-        type
+      type
       ] ?? type
     );
   }
@@ -1534,11 +1539,11 @@ export class DashboardComponent implements OnInit {
   isMentionedInMessage(msg: any): boolean {
     const uid = this.auth.currentUser?.uid;
     if (!uid) return false;
-    // Check stored mentionedIds (works even after name changes)
+
     if (msg.mentionedIds?.length) {
       return msg.mentionedIds.includes(uid);
     }
-    // Fallback: text-based match for messages without mentionedIds
+
     const content = typeof msg === 'string' ? msg : msg?.content;
     if (!content || !this.myProfile) return false;
     const myName =
@@ -1761,6 +1766,7 @@ export class DashboardComponent implements OnInit {
     return this.collapsedCategories.has(categoryId);
   }
 
+  // Sekcja kategorie
   async createCategory() {
     if (!this.newCategoryName.trim() || !this.activeWorkspace) return;
     this.isCreatingCategory = true;

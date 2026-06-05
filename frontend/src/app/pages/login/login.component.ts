@@ -18,6 +18,7 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
+// Komponent logowania
 @Component({
   selector: 'app-login',
   imports: [RouterLink, ReactiveFormsModule],
@@ -33,11 +34,13 @@ export class LoginComponent {
   errorMessage: string | null = null;
   isLoading: boolean = false;
 
+  // Definicja formularza
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required]),
   });
 
+  // Synchronizacja z backendem
   private async syncUserWithBackend(user: any) {
     const token = await user.getIdToken();
 
@@ -52,6 +55,7 @@ export class LoginComponent {
     );
   }
 
+  // Obsluga wyslania
   async onSubmit() {
     if (this.loginForm.valid) {
       this.isLoading = true;
@@ -92,6 +96,7 @@ export class LoginComponent {
     }
   }
 
+  // Logowanie przez Google
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
     try {
@@ -106,3 +111,4 @@ export class LoginComponent {
     }
   }
 }
+
